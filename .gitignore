@@ -1,0 +1,65 @@
+# ==============================================================================
+# .gitignore — QIA-Correction
+# Configurado según D-019 / v0.1-001 (Python/FastAPI, Node/React, WSL y herramientas IA)
+# ==============================================================================
+
+# ------------------------------------------------------------------------------
+# 1. Variables de entorno y secretos (¡CRÍTICO: NUNCA SUBIR ENTORNO FISICO!)
+# ------------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# ------------------------------------------------------------------------------
+# 2. Entornos virtuales y cachés de Python (Backend)
+# ------------------------------------------------------------------------------
+venv/
+.venv/
+env/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# ------------------------------------------------------------------------------
+# 3. Dependencias de Node.js / React (Frontend)
+# ------------------------------------------------------------------------------
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+dist-frontend/
+
+# ------------------------------------------------------------------------------
+# 4. Archivos locales de subida y temporales
+# ------------------------------------------------------------------------------
+uploads/
+*.tmp
+*.log
+
+# ------------------------------------------------------------------------------
+# 5. Sistema operativo y herramientas de desarrollo (WSL / Windows / VS Code)
+# ------------------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# ------------------------------------------------------------------------------
+# 6. Carpetas y archivos de herramientas IA locales (Antigravity / OpenCode)
+# ------------------------------------------------------------------------------
+.gemini/
+.opencode/logs/
+scratch/
