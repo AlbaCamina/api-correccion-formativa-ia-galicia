@@ -17,18 +17,18 @@ El objetivo primordial del módulo es garantizar el **derecho legal del alumnado
 
 ### 1.1. Doble Circuito Operativo de Calificación en Galicia (Materias vs. Competencias)
 
-Antes de abordar las adaptaciones curriculares, QIA-Correction se cimienta sobre la legislación general de evaluación y la práctica real y cotidiana en las juntas de evaluación y en las herramientas oficiales de la Xunta de Galicia (Decretos 156/2022 y 157/2022, y Orden de 26 de mayo de 2023), operando bajo un **Doble Circuito de Calificación**:
+Antes de abordar las adaptaciones curriculares, api-correccion-formativa-ia-galicia se cimienta sobre la legislación general de evaluación y la práctica real y cotidiana en las juntas de evaluación y en las herramientas oficiales de la Xunta de Galicia (Decretos 156/2022 y 157/2022, y Orden de 26 de mayo de 2023), operando bajo un **Doble Circuito de Calificación**:
 
 1. **Circuito de Materias (Calificación Numérica Cotidiana, Trimestral y Final Ordinaria):**  
    En las evaluaciones trimestrales (1ª, 2ª, 3ª) y en la evaluación final ordinaria/extraordinaria, cada asignatura (*Matemáticas, Lengua Castellana, Bioloxía e Xeoloxía, Historia...*) se califica y cierra en las actas con **números enteros del 1 al 10** (adjuntando un decimal en Bachillerato). Para obtener ese número trimestral, a lo largo de las semanas y meses del curso el docente califica el día a día y las **pruebas o instrumentos evaluables** con una nota numérica cotidiana en su cuaderno de profesor (ej. *"Tienes un 7,2 en el mural de cartulina"*, *"Un 8,5 en la presentación de Canva"*, *"Un 6,4 en el control de saberes básicos"*). Estas notas numéricas cotidianas son indispensables para que el profesor pueda ponderar sus instrumentos de evaluación y para que el alumno (y su familia) comprendan con exactitud matemática y precisión su evolución real mes a mes.
    
-   En la Secundaria y Bachillerato actual, una **prueba o instrumento evaluable (Omni-canalidad total)** abarca un abanico riquísimo de tres grandes soportes que QIA-Correction procesa con el mismo rigor:
+   En la Secundaria y Bachillerato actual, una **prueba o instrumento evaluable (Omni-canalidad total)** abarca un abanico riquísimo de tres grandes soportes que api-correccion-formativa-ia-galicia procesa con el mismo rigor:
    * **Soportes físicos y creativos:** Murales de cartulina infográficos colgados en la pared, maquetas, prácticas de laboratorio en papel o mapas conceptuales a mano (mediante captura fotográfica).
    * **Soportes digitales:** Presentaciones grupales o individuales diseñadas en *Canva*, *Google Slides* o *Genially*, redacciones online en plataformas escolares o cuestionarios interactivos.
    * **Soportes tradicionales:** Exámenes escritos, comentarios de texto manuscritos o resolución de problemas matemáticos en folio.
 2. **Circuito de Competencias Clave (Cruce Matricial Inter-Materias):**  
    Las 8 Competencias Clave del currículo (*CCL, STEM, CD, CPSAA, CC, CE, CCEC, CP*) no son evaluadas aisladamente por un único profesor ni materia. Al final del curso, el sistema informático del centro (ej. XADE) realiza un **cruce e intersección matricial** de las calificaciones de los criterios de evaluación (`criterio_id`) acumulados en todas las asignaturas impartidas al alumno. De ese cruce global brota la calificación cualitativa oficial del informe competencial y de titulación: *Insuficiente (IN)*, *Suficiente (SU)*, *Bien (BI)*, *Notable (NT)* y *Sobresaliente (SB)*.
-3. **El Rol Sincronizador de QIA-Correction:**  
+3. **El Rol Sincronizador de api-correccion-formativa-ia-galicia:**  
    Al evaluar una prueba concreta en el día a día, el motor de IA devuelve simultáneamente la **nota numérica cotidiana (`nota_numerica`)** para alimentar el cuaderno del profesor y el cierre trimestral de la materia, y la **calificación cualitativa con desglose criterial (`competencias_criterios`)** para nutrir de forma transparente y auditable el registro inter-materias del colegio.
 
 ### 1.2. Autonomía Pedagógica y Criterios Transversales de Centro (Art. 120 LOMLOE / PEC / CCP)
@@ -60,47 +60,47 @@ En una clase estándar de 30 alumnos de ESO o Bachillerato en Galicia, el docent
 | **TEA Grado 1** (Trastorno del Espectro Autista / Síndrome de Asperger) | NEE / ACNS o ACS | Literalidad en la interpretación del lenguaje, dificultad ante preguntas abiertas y ambiguas | **Enunciados directos y estructurados.** Evitar dobles negaciones, ironías o preguntas implícitas. Uso de apoyos visuales o esquemas. |
 | **Altas Capacidades Intelectuales** | NEAE / ACIS | Disincronía, aburrimiento ante tareas mecánicas, pensamiento divergente | **Valoración de soluciones creativas o no estándares.** Posibilidad de profundización y enriquecimiento curricular en la respuesta. |
 
-### 1.5. Diagnóstico de la Realidad Docente en Galicia: Necesidades, Dificultades y Soluciones QIA-Correction
+### 1.5. Diagnóstico de la Realidad Docente en Galicia: Necesidades, Dificultades y Soluciones api-correccion-formativa-ia-galicia
 
 El estudio de los comunicados sindicales en Galicia (*CIG-Ensino, ANPE Galicia, UGT-SP*), publicaciones docentes y foros de profesores de Educación Secundaria revela un diagnóstico unánime: **el profesorado no rechaza el espíritu pedagógico de la evaluación competencial (LOMLOE / Decretos 156/157/2022), sino el colapso burocrático y técnico que su implementación manual impone en las aulas**. 
 
-A continuación se sintetizan las cuatro grandes dificultades del día a día en los IES gallegos y la respuesta tecnológica diseñada en QIA-Correction:
+A continuación se sintetizan las cuatro grandes dificultades del día a día en los IES gallegos y la respuesta tecnológica diseñada en api-correccion-formativa-ia-galicia:
 
 1. **La "Neolengua Burocrática" y la Explosión Combinatoria de Registros:**
    * *El Dolor Docente:* El paso de calificar contenidos aislados a evaluar una jerarquía arborescente de ítems (*Competencias Clave → Descriptores Operativos → Competencias Específicas → Criterios de Evaluación*) ha multiplicado exponencialmente la carga administrativa. En un departamento con 150 alumnos (5 grupos de 30), evaluar 4 criterios por examen exige 600 registros manuales y ponderaciones por prueba.
-   * *Respuesta QIA-Correction:* El docente sube la foto o documento digital de la prueba evaluable. El motor LLM cruza automáticamente la entrega con la Programación del Departamento (`marcos_evaluacion en JSONB`) y devuelve al instante el desglose criterial y la nota numérica/cualitativa de cada alumno, eliminando el 100% de la fricción burocrática del registro.
+   * *Respuesta api-correccion-formativa-ia-galicia:* El docente sube la foto o documento digital de la prueba evaluable. El motor LLM cruza automáticamente la entrega con la Programación del Departamento (`marcos_evaluacion en JSONB`) y devuelve al instante el desglose criterial y la nota numérica/cualitativa de cada alumno, eliminando el 100% de la fricción burocrática del registro.
 2. **La Paradoja de las Rúbricas (Falta de Tiempo vs. Seguridad Jurídica):**
    * *El Dolor Docente:* El profesorado reconoce que evaluar mediante rúbricas es el método más equitativo y seguro para evitar reclamaciones ante la inspección educativa. Sin embargo, diseñar, calibrar y rellenar rúbricas manuales para cada instrumento de evaluación consume una cantidad inasumible de horas fuera del horario lectivo.
-   * *Respuesta QIA-Correction:* Incorporamos el **Generador Asistido de Rúbricas (Copiloto Pre-Corrección en Capa 4)**. El profesor aporta el enunciado o describe la tarea en 10 segundos, y la IA propone automáticamente la tabla de evaluación en 4 niveles (*IN, SU, BI, NT/SB*) vinculada al decreto gallego, reduciendo el tiempo de preparación de horas a segundos.
+   * *Respuesta api-correccion-formativa-ia-galicia:* Incorporamos el **Generador Asistido de Rúbricas (Copiloto Pre-Corrección en Capa 4)**. El profesor aporta el enunciado o describe la tarea en 10 segundos, y la IA propone automáticamente la tabla de evaluación en 4 niveles (*IN, SU, BI, NT/SB*) vinculada al decreto gallego, reduciendo el tiempo de preparación de horas a segundos.
 3. **Incertidumbre en la Ponderación y el "Paso a la Calificación Final" (XADE):**
    * *El Dolor Docente:* Existe inseguridad jurídica a la hora de transformar las valoraciones cualitativas de los criterios en la calificación final de la materia en XADE o en los boletines trimestrales.
-   * *Respuesta QIA-Correction:* Nuestro contrato JSON (`Structured Output` / `[D-024]`) devuelve de forma dual y sincronizada tanto la **Nota Numérica Cotidiana (`nota_numerica`)** para la gestión diaria del cuaderno del docente, como la **Calificación Cualitativa (`calificacion_cualitativa`)** justificada criterialmente con su índice de confianza (`confidence_score`), garantizando un respaldo probatorio total bajo el *AI Act* (*Human-in-the-Loop*).
+   * *Respuesta api-correccion-formativa-ia-galicia:* Nuestro contrato JSON (`Structured Output` / `[D-024]`) devuelve de forma dual y sincronizada tanto la **Nota Numérica Cotidiana (`nota_numerica`)** para la gestión diaria del cuaderno del docente, como la **Calificación Cualitativa (`calificacion_cualitativa`)** justificada criterialmente con su índice de confianza (`confidence_score`), garantizando un respaldo probatorio total bajo el *AI Act* (*Human-in-the-Loop*).
 4. **Parálisis y Riesgo de Error en Adaptaciones Curriculares Masificadas:**
    * *El Dolor Docente:* Con ratios de 30 alumnos y una media de 3 a 5 estudiantes con adaptaciones curriculares en cada aula (*Dislexia, TDAH, TEA, Altas Capacidades*), el docente se arriesga constantemente a penalizar por error a un alumno que tiene derecho legal a la exclusión de faltas ortográficas o a una escala de corrección diferente.
-   * *Respuesta QIA-Correction:* La **Capa 5 (`adaptaciones_alumno en JSONB`)** actúa como filtro soberano de equidad. Separa automáticamente los errores excluidos por diagnóstico en marcadores grises neutros (*GRAY_NEUTRAL*) sin afectar a la nota final del contenido, protegiendo al menor y liberando al profesor de cálculos paralelos en tiempo real.
+   * *Respuesta api-correccion-formativa-ia-galicia:* La **Capa 5 (`adaptaciones_alumno en JSONB`)** actúa como filtro soberano de equidad. Separa automáticamente los errores excluidos por diagnóstico en marcadores grises neutros (*GRAY_NEUTRAL*) sin afectar a la nota final del contenido, protegiendo al menor y liberando al profesor de cálculos paralelos en tiempo real.
 
-### 1.6. Situaciones de Aprendizaje (SdA), Equipotencialidad Criterial y Ponderación de Instrumentos en QIA-Correction
+### 1.6. Situaciones de Aprendizaje (SdA), Equipotencialidad Criterial y Ponderación de Instrumentos en api-correccion-formativa-ia-galicia
 
 El modelo de evaluación competencial prescrito en los Decretos gallegos 156/157/2022 y la Orden de 26 de mayo de 2023 exige una transformación profunda en cómo se conciben las actividades, cómo se ponderan los ítems y cómo opera el cálculo matemático en los centros educativos:
 
 1. **Las Situaciones de Aprendizaje (SdA) como Contenedor Padre (`Parent Container`):**
    * *Mandato Normativo:* Una Situación de Aprendizaje no es un tema del libro ni un examen aislado; es una propuesta metodológica o tarea reto contextualizada (en un entorno real o simulado cercano al alumnado) que moviliza e integra los saberes básicos para resolver un problema. Su trazabilidad es innegociable: `[Situación de Aprendizaje / Reto]` → moviliza `[Saberes Básicos]` → para desarrollar `[Competencias Específicas]` → que se miden mediante `[Criterios de Evaluación]` → vinculados al `[Perfil de Salida / Descriptores Operativos]`.
-   * *Implementación en QIA-Correction:* En la `Capa 2` (Programación Didáctica), el docente estructura la base de datos creando la entidad `situacion_aprendizaje_id`. Todas las pruebas o instrumentos evaluables omni-canal realizadas por el estudiante durante esa unidad se asocian a dicho contenedor padre, permitiendo al sistema consolidar y certificar el nivel cualitativo de las competencias al finalizar el reto.
+   * *Implementación en api-correccion-formativa-ia-galicia:* En la `Capa 2` (Programación Didáctica), el docente estructura la base de datos creando la entidad `situacion_aprendizaje_id`. Todas las pruebas o instrumentos evaluables omni-canal realizadas por el estudiante durante esa unidad se asocian a dicho contenedor padre, permitiendo al sistema consolidar y certificar el nivel cualitativo de las competencias al finalizar el reto.
 2. **Ponderación de Criterios vs. Instrumentos y Principio de Equipotencialidad:**
    * *Legalidad estricta (`Criterios > Instrumentos`):* Según la LOMLOE, la calificación no se pondera sobre instrumentos ("el examen vale el 60% y el cuaderno el 40%"), lo cual resulta contrario a derecho. Los instrumentos (el mural, la redacción en *Canva*, la prueba escrita) son únicamente **medios o soportes** de recogida de evidencias. Lo que posee calificación y peso oficial en la nota son los **Criterios de Evaluación (`criterio_id`)**.
    * *Equipotencialidad por defecto:* Salvo disposición explícita en contra por parte del departamento en su programación didáctica (`Capa 2`), todos los criterios de evaluación asociados a las competencias específicas se consideran **equipotenciales** (tienen idéntico valor en la nota de la materia). No obstante, la autonomía pedagógica permite que el departamento asigne porcentajes diferenciados en `JSONB` (`peso_en_materia`) a aquellos criterios nucleares o de desarrollo continuo a lo largo del curso.
 3. **El Motor Matemático Invisible en 3 Pasos:**
-   Para descargar al docente de cálculos aritméticos complejos y asegurar compatibilidad con la plataforma autonómica oficial **XADE (`Xestión Administrativa da Educación`)**, QIA-Correction opera en tres fases sincronizadas:
+   Para descargar al docente de cálculos aritméticos complejos y asegurar compatibilidad con la plataforma autonómica oficial **XADE (`Xestión Administrativa da Educación`)**, api-correccion-formativa-ia-galicia opera en tres fases sincronizadas:
    * **Fase 1 (Nota Numérica Cotidiana por Instrumento):** Al corregir un instrumento concreto (ej. un mural de cartulina donde el Criterio 1.1 vale un 70% y el Criterio 3.2 un 30% local), el LLM evalúa ambos ítems (`8.0` y `6.0`) y calcula la **Nota Numérica Cotidiana (`nota_numerica: 7.4`)** que el docente registra en su cuaderno diario para retroalimentación inmediata del estudiante.
-   * **Fase 2 (Acumulación en el Historial de Criterios):** En segundo plano, QIA-Correction almacena y actualiza el historial criterial del alumno (`registro_criterios_alumno`), acumulando las evidencias obtenidas en los distintos instrumentos omni-canal.
+   * **Fase 2 (Acumulación en el Historial de Criterios):** En segundo plano, api-correccion-formativa-ia-galicia almacena y actualiza el historial criterial del alumno (`registro_criterios_alumno`), acumulando las evidencias obtenidas en los distintos instrumentos omni-canal.
    * **Fase 3 (Cierre de Actas en XADE):** Al celebrarse las juntas de evaluación trimestral u ordinaria, el motor calcula automáticamente la nota media o formativa por cada `criterio_id` (aplicando la equipotencialidad o el porcentaje de la `Capa 2`) y entrega al docente el informe numérico y cualitativo listo para su traslación oficial a las actas de **XADE**.
-   * **El Bucle de Refuerzo del Feed Forward en Pruebas Sucesivas (`[D-026]`):** Para que el "Siguiente Paso Accionable" no quede en el olvido ni sobrecargue al docente con correcciones extras, QIA-Correction activa un bucle de retorno automático. Cuando el estudiante entrega su **siguiente prueba evaluable** dentro de la misma Situación de Aprendizaje, el prompt del LLM recibe en contexto el campo `siguiente_paso_accionable` que el alumno tenía pendiente de la tarea anterior. Si el alumno aplicó la mejora en esta nueva entrega, la IA lo reconoce y le otorga una **felicitación explícita de refuerzo positivo** en su nuevo informe formativo (ej. *"¡Excelente progreso! En el mural anterior tenías pendiente mejorar la concordancia temporal y en esta redacción lo has dominado por completo"*), cambiando el estado en base de datos a `VERIFICADO_PRÓXIMA_PRUEBA`.
+   * **El Bucle de Refuerzo del Feed Forward en Pruebas Sucesivas (`[D-026]`):** Para que el "Siguiente Paso Accionable" no quede en el olvido ni sobrecargue al docente con correcciones extras, api-correccion-formativa-ia-galicia activa un bucle de retorno automático. Cuando el estudiante entrega su **siguiente prueba evaluable** dentro de la misma Situación de Aprendizaje, el prompt del LLM recibe en contexto el campo `siguiente_paso_accionable` que el alumno tenía pendiente de la tarea anterior. Si el alumno aplicó la mejora en esta nueva entrega, la IA lo reconoce y le otorga una **felicitación explícita de refuerzo positivo** en su nuevo informe formativo (ej. *"¡Excelente progreso! En el mural anterior tenías pendiente mejorar la concordancia temporal y en esta redacción lo has dominado por completo"*), cambiando el estado en base de datos a `VERIFICADO_PRÓXIMA_PRUEBA`.
 
 ### 1.7. Cuadro de Auditoría de Coherencia y Cumplimiento Integral (Legal, Normativo, Administrativo y Técnico)
 
-La arquitectura y diseño de QIA-Correction han sido sometidos a un contraste exhaustivo cruzando el marco jurídico estatal y autonómico, las regulaciones de ciberseguridad e inteligencia artificial, las directrices pedagógicas gallegas y el estado del arte técnico, arrojando una **coherencia integral hermética** en todas sus dimensiones:
+La arquitectura y diseño de api-correccion-formativa-ia-galicia han sido sometidos a un contraste exhaustivo cruzando el marco jurídico estatal y autonómico, las regulaciones de ciberseguridad e inteligencia artificial, las directrices pedagógicas gallegas y el estado del arte técnico, arrojando una **coherencia integral hermética** en todas sus dimensiones:
 
-| Dimensión | Requisito / Riesgo en el Ecosistema Educativo | Blindaje y Solución Implementada en QIA-Correction | Estado de Coherencia |
+| Dimensión | Requisito / Riesgo en el Ecosistema Educativo | Blindaje y Solución Implementada en api-correccion-formativa-ia-galicia | Estado de Coherencia |
 |---|---|---|---|
 | **⚖️ LEGAL (RGPD / LOPDGDD)** | Protección absoluta de datos de menores de edad y salvaguarda de datos médicos o psicopedagógicos (NEAE/NEE). | **`[D-022]`**: Recorte local (*Client-Side*) en PWA mediante Canvas de los 3 cm de cabecera antes de subir al *Object Storage*.<br>**`[D-014]`**: Cláusula *Zero Data Retention* en llamadas a API LLM.<br>**`[D-023]`**: Seudonimización con `alumno_id` y alertas visuales grisáceas (*GRAY_NEUTRAL*) sin revelar diagnóstico médico al prompt. | 🟢 **100% BLINDADO** |
 | **🇪🇺 LEGAL (*AI Act* / Europa)** | Prohibición de que una IA actúe como autora de decisiones sumativas o de actos administrativos sin supervisión humana real. | **`[D-024]`**: *Confidence Score* (`0.0 - 1.0`). Alerta preventiva obligatoria si `< 0.75` por caligrafía confusa o ambigüedad.<br>**`Soberanía del Acto Administrativo (HitL)`**: La IA asiste, propone y autocompleta, pero la aprobación (`GRADED`) y firma de actas es competencia exclusiva del profesor. | 🟢 **100% BLINDADO** |
@@ -110,11 +110,11 @@ La arquitectura y diseño de QIA-Correction han sido sometidos a un contraste ex
 
 ---
 
-## 🛠️ PARTE 2 — Arquitectura, Diseño de Base de Datos e Integración en QIA-Correction
+## 🛠️ PARTE 2 — Arquitectura, Diseño de Base de Datos e Integración en api-correccion-formativa-ia-galicia
 
 ### 2.1. Jerarquía Normativa en 5 Capas Relacionales Dinámicas (`JSONB`)
 
-Para combinar con exactitud milimétrica la normativa pública, las programaciones didácticas de cada departamento, las normas del centro, la creación de rúbricas del docente y las adaptaciones de los estudiantes sin saturar la burocracia escolar, el motor de **QIA-Correction** opera bajo una jerarquía de **5 Capas Relacionales Dinámicas (`JSONB`)** inyectadas en el prompt y procesadas por el LLM multimodal:
+Para combinar con exactitud milimétrica la normativa pública, las programaciones didácticas de cada departamento, las normas del centro, la creación de rúbricas del docente y las adaptaciones de los estudiantes sin saturar la burocracia escolar, el motor de **api-correccion-formativa-ia-galicia** opera bajo una jerarquía de **5 Capas Relacionales Dinámicas (`JSONB`)** inyectadas en el prompt y procesadas por el LLM multimodal:
 
 ```
 [CAPA 1: Marco Normativo General (Xunta de Galicia)]
@@ -135,7 +135,7 @@ Para combinar con exactitud milimétrica la normativa pública, las programacion
 
 ### 2.2. El Principio de Inyección Explicita (*AI Never Diagnoses*)
 
-Para cumplir escrupulosamente con el **Reglamento Europeo de Inteligencia Artificial (EU AI Act)** y el **RGPD / LOPDGDD (Art. 7)**, QIA-Correction establece tres reglas arquitectónicas innegociables:
+Para cumplir escrupulosamente con el **Reglamento Europeo de Inteligencia Artificial (EU AI Act)** y el **RGPD / LOPDGDD (Art. 7)**, api-correccion-formativa-ia-galicia establece tres reglas arquitectónicas innegociables:
 1. **La IA jamás infiere ni diagnostica adaptaciones:** El LLM multimodal no tiene permiso para deducir de la caligrafía o redacción que un alumno tiene dislexia o TDAH.
 2. **El docente o el centro es el único soberano de la configuración:** El profesor asigna de forma explícita las reglas de adaptación en la ficha del alumno.
 3. **Los datos de salud están aislados:** Los informes médicos u orientativos nunca se suben ni procesan en la nube; la IA únicamente recibe reglas de comportamiento técnico anonimizadas y asociadas a un `alumno_id`.
@@ -219,7 +219,7 @@ En el panel frontal de corrección (*Human-in-the-Loop*):
 
 ## 🎯 Conclusión Arquitectónica
 
-Al integrar la legislación gallega (`Decretos 156/157/2022` y `Decreto 229/2011`) con un modelo relacional dinámico (`JSONB`) y una IA que separa técnica de diagnóstico, **QIA-Correction** se posiciona como una herramienta líder en equidad educativa. Permite a los centros cumplir con la inspección y la ley de protección de datos al tiempo que humaniza la evaluación de los estudiantes neurodivergentes y general.
+Al integrar la legislación gallega (`Decretos 156/157/2022` y `Decreto 229/2011`) con un modelo relacional dinámico (`JSONB`) y una IA que separa técnica de diagnóstico, **api-correccion-formativa-ia-galicia** se posiciona como una herramienta líder en equidad educativa. Permite a los centros cumplir con la inspección y la ley de protección de datos al tiempo que humaniza la evaluación de los estudiantes neurodivergentes y general.
 
 ---
 

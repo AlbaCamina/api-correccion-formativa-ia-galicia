@@ -24,7 +24,7 @@ El valor diferencial de la herramienta frente a otras opciones del mercado se ba
 Por diseño y para cumplir con la **EU AI Act** y el **RGPD** al tratar datos de menores, la herramienta utiliza un modelo *Human-in-the-Loop*: la IA actúa exclusivamente como asistente (copiloto) que propone un borrador de corrección, recayendo siempre la aprobación y decisión final en el profesor.
 
 ### 🌍 Respaldo y Benchmarking Internacional (`[D-022]`, `[D-023]`, `[D-024]`)
-El diseño y la viabilidad de **QIA-Correction** están directamente avalados por las prácticas y normativas de los ecosistemas educativos más rigurosos de Europa y el mundo:
+El diseño y la viabilidad de **api-correccion-formativa-ia-galicia** están directamente avalados por las prácticas y normativas de los ecosistemas educativos más rigurosos de Europa y el mundo:
 - **Alemania (Privacidad por diseño / *Datenschutz*):** Al igual que herramientas punteras en colegios alemanes como *Fobizz*, nuestro sistema opera bajo una "cámara de exclusión pre-nube" que recorta cabeceras y seudonimiza los datos locales antes de cualquier subida, cumpliendo con las estrictas directrices de la *KMK* y los delegados de protección de datos de los *Länder*.
 - **Países Nórdicos — Finlandia y Suecia (Evaluación cualitativa y equidad):** Siguiendo el modelo pedagógico de *Abitti* y *FeedbackFruits*, la IA se autoriza como copiloto formativo para liberar tiempo administrativo y dedicarlo a la tutoría individual humana con alumnos NEAE, priorizando calificaciones cualitativas competenciales congruentes con los Decretos 156/157/2022 de la Xunta de Galicia.
 - **Reino Unido y EE.UU. (Acción inmediata y certeza):** Integración obligatoria de *Actionable Next Steps* (*Feed Forward* del modelo Hattie) y un *Confidence Score* que alerta visualmente cuando la caligrafía o respuesta requiere revisión humana prioritaria.
@@ -33,8 +33,8 @@ El diseño y la viabilidad de **QIA-Correction** están directamente avalados po
 > **La combinación es imbatible:** usamos la legalidad y los criterios competenciales cualitativos de Galicia como cimiento (`marcos_evaluacion` en `JSONB`), e inyectamos las técnicas pedagógicas más avanzadas de Reino Unido y USA (*Next Steps* y *Confidence Score*) como superpoder del motor de IA. Es un producto redondísimo para presentar tanto en la AESIA como en cualquier instituto o entrevista de ingeniería EdTech.
 
 ### 📢 Argumentario Comercial y Ventajas Clave para el Profesorado (Marketing B2C/B2B)
-El éxito de adopción de **QIA-Correction** por parte de docentes, orientadores y jefes de estudio se sustenta en cinco promesas de valor directas que resuelven sus dolores diarios reales:
-1. **Ahorro masivo para humanizar la enseñanza:** QIA-Correction no sustituye al profesor ni quita autoridad; actúa como un copiloto que elimina hasta el 70% del tiempo burocrático de corrección mecánica en grupos de 30 alumnos. El docente recupera sus tardes y fines de semana para invertir ese tiempo en atención humana y tutoría directa con los estudiantes que más lo necesitan.
+El éxito de adopción de **api-correccion-formativa-ia-galicia** por parte de docentes, orientadores y jefes de estudio se sustenta en cinco promesas de valor directas que resuelven sus dolores diarios reales:
+1. **Ahorro masivo para humanizar la enseñanza:** api-correccion-formativa-ia-galicia no sustituye al profesor ni quita autoridad; actúa como un copiloto que elimina hasta el 70% del tiempo burocrático de corrección mecánica en grupos de 30 alumnos. El docente recupera sus tardes y fines de semana para invertir ese tiempo en atención humana y tutoría directa con los estudiantes que más lo necesitan.
 2. **El fin de la "caja negra" y del feedback inútil:** A diferencia de las correcciones genéricas ("mejorar redacción"), cada alumno recibe un **Siguiente Paso Accionable (*Feed Forward*)** que le dice exactamente qué acción única y realizable debe hacer hoy para progresar. Además, el docente visualiza un *Confidence Score* que le advierte cuándo una caligrafía confusa o respuesta ambigua requiere su inspección manual prioritaria.
 3. **100% A prueba de inspección y normativa autonómica:** Todas las correcciones cualitativas se cruzan de forma nativa con los criterios y competencias de los **Decretos 156/2022 y 157/2022** y la **Orden de 26 de mayo de 2023 de la Xunta de Galicia**, además de garantizar la inclusión educativa de alumnos NEAE/NEE según la LOMLOE (`Decreto 229/2011`) sin que el docente tenga que hacer cálculos paralelos ni arriesgarse a penalizar por error a un alumno con dislexia.
 4. **Privacidad blindada al nivel del *Datenschutz* alemán:** El profesorado y el centro pueden estar tranquilos: ninguna imagen con el nombre y apellidos del alumno llega a internet ni a los servidores de la nube o las empresas de IA. El recorte y la seudonimización pre-nube (`[D-022]`) garantizan un cumplimiento impecable del RGPD y de la LOPDGDD.
@@ -50,7 +50,7 @@ El éxito de adopción de **QIA-Correction** por parte de docentes, orientadores
 
 Dada la situación actual (subsidio de desempleo incompatible con el alta en autónomos), la comercialización temprana de la plataforma como SaaS individual supondría un riesgo financiero injustificado. Por tanto, la estrategia central del proyecto es la **construcción de un portfolio técnico de alto nivel**.
 
-El valor real de QIA-Correction radica en demostrar a futuras empresas empleadoras que la desarrolladora domina:
+El valor real de api-correccion-formativa-ia-galicia radica en demostrar a futuras empresas empleadoras que la desarrolladora domina:
 1. **Arquitectura avanzada:** Uso de asincronía y colas de tareas (Celery + Redis) para evitar cuellos de botella.
 2. **Integraciones complejas:** Modelos LLM multimodales (OpenAI/Anthropic) y OCR.
 3. **Visión de negocio y legal:** Diseño de base de datos preparada para escalar y arquitectura *Human-in-the-Loop* que cumple con la normativa europea de Inteligencia Artificial (AI Act).
@@ -329,7 +329,7 @@ B2B — Canal institucional / integración
 
 ### Entorno de ejecución
 - **Sistema operativo:** Windows 11 + WSL (Ubuntu) — todo el código Python/FastAPI corre en WSL
-- **Editor:** VS Code con workspace apuntando a `C:\Users\34636\Desktop\qia-correction`
+- **Editor:** VS Code con workspace apuntando a `C:\Users\34636\Desktop\api-correccion`
 
 ### Agentes de IA disponibles
 
@@ -364,7 +364,7 @@ B2B — Canal institucional / integración
 ### Estructura de carpetas y gestión de contexto
 
 ```
-qia-correction/                              ← workspace único de VS Code
+api-correccion/                              ← workspace único de VS Code
 ├── api_correccion_plan.md                   ← planificación y arquitectura
 ├── backlog.md                               ← historias de usuario con criterios de aceptación
 ├── sesion_01_asincronia_y_colas.md          ← ✅ Síncrono/Asíncrono · Celery + Redis

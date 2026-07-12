@@ -69,7 +69,7 @@
 **para** que el alumnado con dificultades específicas sea evaluado con justicia según el `Decreto 229/2011` de la Xunta de Galicia y la `LOMLOE` [D-023].
 
 **Criterios de aceptación:**
-- [x] Elaborada taxonomía técnica en 4 niveles (Medidas ordinarias DEA, ACNS no significativas, ACS significativas y ACIS altas capacidades) documentada en [marco_normativo_y_adaptaciones.md](file:///c:/Users/34636/Desktop/qia-correction/marco_normativo_y_adaptaciones.md)
+- [x] Elaborada taxonomía técnica en 4 niveles (Medidas ordinarias DEA, ACNS no significativas, ACS significativas y ACIS altas capacidades) documentada en [marco_normativo_y_adaptaciones.md](file:///c:/Users/34636/Desktop/api-correccion/marco_normativo_y_adaptaciones.md)
 - [x] Diseñada la columna `adaptaciones_alumno (JSONB)` en `submissions` (`[v0.2-005]`) para inyectar reglas de exclusión ortográfica en el prompt sin que la IA diagnostique
 - [x] El contrato JSON clasifica faltas ortográficas en dislexia como marcadores neutros (`ortografia_excluida`) en gris, separándolos del cálculo de nota penalizadora
 
@@ -79,7 +79,7 @@
 
 ### [v0.0-004] Benchmarking y aval internacional: Alemania, Países Nórdicos, UK y USA
 **Como** investigadora de producto,  
-**quiero** contrastar la arquitectura y pedagogía de QIA-Correction contra las prácticas líderes mundiales (Datenschutz alemán, Fobizz, Finlandia/Abitti, FeedbackFruits, Gradescope, NoMoreMarking, Hattie & Timperley en UK)  
+**quiero** contrastar la arquitectura y pedagogía de api-correccion-formativa-ia-galicia contra las prácticas líderes mundiales (Datenschutz alemán, Fobizz, Finlandia/Abitti, FeedbackFruits, Gradescope, NoMoreMarking, Hattie & Timperley en UK)  
 **para** blindar nuestras decisiones de diseño con el mayor aval técnico y legal de Europa [D-022, D-023, D-024].
 
 **Criterios de aceptación:**

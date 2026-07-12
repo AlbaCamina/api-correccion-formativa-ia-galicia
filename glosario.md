@@ -58,7 +58,7 @@ Reescribir código para que sea más limpio o eficiente sin cambiar lo que hace.
 Archivo de texto en la raíz del repositorio que explica qué es el proyecto, cómo instalarlo y cómo usarlo. Es lo primero que ve cualquier persona que visita el repositorio en GitHub.
 
 **Stack tecnológico**  
-El conjunto de tecnologías que usa un proyecto. En QIA-Correction: Python + FastAPI + PostgreSQL + React + Vite + Redis + Celery.
+El conjunto de tecnologías que usa un proyecto. En api-correccion-formativa-ia-galicia: Python + FastAPI + PostgreSQL + React + Vite + Redis + Celery.
 
 **Swagger / OpenAPI**  
 Estándar para describir y documentar APIs REST. FastAPI lo integra nativamente: al arrancar el servidor, genera automáticamente una interfaz web interactiva en la ruta `/docs` que permite probar todos los endpoints desde el navegador sin escribir código ni instalar herramientas.
@@ -130,28 +130,28 @@ Un código alfanumérico generado automáticamente que identifica un registro de
 Modelo de lenguaje de la empresa Anthropic. Alternativa a GPT-4o. Se considera especialmente bueno para tareas de razonamiento y escritura estructurada.
 
 **Confidence Score** (Índice de Confianza IA)  
-Medida numérica devuelta por el modelo (`0.0` a `1.0`) que indica la certeza o fiabilidad de la interpretación y lectura de un examen. En QIA-Correction (`[D-024]`), si la confianza es `< 0.75` (caligrafía confusa, borrones), el sistema emite una alerta visual para que la profesora revise con especial atención prioritaria.
+Medida numérica devuelta por el modelo (`0.0` a `1.0`) que indica la certeza o fiabilidad de la interpretación y lectura de un examen. En api-correccion-formativa-ia-galicia (`[D-024]`), si la confianza es `< 0.75` (caligrafía confusa, borrones), el sistema emite una alerta visual para que la profesora revise con especial atención prioritaria.
 
 **Generador Asistido de Rúbricas (Copiloto Pre-Corrección)**  
-Funcionalidad de asistencia de QIA-Correction (`Capa 4` relacional) por la que el docente solo necesita subir o describir el enunciado de una prueba o tarea evaluable. El motor LLM cruza automáticamente la normativa general (`Capa 1`), la programación del departamento (`Capa 2`) y el acuerdo transversal del centro (`Capa 3`) para generar una propuesta de rúbrica en 4 niveles de logro (*Insuficiente, Suficiente/Bien, Notable y Sobresaliente*). El profesor la valida con un clic en su PWA, reduciendo un 90% del tiempo burocrático de diseño de baremos.
+Funcionalidad de asistencia de api-correccion-formativa-ia-galicia (`Capa 4` relacional) por la que el docente solo necesita subir o describir el enunciado de una prueba o tarea evaluable. El motor LLM cruza automáticamente la normativa general (`Capa 1`), la programación del departamento (`Capa 2`) y el acuerdo transversal del centro (`Capa 3`) para generar una propuesta de rúbrica en 4 niveles de logro (*Insuficiente, Suficiente/Bien, Notable y Sobresaliente*). El profesor la valida con un clic en su PWA, reduciendo un 90% del tiempo burocrático de diseño de baremos.
 
 **GPT-4o** / **GPT-4o Vision**  
 Modelo de lenguaje de OpenAI. La variante Vision acepta imágenes además de texto, lo que permite enviarle la foto del examen para que lo lea y evalúe.
 
 **Jerarquía Normativa en 5 Capas Relacionales (`JSONB`)**  
-Modelo arquitectónico multinivel de QIA-Correction que desacopla y combina sin ambigüedad la legislación pública (`Capa 1: Decreto Xunta`), la programación anual del departamento (`Capa 2: Saberes y Criterios`), las normas comunes del colegio (`Capa 3: PEC/CCP`), la rúbrica de la prueba asistida (`Capa 4: El Profesor`) y las adaptaciones individuales de equidad (`Capa 5: NEAE/NEE en JSONB`).
+Modelo arquitectónico multinivel de api-correccion-formativa-ia-galicia que desacopla y combina sin ambigüedad la legislación pública (`Capa 1: Decreto Xunta`), la programación anual del departamento (`Capa 2: Saberes y Criterios`), las normas comunes del colegio (`Capa 3: PEC/CCP`), la rúbrica de la prueba asistida (`Capa 4: El Profesor`) y las adaptaciones individuales de equidad (`Capa 5: NEAE/NEE en JSONB`).
 
 **LLM** (Large Language Model — Modelo de Lenguaje Grande)  
 Modelo de inteligencia artificial entrenado con enormes cantidades de texto. Es la IA que corrige los exámenes en este proyecto (GPT-4o o Claude).
 
 **Multimodal / Omni-canal**  
-Un modelo de IA que procesa texto, imagen y estructuras combinadas de forma simultánea (ej. GPT-4o o Claude 3.5 Sonnet). En QIA-Correction esto permite evaluar **cualquier tipo de prueba evaluable**: no solo fotos de exámenes manuscritos, sino murales de cartulina de aula, redacciones en campos de texto online (`Form Text`) y PDFs o capturas de presentaciones hechas a ordenador (como *Canva* o *Google Slides*).
+Un modelo de IA que procesa texto, imagen y estructuras combinadas de forma simultánea (ej. GPT-4o o Claude 3.5 Sonnet). En api-correccion-formativa-ia-galicia esto permite evaluar **cualquier tipo de prueba evaluable**: no solo fotos de exámenes manuscritos, sino murales de cartulina de aula, redacciones en campos de texto online (`Form Text`) y PDFs o capturas de presentaciones hechas a ordenador (como *Canva* o *Google Slides*).
 
 **OCR** (Optical Character Recognition — Reconocimiento Óptico de Caracteres)  
 Tecnología integrada en la IA multimodal que extrae y convierte la caligrafía manuscrita de la foto del examen o el texto gráfico de un mural/cartulina en datos legibles para evaluarlos contra la rúbrica.
 
 **Prueba evaluable (Instrumento de evaluación)**  
-Cualquier evidencia de aprendizaje del alumno sometida a corrección formativa. En QIA-Correction abarca los 3 formatos del aula moderna: papel manuscrito (foto), creación plástica/visual (foto de mural o cartulina) y entregas digitales (redacciones online o exportaciones PDF/PNG de presentaciones de Canva).
+Cualquier evidencia de aprendizaje del alumno sometida a corrección formativa. En api-correccion-formativa-ia-galicia abarca los 3 formatos del aula moderna: papel manuscrito (foto), creación plástica/visual (foto de mural o cartulina) y entregas digitales (redacciones online o exportaciones PDF/PNG de presentaciones de Canva).
 
 **Prompt**  
 El texto de instrucciones que se le da al modelo de IA para que sepa cómo comportarse. En este proyecto, el prompt le dice a la IA que actúe como "evaluador formativo experto en educación secundaria de Galicia" y le especifica el formato JSON que debe devolver.
@@ -185,7 +185,7 @@ Docker permite empaquetar una aplicación con todo lo que necesita para funciona
 Un enlace temporal y firmado que permite subir un archivo directamente a Cloudinary o S3 sin pasar por el servidor. Explicado con la analogía del aparcacoches en `sesion_02_storage_y_structured_outputs.md`.
 
 **Storage Lifecycle / Política de ciclo de vida**  
-Reglas automatizadas configuradas en el proveedor de nube (S3/Cloudinary) que trasladan o eliminan archivos según su antigüedad. En QIA-Correction: pasan a Cold Storage a los 60 días y se eliminan (purga legal RGPD) al año exacto.
+Reglas automatizadas configuradas en el proveedor de nube (S3/Cloudinary) que trasladan o eliminan archivos según su antigüedad. En api-correccion-formativa-ia-galicia: pasan a Cold Storage a los 60 días y se eliminan (purga legal RGPD) al año exacto.
 
 **Railway**  
 Plataforma de hosting (alojamiento) donde se desplegará el backend en producción. Incluye PostgreSQL y Redis. Tiene plan gratuito suficiente para el MVP.
@@ -204,13 +204,13 @@ Un proceso que ejecuta tareas en segundo plano. Cuando Celery recibe una tarea d
 ## 6. Frontend y PWA
 
 **Canvas** (HTML5 Canvas)  
-Elemento de HTML que permite dibujar, recortar y transformar gráficos e imágenes en la memoria local del navegador mediante JavaScript. En QIA-Correction: la PWA utiliza el Canvas para redimensionar los exámenes a ~2048px ([D-020]) y recortar los 3 cm de la cabecera con el nombre del alumno ([D-022]) antes de subirlos a la nube.
+Elemento de HTML que permite dibujar, recortar y transformar gráficos e imágenes en la memoria local del navegador mediante JavaScript. En api-correccion-formativa-ia-galicia: la PWA utiliza el Canvas para redimensionar los exámenes a ~2048px ([D-020]) y recortar los 3 cm de la cabecera con el nombre del alumno ([D-022]) antes de subirlos a la nube.
 
 **Manifest.json**  
 Archivo de configuración que le dice al navegador cómo mostrar la PWA cuando se instala: nombre, icono, colores, orientación de pantalla.
 
 **PWA / PWA del Profesor** (Progressive Web App — Aplicación Web Progresiva)  
-Una aplicación web construida con tecnologías modernas (React + Vite) que se abre en el navegador pero se comporta y se puede instalar como una app nativa en el portátil, tablet o móvil del docente sin pasar por tiendas de aplicaciones. En QIA-Correction es el panel frontal y centro de mando del profesor (*Human-in-the-Loop*): donde sube las fotos del examen o mural, visualiza la corrección con sus marcadores de color (rojos o grises de adaptación), ajusta la propuesta y aprueba las notas finales. Accessa localmente a cámara y funciona en red de forma ultra veloz.
+Una aplicación web construida con tecnologías modernas (React + Vite) que se abre en el navegador pero se comporta y se puede instalar como una app nativa en el portátil, tablet o móvil del docente sin pasar por tiendas de aplicaciones. En api-correccion-formativa-ia-galicia es el panel frontal y centro de mando del profesor (*Human-in-the-Loop*): donde sube las fotos del examen o mural, visualiza la corrección con sus marcadores de color (rojos o grises de adaptación), ajusta la propuesta y aprueba las notas finales. Accessa localmente a cámara y funciona en red de forma ultra veloz.
 
 **React**  
 Librería de JavaScript para construir interfaces de usuario. Se trabaja con "componentes" (piezas reutilizables de pantalla). El frontend de la PWA estará construido con React.
@@ -279,10 +279,10 @@ Capa de compatibilidad que permite ejecutar un sistema Linux (Ubuntu) dentro de 
 ## 9. Legal y normativo
 
 **Adaptaciones Curriculares (ACS / ACNS / DEA)**  
-Medidas de modificación o ajuste pedagógico reguladas por la legislación (LOMLOE, Decreto 229/2011 de Galicia) para garantizar la equidad educativa del alumnado. Pueden ser ordinarias o no significativas (ACNS, ej: dislexia, TDAH) sin alterar objetivos, o significativas (ACS) cuando modifican el currículo oficial. En QIA-Correction se inyectan mediante el campo `adaptaciones_alumno` ([D-023]) para separar faltas ortográficas del cálculo penalizador de nota.
+Medidas de modificación o ajuste pedagógico reguladas por la legislación (LOMLOE, Decreto 229/2011 de Galicia) para garantizar la equidad educativa del alumnado. Pueden ser ordinarias o no significativas (ACNS, ej: dislexia, TDAH) sin alterar objetivos, o significativas (ACS) cuando modifican el currículo oficial. En api-correccion-formativa-ia-galicia se inyectan mediante el campo `adaptaciones_alumno` ([D-023]) para separar faltas ortográficas del cálculo penalizador de nota.
 
 **AI Act** (Reglamento Europeo de Inteligencia Artificial)  
-La primera ley de la Unión Europea que regula los sistemas de IA. Clasifica los sistemas por nivel de riesgo. QIA-Correction entra en la categoría de alto riesgo (afecta a educación de menores y procesa variables de necesidades específicas), por lo que requiere Human-in-the-Loop y trazabilidad completa.
+La primera ley de la Unión Europea que regula los sistemas de IA. Clasifica los sistemas por nivel de riesgo. api-correccion-formativa-ia-galicia entra en la categoría de alto riesgo (afecta a educación de menores y procesa variables de necesidades específicas), por lo que requiere Human-in-the-Loop y trazabilidad completa.
 
 **DUA** (Diseño Universal de Aprendizaje)  
 Enfoque pedagógico recogido por la LOMLOE y la normativa gallega que busca minimizar las barreras en el aprendizaje, ofreciendo múltiples formas de representación, expresión e implicación en la evaluación.
@@ -297,10 +297,10 @@ Propiedad por la cual un registro o evaluación ya aprobada (`GRADED`) queda blo
 La ley educativa estatal actualmente vigente en España (2020). Define competencias, criterios de evaluación y estructura curricular. El decreto autonómico de la Xunta de Galicia la desarrolla a nivel regional para el sistema educativo gallego (bilingüe castellano/gallego).
 
 **LOPDGDD** (Ley Orgánica de Protección de Datos y Garantía de los Derechos Digitales)  
-La ley española que desarrolla el RGPD. Su artículo 7 regula el consentimiento y protección integral en el tratamiento de datos de menores. En QIA-Correction es crítico porque la información sobre adaptaciones por dislexia, TDAH o TEA constituye un dato de salud del menor (especialmente protegido), motivo por el cual la IA jamás diagnostica y el dato solo se asocia al identificador seudonimizado `alumno_id` ([D-023]).
+La ley española que desarrolla el RGPD. Su artículo 7 regula el consentimiento y protección integral en el tratamiento de datos de menores. En api-correccion-formativa-ia-galicia es crítico porque la información sobre adaptaciones por dislexia, TDAH o TEA constituye un dato de salud del menor (especialmente protegido), motivo por el cual la IA jamás diagnostica y el dato solo se asocia al identificador seudonimizado `alumno_id` ([D-023]).
 
 **NEAE / NEE** (Necesidades Específicas de Apoyo Educativo / Necesidades Educativas Especiales)  
-Clasificación legal en España para el alumnado que requiere una atención educativa diferente a la ordinaria por presentar dificultades específicas de aprendizaje (DEA como dislexia), TDAH, altas capacidades o discapacidad (NEE). QIA-Correction adapta su motor formativo para que estos perfiles sean evaluados con justicia sin penalizar errores derivados de su condición ([D-023]).
+Clasificación legal en España para el alumnado que requiere una atención educativa diferente a la ordinaria por presentar dificultades específicas de aprendizaje (DEA como dislexia), TDAH, altas capacidades o discapacidad (NEE). api-correccion-formativa-ia-galicia adapta su motor formativo para que estos perfiles sean evaluados con justicia sin penalizar errores derivados de su condición ([D-023]).
 
 **RGPD** (Reglamento General de Protección de Datos)  
 La ley europea de privacidad de datos. Obliga a proteger los datos personales, especialmente los de menores. En este proyecto: los exámenes se anonimizan antes de enviarse a la IA (campo `alumno_id`), y OpenAI/Anthropic tienen contratos de Zero Data Retention.
@@ -322,7 +322,7 @@ Documento donde cada decisión técnica importante queda registrada con su conte
 Metodología pedagógica innovadora (ej. *No More Marking* en Reino Unido) donde se evalúa el razonamiento cualitativo global en lugar de contar puntos mecánicos aislados (`[D-024]`).
 
 **Doble Circuito de Calificación (Materias vs. Competencias Clave)**  
-Modelo operativo dual vigente en los IES gallegos (Decretos 156/157/2022) y reflejado en XADE/QIA-Correction: 1) **Circuito de Materias:** Las asignaturas se califican y cierran en los boletines trimestrales y ordinarios con **números enteros del 1 al 10** derivados de las notas cotidianas numéricas de las pruebas evaluables. 2) **Circuito de Competencias Clave:** Las 8 competencias oficiales (*CCL, STEM, CD...*) se califican al final del curso de forma cualitativa (*IN, SU, BI, NT, SB*) mediante el **cruce e intersección matricial inter-materias** de todos los criterios evaluados en las diferentes asignaturas del alumno.
+Modelo operativo dual vigente en los IES gallegos (Decretos 156/157/2022) y reflejado en XADE/api-correccion-formativa-ia-galicia: 1) **Circuito de Materias:** Las asignaturas se califican y cierran en los boletines trimestrales y ordinarios con **números enteros del 1 al 10** derivados de las notas cotidianas numéricas de las pruebas evaluables. 2) **Circuito de Competencias Clave:** Las 8 competencias oficiales (*CCL, STEM, CD...*) se califican al final del curso de forma cualitativa (*IN, SU, BI, NT, SB*) mediante el **cruce e intersección matricial inter-materias** de todos los criterios evaluados en las diferentes asignaturas del alumno.
 
 **Equipotencialidad Criterial (`Decreto 156/157/2022`)**  
 Regla pedagógica general y por defecto por la que todos los Criterios de Evaluación (`criterio_id`) asociados a las competencias específicas de una materia tienen idéntico valor o peso en el cálculo de la nota final, salvo que el departamento establezca porcentajes diferenciados en su Programación Didáctica (`Capa 2`).
@@ -352,16 +352,16 @@ La versión más pequeña del producto que ya aporta valor real. En este proyect
 Mandato legal de la LOMLOE en Galicia según el cual la calificación y ponderación recae siempre sobre los **Criterios de Evaluación (`criterio_id`)** del currículo, y nunca sobre los instrumentos en sí mismos. Los instrumentos (exámenes, murales de cartulina o exposiciones en *Canva*) son únicamente el soporte o medio omni-canal de recogida de evidencias de aprendizaje.
 
 **Situación de Aprendizaje (SdA)**  
-Propuesta metodológica o tarea reto contextualizada (real o simulada) que permite al alumnado movilizar saberes básicos para resolver un problema, siguiendo la trazabilidad `Reto → Saberes → Competencias Específicas → Criterios → Descriptores Operativos`. En QIA-Correction actúa como el Contenedor Padre (`situacion_aprendizaje_id` en Capa 2) para agrupar todas las pruebas evaluables omni-canal del alumno en esa unidad y calcular el logro de sus competencias.
+Propuesta metodológica o tarea reto contextualizada (real o simulada) que permite al alumnado movilizar saberes básicos para resolver un problema, siguiendo la trazabilidad `Reto → Saberes → Competencias Específicas → Criterios → Descriptores Operativos`. En api-correccion-formativa-ia-galicia actúa como el Contenedor Padre (`situacion_aprendizaje_id` en Capa 2) para agrupar todas las pruebas evaluables omni-canal del alumno en esa unidad y calcular el logro de sus competencias.
 
 **Soberanía del Acto Administrativo (`HitL`)**  
-Principio fundamental del Derecho Público español y del *AI Act* que dictamina que la responsabilidad jurídica, formal y humana y el poder de decisión sobre una calificación oficial (*que constituye un acto administrativo con efectos en la promoción o titulación del alumno*) recae exclusiva e intransferiblemente en el docente o tribunal que firma el acta en XADE. Una IA o aplicación comercial jamás puede ser autora ni titular legal del acto administrativo; por ello, QIA-Correction asiste y calcula, pero exige siempre la validación y firma humana final del profesor (*Human-in-the-Loop*).
+Principio fundamental del Derecho Público español y del *AI Act* que dictamina que la responsabilidad jurídica, formal y humana y el poder de decisión sobre una calificación oficial (*que constituye un acto administrativo con efectos en la promoción o titulación del alumno*) recae exclusiva e intransferiblemente en el docente o tribunal que firma el acta en XADE. Una IA o aplicación comercial jamás puede ser autora ni titular legal del acto administrativo; por ello, api-correccion-formativa-ia-galicia asiste y calcula, pero exige siempre la validación y firma humana final del profesor (*Human-in-the-Loop*).
 
 **Smoke test**  
 Prueba muy básica que verifica que lo más fundamental funciona antes de construir nada encima. En este proyecto: `v0.1-000` comprueba que la IA devuelve el JSON correcto antes de construir FastAPI.
 
 **XADE (`Xestión Administrativa da Educación`)**  
-Aplicación informática oficial de la Xunta de Galicia (Consellería de Educación) para todos los centros docentes gallegos. Es donde las secretarías y equipos docentes matriculan al alumnado e introducen las notas numéricas por materia y cualitativas por competencias clave para cerrar actas e imprimir boletines en cada junta de evaluación. QIA-Correction asiste y calcula el día a día para que el trasvase final de datos de corrección a XADE sea rápido, seguro y 100% auditable.
+Aplicación informática oficial de la Xunta de Galicia (Consellería de Educación) para todos los centros docentes gallegos. Es donde las secretarías y equipos docentes matriculan al alumnado e introducen las notas numéricas por materia y cualitativas por competencias clave para cerrar actas e imprimir boletines en cada junta de evaluación. api-correccion-formativa-ia-galicia asiste y calcula el día a día para que el trasvase final de datos de corrección a XADE sea rápido, seguro y 100% auditable.
 
 **YAGNI** (You Aren't Gonna Need It — No lo vas a necesitar)  
 Principio de desarrollo: no escribas código para funcionalidades que no necesitas ahora mismo. Evita sobre-ingeniería.
@@ -380,7 +380,7 @@ Tipo de token de autenticación que se envía en la cabecera HTTP de cada petici
 Archivo de texto que contiene variables de entorno (claves de API, contraseñas, configuración sensible). Nunca se sube a GitHub — está en el `.gitignore`. El archivo `.env.example` muestra qué variables existen sin revelar sus valores.
 
 **ENS (Esquema Nacional de Seguridad)**  
-Regulamento y marco normativo obligatorio que fija los requisitos y políticas de ciberseguridad en la Administración Pública y en los sistemas que tratan datos institucionales o de ciudadanos (como XADE en Galicia). Debido a las rigurosas exigencias del ENS y de AMTEGA sobre la protección de datos de menores, se prohíbe la conexión o inyección externa por APIs privadas comerciales directamente en XADE, justificando que el trasvase desde QIA-Correction se realice localmente mediante exportación de ficheros o scripts locales en el navegador del funcionario (`[D-025]`).
+Regulamento y marco normativo obligatorio que fija los requisitos y políticas de ciberseguridad en la Administración Pública y en los sistemas que tratan datos institucionales o de ciudadanos (como XADE en Galicia). Debido a las rigurosas exigencias del ENS y de AMTEGA sobre la protección de datos de menores, se prohíbe la conexión o inyección externa por APIs privadas comerciales directamente en XADE, justificando que el trasvase desde api-correccion-formativa-ia-galicia se realice localmente mediante exportación de ficheros o scripts locales en el navegador del funcionario (`[D-025]`).
 
 **JWT** (JSON Web Token — Token Web JSON)  
 Un token firmado digitalmente que el servidor entrega al usuario al hacer login. El usuario lo incluye en cada petición posterior para demostrar que está autenticado, sin que el servidor tenga que consultar la base de datos en cada petición.
@@ -393,19 +393,19 @@ Valores de configuración que se inyectan en el programa desde el sistema operat
 ## 12. Negocio y modelo
 
 **B2B** (Business to Business — De empresa a empresa)  
-Modelo en el que el cliente es otra empresa, no un usuario individual. En QIA-Correction: colegios o plataformas EdTech que contratan la API con una API key.
+Modelo en el que el cliente es otra empresa, no un usuario individual. En api-correccion-formativa-ia-galicia: colegios o plataformas EdTech que contratan la API con una API key.
 
 **B2C** (Business to Consumer — De empresa a consumidor)  
-Modelo en el que el cliente es un usuario individual. En QIA-Correction: profesores que se suscriben directamente a la PWA.
+Modelo en el que el cliente es un usuario individual. En api-correccion-formativa-ia-galicia: profesores que se suscriben directamente a la PWA.
 
 **EdTech** (Education Technology — Tecnología educativa)  
-Sector de empresas que desarrollan productos tecnológicos para la educación. Son los potenciales clientes B2B de QIA-Correction.
+Sector de empresas que desarrollan productos tecnológicos para la educación. Son los potenciales clientes B2B de api-correccion-formativa-ia-galicia.
 
 **Freemium**  
 Modelo de negocio con una versión gratuita (con límites) y una versión de pago (sin límites o con funcionalidades extra).
 
 **SaaS** (Software as a Service — Software como Servicio)  
-Modelo en el que el software se ofrece como servicio por suscripción, sin que el usuario tenga que instalarlo. La PWA de QIA-Correction es un SaaS.
+Modelo en el que el software se ofrece como servicio por suscripción, sin que el usuario tenga que instalarlo. La PWA de api-correccion-formativa-ia-galicia es un SaaS.
 
 ---
 

@@ -41,6 +41,8 @@
 | [D-024](#d-024) | Benchmarking pedagógico UK/USA (Next Steps / Confidence Score) y evaluación competencial gallega | Jul 2026 | ✅ Adoptada |
 | [D-025](#d-025) | Vinculación con XADE mediante exportación homologada + RPA client-side | Jul 2026 | ✅ Adoptada |
 | [D-026](#d-026) | `estado_feed_forward` como columna propia en `submissions` (seguimiento formativo, no sumativo) | Jul 2026 | ✅ Adoptada |
+| [D-027](#d-027) | Modo dual de interacción rúbrica-normativa seleccionable en PWA (`COMBINADO` vs `AUDITORIA_CURRICULAR`) | Jul 2026 | ✅ Adoptada |
+| [D-028](#d-028) | Adopción de Groq (`llama-3.3-70b-versatile`) como motor LLM primario de coste cero y alta velocidad | Jul 2026 | ✅ Adoptada |
 
 ---
 
@@ -326,7 +328,7 @@ A medida que el proyecto crezca, habrá documentación, código backend y códig
 - Workspace único sin organización — caos cuando el proyecto crezca
 - Workspace único con estructura clara y reglas de contexto — balance óptimo
 
-**Decisión:** Un único workspace (`qia-correction/`) con todo el proyecto. Contexto gestionado manualmente abriendo solo los archivos relevantes para cada tipo de tarea. OpenCode usa `AGENTS.md` para contexto persistente.
+**Decisión:** Un único workspace (`api-correccion/`) con todo el proyecto. Contexto gestionado manualmente abriendo solo los archivos relevantes para cada tipo de tarea. OpenCode usa `AGENTS.md` para contexto persistente.
 
 **Consecuencias:** El desarrollador debe cerrar los `.md` de documentación cuando trabaja en código, y cerrar los `.py` cuando trabaja en arquitectura. Es un hábito de trabajo, no una configuración automática.
 
@@ -482,7 +484,7 @@ La normativa educativa gallega (Decretos 156/157/2022 de la Xunta de Galicia) ob
 Subir imágenes de exámenes sin anonimizar (con nombre y apellidos del alumno visibles) a almacenamiento en nube externa (Cloudinary o AWS S3) supondría un tratamiento indebido de datos personales de menores identificables en infraestructura multi-tenant con copias internacionales, vulnerando el RGPD y nuestra propia Regla de Trabajo Nº 9. Asimismo, los exámenes pueden constar de un folio suelto, varios folios o PDFs de múltiples páginas, por lo que un campo de texto único `imagen_url` limitaría innecesariamente la capacidad del sistema.
 
 **Respaldo internacional y legal (Alemania — *Datenschutz* / *KMK*):**  
-Esta decisión está directamente avalada por el estándar más riguroso de Europa: las directrices de los delegados de protección de datos de Alemania (*Datenschutzbeauftragter*) y la Conferencia de Ministros de Educación (*KMK*), que prohíben categóricamente la subida de exámenes o ensayos con nombres de alumnos a LLMs en la nube sin anonimización previa. Herramientas punteras en Alemania como *Fobizz* basan su éxito en actuar como "cámara de exclusión local pre-nube" que filtra y elimina datos personales (*Zero Data Retention*). Al adoptar el mismo diseño arquitectónico, QIA-Correction se blinda al nivel del *Datenschutz* alemán, superando con creces cualquier auditoría de privacidad en Galicia o España.
+Esta decisión está directamente avalada por el estándar más riguroso de Europa: las directrices de los delegados de protección de datos de Alemania (*Datenschutzbeauftragter*) y la Conferencia de Ministros de Educación (*KMK*), que prohíben categóricamente la subida de exámenes o ensayos con nombres de alumnos a LLMs en la nube sin anonimización previa. Herramientas punteras en Alemania como *Fobizz* basan su éxito en actuar como "cámara de exclusión local pre-nube" que filtra y elimina datos personales (*Zero Data Retention*). Al adoptar el mismo diseño arquitectónico, api-correccion-formativa-ia-galicia se blinda al nivel del *Datenschutz* alemán, superando con creces cualquier auditoría de privacidad en Galicia o España.
 
 **Opciones consideradas:**
 - Subir el examen original intacto a la nube y anonimizarlo en el backend justo antes del envío al LLM — rechazado: la nube almacenaría datos personales de menores sin control probatorio.
@@ -557,17 +559,17 @@ Los centros de educación secundaria en Galicia tienen la obligación legal de v
 
 **Opciones consideradas:**
 - **Inyección directa en servidor (Nube a Nube por API o scraping de backend):** Rechazada por violar el ENS de la Administración Pública, carecer de API pública en XADE y romper la cadena de custodia probatoria del acto administrativo firmado por el docente.
-- **Doble picado manual en XADE por el profesor:** Rechazada por generar una fricción burocrática inasumible, invalidando el propósito de ahorro de tiempo que justifica la adopción de QIA-Correction.
+- **Doble picado manual en XADE por el profesor:** Rechazada por generar una fricción burocrática inasumible, invalidando el propósito de ahorro de tiempo que justifica la adopción de api-correccion-formativa-ia-galicia.
 - **Exportación homologada en plantilla Excel/CSV + Autocompletado Local (*RPA Client-Side* en navegador):** **Elegida por su solidez legal 100% estricta y máxima ergonomía docente**.
 
 **Decisión:**  
-La vinculación entre **QIA-Correction** y la plataforma oficial **XADE** se diseña bajo un modelo de **Soberanía Local y Asistencia de Interfaz (`Client-Side HitL`)**, articulado en dos niveles de implementación:
-1. **Exportación Estándar Homologada (`MVP v0.5`):** La PWA de QIA-Correction genera y descarga localmente un fichero Excel/CSV formateado al milímetro con las cabeceras, codificación e identificadores locales que exige XADE. El docente importa este fichero directamente dentro de su sesión logueada de XADE.
+La vinculación entre **api-correccion-formativa-ia-galicia** y la plataforma oficial **XADE** se diseña bajo un modelo de **Soberanía Local y Asistencia de Interfaz (`Client-Side HitL`)**, articulado en dos niveles de implementación:
+1. **Exportación Estándar Homologada (`MVP v0.5`):** La PWA de api-correccion-formativa-ia-galicia genera y descarga localmente un fichero Excel/CSV formateado al milímetro con las cabeceras, codificación e identificadores locales que exige XADE. El docente importa este fichero directamente dentro de su sesión logueada de XADE.
 2. **Autocompletado Local por Asistente/Extensión (`v0.8 / v1.0`):** Se habilita un helper local (extensión o script de navegador del docente) que, al tener abiertas simultáneamente la PWA (`GRADED`) y la web de XADE, autocompleta las casillas numéricas y cualitativas de la pantalla del funcionario en segundos como si las tecleara mecánicamente.
 3. **El Salvaguarda HitL Innegociable:** El asistente o exportación **jamás ejecuta el comando o botón final de `Guardar/Firmar Acta en XADE`**. Es el propio profesor quien, tras una rápida inspección visual en pantalla, realiza la acción de firma o guardado final con su certificado digital/Chave365, asumiendo la plena autoría formal del acto administrativo.
 
 **Consecuencias:**  
-QIA-Correction se posiciona como una herramienta técnicamente invulnerable ante la inspección educativa de la Xunta de Galicia y el ENS, al no almacenar ni transferir datos hacia o desde servidores públicos, actuando exclusivamente como un copiloto de cálculo e interfaz en el ordenador del funcionario.
+api-correccion-formativa-ia-galicia se posiciona como una herramienta técnicamente invulnerable ante la inspección educativa de la Xunta de Galicia y el ENS, al no almacenar ni transferir datos hacia o desde servidores públicos, actuando exclusivamente como un copiloto de cálculo e interfaz en el ordenador del funcionario.
 
 ---
 
@@ -577,7 +579,7 @@ QIA-Correction se posiciona como una herramienta técnicamente invulnerable ante
 **Estado:** ✅ Adoptada
 
 **Contexto:**  
-En el modelo de corrección de QIA-Correction (`[D-024]`), el motor LLM devuelve un "Siguiente Paso Accionable" (*Feed Forward*) con una directriz clara y concreta para que el estudiante la ejecute de inmediato (*"Reescribe el párrafo 3 incorporando dos conectores temporales"*). Surge el dilema sobre si el sistema y el docente deben evaluar o calificar numéricamente la entrega o devolución de dicho paso.
+En el modelo de corrección de api-correccion-formativa-ia-galicia (`[D-024]`), el motor LLM devuelve un "Siguiente Paso Accionable" (*Feed Forward*) con una directriz clara y concreta para que el estudiante la ejecute de inmediato (*"Reescribe el párrafo 3 incorporando dos conectores temporales"*). Surge el dilema sobre si el sistema y el docente deben evaluar o calificar numéricamente la entrega o devolución de dicho paso.
 
 **Opciones consideradas:**
 - **Calificar numéricamente cada devolución de Feed Forward:** Rechazado categóricamente por generar una duplicación masiva de la carga burocrática del profesor (convertir cada corrección en una nueva mini-tarea evaluable que revisar al día siguiente), destruyendo la promesa de alivio docente del producto.
@@ -597,6 +599,42 @@ El contrato de la base de datos y la interfaz de la PWA incorporan el campo y el
 
 ---
 
+### D-027
+## Modo dual de interacción rúbrica-normativa seleccionable en PWA (`COMBINADO` vs `AUDITORIA_CURRICULAR`)
+
+**Estado:** Adoptada (`[v0.2-004]`)  
+**Fecha:** Julio 2026  
+**Contexto:**  
+En el diseño del hito `[v0.2-004]`, surgió el debate técnico sobre cómo deben interactuar los criterios del marco normativo autonómico (Decreto 157/2022 de la Xunta de Galicia) y la rúbrica personalizada creada por la profesora. Se plantearon inicialmente dos opciones mutuamente excluyentes: combinación simple o auditoría pedagógica de coherencia.
+
+**Decisión:**  
+En lugar de forzar una única estrategia fija en el backend, se implementa un **Modo Dual de Evaluación** configurable por la profesora directamente desde la interfaz PWA y transmitido en cada petición de corrección (`modo_evaluacion` en el JSON / columna en `submissions`):
+1. `COMBINADO` (Evaluación Rápida Cotidiana): El motor LLM fusiona de forma aditiva los saberes básicos oficiales y los criterios específicos de la rúbrica del docente para calificar con agilidad tareas del día a día, controles cortos o exposiciones.
+2. `AUDITORIA_CURRICULAR` (Coherencia e Inspección Pedagógica): Diseñado para evaluaciones formales de fin de trimestre o revisión de nuevas rúbricas. El motor corrige la entrega pero además actúa como orientador pedagógico para el docente, contrastando la rúbrica de aula contra el Decreto 157/2022 e informando confidencialmente en `teacherSummary` si la rúbrica omite competencias básicas obligatorias o entra en contradicción normativa.
+
+**Consecuencias:**  
+Otorga una flexibilidad total al docente y aporta un valor diferencial extraordinario ante directores de centro e inspección educativa, posicionando a api-correccion-formativa-ia-galicia como un escudo legal y pedagógico del profesor sin sobrecargar la complejidad técnica del backend.
+
+---
+
+### D-028
+## Adopción de Groq (`llama-3.3-70b-versatile`) como motor LLM primario de coste cero y alta velocidad
+
+**Estado:** Adoptada (`[v0.1-000]`)  
+**Fecha:** Julio 2026  
+**Contexto:**  
+Durante la ejecución del Smoke Test del contrato JSON (`[v0.1-000]`), se evaluó la viabilidad, velocidad y coste operativo del motor LLM. Mientras que OpenAI (`gpt-4o-mini`) o Anthropic (`claude-3-5-sonnet`) requieren saldo o suscripciones comerciales constantes, el proyecto busca demostrar una optimización máxima en ingeniería en la nube (FinOps) y desacoplamiento de proveedores para la fase de portfolio técnico sin renunciar a la potencia de razonamiento.
+
+**Decisión:**  
+Se adopta **Groq** (con el modelo `llama-3.3-70b-versatile` y hardware de unidades LPU) como **motor LLM primario por defecto** para la ejecución de correcciones, preservando compatibilidad completa multi-proveedor con OpenAI, Anthropic y el modo local `mock` mediante la variable de entorno `LLM_PROVIDER`.
+
+**Consecuencias:**  
+1. **Coste Cero (0€/mes):** Permite ejecutar miles de correcciones con un modelo de código abierto de 70 mil millones de parámetros sin gasto en API en la fase de desarrollo y demostración en portfolio.
+2. **Velocidad de Respuesta:** El hardware de Groq genera las evaluaciones Pydantic en una fracción del tiempo de un LLM convencional.
+3. **Paridad de SDK:** La integración aprovecha el SDK nativo de OpenAI (`base_url="https://api.groq.com/openai/v1"`), permitiendo alternar a OpenAI en producción institucional con cambiar una sola línea en `.env`.
+
+---
+
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Total de decisiones registradas: 26*  
-*Próxima actualización: al completar v0.1-000 (smoke test LLM)*
+*Actualizado el 12/07/2026 — añadidas D-027 (Modo Dual) y D-028 (Groq como Motor Primario) con marca api-correccion-formativa-ia-galicia*  
+*Total de decisiones registradas: 28*
