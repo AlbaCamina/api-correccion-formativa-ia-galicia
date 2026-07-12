@@ -128,6 +128,8 @@
 - [ ] `qualitativeAnalysis` incluye: `strengths[]`, `improvementNeeds.immediate[]`, `improvementNeeds.mediumLongTerm[]`, `teacherSummary`
 - [ ] Probado con al menos 1 respuesta de alumno de ejemplo (buena, regular o mala)
 - [ ] El script imprime el JSON recibido con formato legible (`json.dumps(..., indent=2)`)
+- [ ] La respuesta incluye `calificacion_cualitativa` (valor IN/SU/BI/NT/SB), `siguiente_paso_accionable` (string no vacío) y `confidence_score` (float 0.0–1.0) según [D-024]
+- [ ] Si `confidence_score < 0.75`, el script imprime una advertencia ("⚠️ Revisión manual recomendada")
 
 **Etiquetas:** `v0.1` `backend`
 
@@ -163,8 +165,10 @@
 **Criterios de aceptación:**
 - [ ] Modelo `EvaluacionIA` con campos: `transcription`, `rubricBreakdown`, `visualMarkers`, `qualitativeAnalysis`
 - [ ] `qualitativeAnalysis` incluye: `strengths[]`, `improvementNeeds.immediate[]`, `improvementNeeds.mediumLongTerm[]`, `teacherSummary`
+- [ ] Modelo incluye `calificacion_cualitativa: Literal["IN","SU","BI","NT","SB"]`, `siguiente_paso_accionable: str` y `confidence_score: float` según [D-024]
+- [ ] `visual_markers: Optional[List[VisualMarker]] = []` — array vacío válido en v0.1 (texto plano, sin imagen). El prompt instruye al LLM a devolver `[]` cuando no hay imagen.
 - [ ] Si la IA devuelve un JSON sin algún campo obligatorio, Pydantic lanza error 422
-- [ ] Test unitario que valida un JSON correcto y uno incorrecto
+- [ ] Test unitario que valida un JSON correcto, uno incorrecto, y uno con `visual_markers: []`
 
 **Etiquetas:** `v0.1` `backend`
 
@@ -196,7 +200,7 @@
 
 **Criterios de aceptación:**
 - [ ] System prompt en archivo separado `services/prompt_builder.py`
-- [ ] El prompt instruye a la IA a actuar como "evaluador formativo experto en **Filosofía de Bachillerato**, educación secundaria andaluza" (asignatura hardcoded en v0.1 — dinámica desde v0.2 vía `marco_id`)
+- [ ] El prompt instruye a la IA a actuar como "evaluador formativo experto en **Filosofía de Bachillerato**, educación secundaria gallega (Decreto 157/2022, Xunta de Galicia)" (asignatura hardcoded en v0.1 — dinámica desde v0.2 vía `marco_id`)
 - [ ] El prompt exige explícitamente el formato JSON del contrato
 - [ ] El prompt diferencia entre mejoras inmediatas y a medio/largo plazo
 - [ ] Probado con al menos 3 respuestas de alumno distintas (buena, regular, mala)
@@ -257,7 +261,7 @@
 
 ## 🗄️ Versión 0.2 — Base de Datos
 
-**Objetivo:** La normativa andaluza y las rúbricas del profesor dejan de estar hardcoded y pasan a ser datos dinámicos almacenados en PostgreSQL.
+**Objetivo:** La normativa gallega (Decretos 156/157/2022, Xunta de Galicia) y las rúbricas del profesor dejan de estar hardcoded y pasan a ser datos dinámicos almacenados en PostgreSQL.
 
 ---
 
@@ -516,6 +520,9 @@
 - [ ] El servidor responde a todas en menos de 1 segundo con `202 Accepted`
 - [ ] Todas las correcciones completan en menos de 3 minutos
 - [ ] Los logs muestran las 5 tareas ejecutándose en workers distintos
+
+> [!NOTE]
+> **Implementación MVP:** Se usa `FastAPI BackgroundTasks` como implementación real en v0.4. El README documenta que en producción a escala se reemplazaría por Celery + Redis Worker dedicado. Esto demuestra conocimiento arquitectónico sin bloquear el desarrollo con la complejidad de configuración de Celery en WSL. Celery queda documentado como mejora futura en `## Roadmap`.
 
 **Etiquetas:** `v0.4` `backend` `infra`
 

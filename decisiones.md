@@ -39,6 +39,8 @@
 | [D-022](#d-022) | Seudonimización pre-nube (recorte local) y modelo multi-folio (`archivos_urls` JSONB) | Jul 2026 | ✅ Adoptada |
 | [D-023](#d-023) | Soporte de adaptaciones curriculares NEAE como variable en el contrato LLM | Jul 2026 | ✅ Adoptada |
 | [D-024](#d-024) | Benchmarking pedagógico UK/USA (Next Steps / Confidence Score) y evaluación competencial gallega | Jul 2026 | ✅ Adoptada |
+| [D-025](#d-025) | Vinculación con XADE mediante exportación homologada + RPA client-side | Jul 2026 | ✅ Adoptada |
+| [D-026](#d-026) | `estado_feed_forward` como columna propia en `submissions` (seguimiento formativo, no sumativo) | Jul 2026 | ✅ Adoptada |
 
 ---
 
@@ -138,9 +140,9 @@ Adaptar el sistema a múltiples asignaturas desde el principio requeriría múlt
 - 1 asignatura con rúbrica muy específica — más realista pero más frágil
 - 1 asignatura con criterios genéricos — equilibrio entre especificidad y generalidad
 
-**Decisión:** 1 asignatura (Filosofía de Bachillerato como referencia) con criterios de evaluación genéricos aplicables a respuesta corta. La rúbrica específica entra en v0.2.
+**Decisión:** 1 asignatura (**Filosofía de Bachillerato gallego**, Decreto 157/2022 Xunta de Galicia) con criterios de evaluación genéricos aplicables a respuesta corta. La rúbrica específica entra en v0.2.
 
-**Consecuencias:** El seed de la BBDD en v0.2 incluirá un marco de evaluación real de Filosofía de Bachillerato andaluz como primer registro.
+**Consecuencias:** El seed de la BBDD en v0.2 incluirá un marco de evaluación real de **Filosofía de Bachillerato gallego** (Decreto 157/2022, Xunta de Galicia) como primer registro. Coherente con D-001 (sede en A Coruña, AESIA, Decretos 156/157/2022).
 
 ---
 
@@ -457,7 +459,7 @@ Una foto de cámara móvil en alta resolución o un PDF escaneado multi-folio pu
 **Estado:** ✅ Adoptada
 
 **Contexto:**  
-La normativa educativa andaluza obliga a conservar los instrumentos de evaluación y pruebas escritas ante posibles reclamaciones oficiales durante plazos legalmente establecidos (hasta final de curso o resolución firme de recursos). Si los archivos se eliminan totalmente tras la corrección, no hay respaldo probatorio. Si se guardan en almacenamiento caliente sin límite o en el servidor local, los costes se disparan y se infringe el principio de limitación del plazo de conservación del RGPD.
+La normativa educativa gallega (Decretos 156/157/2022 de la Xunta de Galicia) obliga a conservar los instrumentos de evaluación y pruebas escritas ante posibles reclamaciones oficiales durante plazos legalmente establecidos (hasta final de curso o resolución firme de recursos). Si los archivos se eliminan totalmente tras la corrección, no hay respaldo probatorio. Si se guardan en almacenamiento caliente sin límite o en el servidor local, los costes se disparan y se infringe el principio de limitación del plazo de conservación del RGPD.
 
 **Opciones consideradas:**
 - Conservación permanente en servidor/almacenamiento estándar — alto coste e infracción RGPD por retención indefinida.
@@ -598,4 +600,3 @@ El contrato de la base de datos y la interfaz de la PWA incorporan el campo y el
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
 *Total de decisiones registradas: 26*  
 *Próxima actualización: al completar v0.1-000 (smoke test LLM)*
-

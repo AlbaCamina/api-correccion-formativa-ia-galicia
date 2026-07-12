@@ -125,7 +125,7 @@ B2B — Canal institucional / integración
 🔌 API Backend — Capa 2 (núcleo compartido B2C + B2B)
    Recibe imagen → procesa con IA → valida JSON con Pydantic
    Gestiona cola de tareas asíncrona (Celery + Redis)
-   Normativa andaluza + rúbrica docente en PostgreSQL
+   Normativa gallega (Decretos 156/157/2022 Xunta) + rúbrica docente en PostgreSQL
             ↓
 🖥️ Panel web — Capa 3 (B2C)     /     🏢 Integración — Capa 3 (B2B)
    Imagen + análisis en paralelo        JSON estructurado vía API key
@@ -239,7 +239,7 @@ B2B — Canal institucional / integración
 - `Profesor` — Usuario del sistema
 - `Examen` — Prueba evaluable
 - `Pregunta` — Ítem (TEST, DESARROLLO, PRESENTACIÓN)
-- `Marco_Evaluacion` — Normativa andaluza como JSONB
+- `Marco_Evaluacion` — Normativa gallega como JSONB
 - `Rubrica_Docente` — Criterios del profesor
 - `Submission` — Entrega (PENDING → ANALYZING → REVIEW → GRADED) con campos `alumno_id` y `archivos_urls` (JSONB multi-folio)
 - `Evaluacion` — JSON completo de resultado IA
