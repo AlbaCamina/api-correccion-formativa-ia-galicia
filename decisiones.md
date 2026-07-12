@@ -1,6 +1,6 @@
-# 📋 Registro de Decisiones — Rubrix IA (`rubrix-ai`)
+# 📋 Registro de Decisiones — API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)
 **Formato:** Architecture Decision Records (ADR)  
-**Proyecto:** Rubrix IA (`rubrix-ai`)  
+**Proyecto:** API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)  
 **Responsable:** Alba Camiña García  
 **Inicio:** Julio 2026
 

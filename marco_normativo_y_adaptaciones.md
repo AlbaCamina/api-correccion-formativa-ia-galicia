@@ -1,5 +1,5 @@
 # 🏛️ Marco Normativo de Evaluación y Adaptaciones Curriculares (NEAE / NEE)
-**Proyecto:** Rubrix IA (`rubrix-ai`)  
+**Proyecto:** API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)  
 **Fecha:** Julio 2026  
 **Ámbito Normativo Principal:** Galicia (Xunta de Galicia — Consellería de Educación) + LOMLOE / AI Act
 
@@ -7,7 +7,7 @@
 
 ## 📖 Resumen Ejecutivo
 
-El presente documento unifica el estudio de **investigación normativa y pedagógica** con el **diseño arquitectónico y de base de datos** del módulo de equidad e inclusión de **Rubrix IA (`rubrix-ai`)** (`[D-023]`). 
+El presente documento unifica el estudio de **investigación normativa y pedagógica** con el **diseño arquitectónico y de base de datos** del módulo de equidad e inclusión de **API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)** (`[D-023]`). 
 
 El objetivo primordial del módulo es garantizar el **derecho legal del alumnado con Necesidades Específicas de Apoyo Educativo (NEAE)** a una evaluación justa, equitativa y adaptada a sus características personales, impidiendo penalizaciones automáticas e injustas (por ejemplo, descuentos por faltas de ortografía en alumnado con dislexia) sin que la Inteligencia Artificial asuma roles de diagnóstico o viole la privacidad del menor.
 

@@ -1,5 +1,5 @@
-# 📖 Glosario — Rubrix IA (`rubrix-ai`)
-**Proyecto:** Rubrix IA (`rubrix-ai`)  
+# 📖 Glosario — API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)
+**Proyecto:** API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)  
 **Responsable:** Alba Camiña García  
 **Inicio:** Julio 2026
 

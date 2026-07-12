@@ -1,10 +1,10 @@
 # 📋 Backlog — API de Corrección Formativa con IA
-**Proyecto:** Rubrix IA (`rubrix-ai`)  
+**Proyecto:** API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)  
 **Fecha:** Julio 2026  
 **Metodología:** Iterativo por versiones — cada versión es un entregable funcional
 
 > [!IMPORTANT]
-> **Definición del Producto:** Rubrix IA (`rubrix-ai`) es un motor de evaluación formativa multinivel y API educativa que opera bajo el rigor pedagógico de los Decretos gallegos y del modelo finlandés (*Feed Forward* + Evaluación competencial cualitativa), el estándar de equidad y adaptaciones curriculares de la LOMLOE, y el máximo blindaje de privacidad técnica europea al nivel del *Datenschutz* alemán (Seudonimización pre-nube + *Human-in-the-Loop*). El sistema es 100% multimodal y omni-canal: procesa **cualquier tipo de prueba evaluable** (exámenes manuscritos en foto, murales de cartulina, redacciones en texto online o capturas y PDFs de presentaciones tipo Canva).
+> **Definición del Producto:** API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`) es un motor de evaluación formativa multinivel y API educativa que opera bajo el rigor pedagógico de los Decretos gallegos y del modelo finlandés (*Feed Forward* + Evaluación competencial cualitativa), el estándar de equidad y adaptaciones curriculares de la LOMLOE, y el máximo blindaje de privacidad técnica europea al nivel del *Datenschutz* alemán (Seudonimización pre-nube + *Human-in-the-Loop*). El sistema es 100% multimodal y omni-canal: procesa **cualquier tipo de prueba evaluable** (exámenes manuscritos en foto, murales de cartulina, redacciones en texto online o capturas y PDFs de presentaciones tipo Canva).
 
 ---
 

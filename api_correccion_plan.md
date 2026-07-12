@@ -1,5 +1,5 @@
 # 🗺️ Plan de Trabajo — API de Corrección Formativa con IA
-**Proyecto:** Rubrix IA (`rubrix-ai`)  
+**Proyecto:** API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)  
 **Perfil:** Programadora Junior Full-Stack — Alba Camiña García  
 **Fecha de inicio:** Julio 2026  
 **Estado:** Fase 0 — Diseño y preparación
@@ -13,7 +13,7 @@
 
 ## 📝 Descripción del Proyecto
 
-**Rubrix IA (`rubrix-ai`)** es un motor de evaluación formativa multinivel y API educativa diseñada para asistir al docente que opera bajo el rigor pedagógico de los Decretos gallegos y del modelo finlandés (*Feed Forward* + Evaluación competencial cualitativa), el estándar de equidad y adaptaciones curriculares de la LOMLOE, y el máximo blindaje de privacidad técnica europea al nivel del *Datenschutz* alemán (Seudonimización pre-nube + *Human-in-the-Loop*). El sistema permite procesar **cualquier tipo de prueba evaluable** —desde fotos de exámenes manuscritos y murales o cartulinas de aula, hasta redacciones en texto digital o capturas/PDFs de presentaciones (ej. Canva o diapositivas)— para que modelos multimodales evalúen el contenido contra rúbricas docentes y normativas dinámicas (`JSONB`), devolviendo un análisis cualitativo estructurado con acciones inmediatas de mejora para el alumno.
+**API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)** es un motor de evaluación formativa multinivel y API educativa diseñada para asistir al docente que opera bajo el rigor pedagógico de los Decretos gallegos y del modelo finlandés (*Feed Forward* + Evaluación competencial cualitativa), el estándar de equidad y adaptaciones curriculares de la LOMLOE, y el máximo blindaje de privacidad técnica europea al nivel del *Datenschutz* alemán (Seudonimización pre-nube + *Human-in-the-Loop*). El sistema permite procesar **cualquier tipo de prueba evaluable** —desde fotos de exámenes manuscritos y murales o cartulinas de aula, hasta redacciones en texto digital o capturas/PDFs de presentaciones (ej. Canva o diapositivas)— para que modelos multimodales evalúen el contenido contra rúbricas docentes y normativas dinámicas (`JSONB`), devolviendo un análisis cualitativo estructurado con acciones inmediatas de mejora para el alumno.
 
 El valor diferencial de la herramienta frente a otras opciones del mercado se basa en cuatro pilares pedagógicos:
 - **Análisis formativo priorizado**: No solo da una nota, sino que clasifica las necesidades de mejora del alumno por nivel de urgencia (inmediata vs. a medio/largo plazo).
