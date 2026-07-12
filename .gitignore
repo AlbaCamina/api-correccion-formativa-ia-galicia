@@ -58,9 +58,11 @@ Thumbs.db
 !.vscode/extensions.json
 
 # ------------------------------------------------------------------------------
-# 6. Carpetas y archivos de herramientas IA locales (Antigravity / OpenCode)
+# 6. Carpetas y archivos de herramientas IA locales (Antigravity / OpenCode / Groq)
 # ------------------------------------------------------------------------------
 .gemini/
 .opencode/logs/
+.groq/
+*.groq.json
 scratch/
 sesion_*.md
