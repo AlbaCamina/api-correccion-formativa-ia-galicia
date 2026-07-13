@@ -43,6 +43,7 @@
 | [D-026](#d-026) | `estado_feed_forward` como columna propia en `submissions` (seguimiento formativo, no sumativo) | Jul 2026 | ✅ Adoptada |
 | [D-027](#d-027) | Modo dual de interacción rúbrica-normativa seleccionable en PWA (`COMBINADO` vs `AUDITORIA_CURRICULAR`) | Jul 2026 | ✅ Adoptada |
 | [D-028](#d-028) | Adopción de Groq (`llama-3.3-70b-versatile`) como motor LLM primario de coste cero y alta velocidad | Jul 2026 | ✅ Adoptada |
+| [D-029](#d-029) | Protocolo de Pausa Arquitectónica (*Stop & Consult*) y Modularidad Plana ante límites técnicos en agentes de IA | Jul 2026 | ✅ Adoptada |
 
 ---
 
@@ -632,9 +633,28 @@ Se adopta **Groq** (con el modelo `llama-3.3-70b-versatile` y hardware de unidad
 1. **Coste Cero (0€/mes):** Permite ejecutar miles de correcciones con un modelo de código abierto de 70 mil millones de parámetros sin gasto en API en la fase de desarrollo y demostración en portfolio.
 2. **Velocidad de Respuesta:** El hardware de Groq genera las evaluaciones Pydantic en una fracción del tiempo de un LLM convencional.
 3. **Paridad de SDK:** La integración aprovecha el SDK nativo de OpenAI (`base_url="https://api.groq.com/openai/v1"`), permitiendo alternar a OpenAI en producción institucional con cambiar una sola línea en `.env`.
+4. **Bifurcación Plana de Formato (`json_object` vs `Structured Outputs`):** Siguiendo el principio de Modularidad Plana (YAGNI), como `llama-3.3-70b-versatile` en Groq no soporta el parámetro nativo `response_format={"type": "json_schema"}` (Structured Outputs de `.parse()`), `llm_client.py` bifurca explícitamente según `LLM_PROVIDER`: si es `groq`, utiliza directamente `response_format={"type": "json_object"}` con inyección textual del esquema en el `SYSTEM_PROMPT` y validación Pydantic en código; si es `openai`, utiliza `.parse()` nativo. Esto elimina reintentos innecesarios por errores HTTP 400 y reduce a la mitad la latencia de red en Groq.
+
+---
+
+### D-029
+## Protocolo de Pausa Arquitectónica (*Stop & Consult*) y Modularidad Plana ante límites técnicos en agentes de IA
+
+**Estado:** Adoptada (`[v0.1-003]`)  
+**Fecha:** Julio 2026 (13/07/2026)  
+**Contexto:**  
+Durante el desarrollo e integración de los motores LLM en la versión v0.1 (`llm_client.py`), se evidenció la tendencia intrínseca de los agentes de IA a aplicar parches locales acumulativos o excepciones anidadas sobre la marcha (`try-except` de fallback dentro de bucles de reintento) para resolver incompatibilidades de API o tests en rojo, sin detenerse a consultar al desarrollador principal ni evaluar el impacto arquitectónico global (violación del principio PonyTail/YAGNI).
+
+**Decisión:**  
+Se establece el **Protocolo de Pausa Arquitectónica (*Stop & Consult*)** como regla fundamental de co-piloteo *Human-in-the-Loop* en el desarrollo de software (`AGENTS.md` Regla 5):
+1. Si durante la implementación surge una incompatibilidad de API, un error no previsto o un caso de borde cuya solución requiera añadir lógica anidada compleja (ej. fallbacks multinivel, reintentos ad-hoc o parches acumulativos), el Agente **TIENE PROHIBIDO** parchear el código sobre la marcha para "hacer que funcione".
+2. El Agente **DEBE PAUSAR** inmediatamente su turno, explicar con claridad al desarrollador la causa raíz del problema y presentar **al menos dos opciones arquitectónicas** contrastadas contra el principio YAGNI (simplicidad y modularidad plana) para tomar la decisión en equipo antes de modificar el código.
+
+**Consecuencias:**  
+Garantiza que toda solución técnica mantenga una estructura plana, limpia y fácil de escalar en versiones posteriores (`v0.2` en adelante), eliminando la deuda técnica temprana y reforzando el rol de la autora del portfolio como arquitecta y directora técnica superior del sistema.
 
 ---
 
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 12/07/2026 — añadidas D-027 (Modo Dual) y D-028 (Groq como Motor Primario) con marca api-correccion-formativa-ia-galicia*  
-*Total de decisiones registradas: 28*
+*Actualizado el 13/07/2026 — añadidas D-027 (Modo Dual), D-028 (Groq como Motor Primario) y D-029 (Protocolo de Pausa Arquitectónica)*  
+*Total de decisiones registradas: 29*

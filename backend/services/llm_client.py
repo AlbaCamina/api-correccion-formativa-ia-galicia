@@ -90,23 +90,8 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "") 
         start_time = time.time()
         logger.info(f"Intento {attempt}/{max_attempts} evaluando en {provider.upper()} con {model_name}...")
         try:
-            # 1. Intentamos Structured Outputs nativo (.parse)
-            try:
-                completion = client.beta.chat.completions.parse(
-                    model=model_name,
-                    messages=[
-                        {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    response_format=EvaluacionIA,
-                    temperature=0.2,
-                )
-                resultado = completion.choices[0].message.parsed
-                if resultado is None:
-                    raise ValueError("El parseador del LLM retornó parsed=None.")
-            except Exception as parse_error:
-                logger.warning(f"Fallo en .parse() nativo: {parse_error}. Intentando fallback con json_object...")
-                # 2. Fallback clásico a json_object + validación manual
+            if provider == "groq":
+                # Groq: 1 sola llamada directa y limpia con json_object + instrucciones en prompt
                 completion = client.chat.completions.create(
                     model=model_name,
                     messages=[
@@ -120,6 +105,22 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "") 
                 if not raw_json:
                     raise ValueError("El LLM retornó contenido vacío.")
                 resultado = EvaluacionIA.model_validate_json(raw_json)
+            elif provider == "openai":
+                # OpenAI: 1 sola llamada directa a Structured Outputs nativos de Pydantic (.parse)
+                completion = client.beta.chat.completions.parse(
+                    model=model_name,
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    response_format=EvaluacionIA,
+                    temperature=0.2,
+                )
+                resultado = completion.choices[0].message.parsed
+                if resultado is None:
+                    raise ValueError("El parseador del LLM retornó parsed=None.")
+            else:
+                raise ValueError(f"Proveedor no soportado: {provider}")
 
             duration = time.time() - start_time
             logger.info(f"¡Éxito! Llamada completada en {duration:.2f}s en intento {attempt}")
