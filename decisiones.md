@@ -674,6 +674,30 @@ El proyecto se vuelve 100% autoinstalable e independiente en cualquier entorno l
 
 ---
 
+### D-031
+## Blindaje de Privacidad y Seguridad sin Claves Maestras (`Seudonimización Estricta + Hacheo Unidireccional bcrypt vs Cifrado Simétrico`)
+
+**Estado:** ✅ Adoptada (`[v0.2-002]`)  
+**Fecha:** Julio 2026 (13/07/2026)  
+**Contexto:**  
+En el diseño del modelo de datos de profesores (`[v0.2-002]`) y la planificación del almacenamiento de adaptaciones curriculares del alumnado (`[D-023]`, `v0.2-007`), se debatió la conveniencia de implementar Cifrado Simétrico en Reposo a nivel de columna (`Application-Level Encryption` mediante `AES / Fernet` y una `ENCRYPTION_KEY` en el archivo `.env`). Se evaluaron el coste computacional, la complejidad técnica y los riesgos de pérdida de datos.
+
+**Opciones consideradas:**
+- **Cifrado Simétrico en Reposo (`cryptography / Fernet`) para todas las columnas sensibles:** Rechazado por introducir el riesgo crítico y catastrófico de pérdida irrecoverable de toda la base de datos ante un extravío o corrupción de la variable `ENCRYPTION_KEY` durante reinicios o migraciones del servidor (`Key Loss Gotcha`), violando la simplicidad del principio *PonyTail/YAGNI*.
+- **Almacenamiento en texto claro sin protección:** Rechazado categóricamente por incumplir el RGPD, la LOPDGDD (art. 7 protección de menores) y el Esquema Nacional de Seguridad (ENS).
+- **Seudonimización Estricta (`HitL Client-Side`) para el alumnado + Hacheo Unidireccional (`bcrypt`) para el docente:** **Elegida por su solidez jurídica y técnica absoluta con cero riesgo de pérdida de datos**.
+
+**Decisión:**  
+Se adopta la siguiente estrategia multinivel de seguridad y privacidad:
+1. **Privacidad de Alumnos por Seudonimización (`[D-023]` & `[D-025]`):** La base de datos en la nube no procesa ni almacena jamás el nombre ni los datos personales del estudiante. Todas las entregas se asocian a un código identificador anónimo (`alumno_id = "A-14"`). La libreta de equivalencia con la identidad real del menor reside en exclusiva en el cuaderno o en la sesión local de XADE del profesor, haciendo que la base de datos sea intrínsecamente inocua e irrelevante en caso de una intrusión externa sin necesidad de claves de descifrado.
+2. **Autenticación Docente por Hacheo Unidireccional (`bcrypt` + `JWT` en `v0.2-002`):** Las contraseñas no utilizan cifrado simétrico ni dependen de una clave secreta del servidor; se transforman mediante el algoritmo matemático irreversible `bcrypt` (`passlib[bcrypt]`). La validación del login compara hashes, lo que inmuniza el sistema frente a pérdidas de variables de entorno y garantiza que el reinicio o cambio de servidor no afecte el acceso de las profesoras.
+3. **Cifrado en Tránsito (`TLS 1.3 / HTTPS`):** Toda la comunicación cliente-servidor se encapsula por túnel seguro como requisito para la PWA.
+
+**Consecuencias:**  
+El proyecto alcanza el máximo nivel de cumplimiento normativo (RGPD, ENS, AI Act) eliminando por diseño la deuda técnica y el peligro mortal de corromper la base de datos por pérdida de claves maestras.
+
+---
+
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 13/07/2026 — añadidas D-027 (Modo Dual), D-028 (Groq como Motor Primario), D-029 (Protocolo de Pausa Arquitectónica) y D-030 (Persistencia y Migraciones en Modularidad Plana)*  
-*Total de decisiones registradas: 30*
+*Actualizado el 13/07/2026 — añadidas D-027 (Modo Dual), D-028 (Groq como Motor Primario), D-029 (Protocolo de Pausa Arquitectónica), D-030 (Persistencia y Migraciones) y D-031 (Blindaje sin Clave Maestra)*  
+*Total de decisiones registradas: 31*

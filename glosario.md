@@ -401,10 +401,17 @@ Clave secreta que identifica y autentica a quien llama a una API. Las claves de 
 **Bearer token**  
 Tipo de token de autenticación que se envía en la cabecera HTTP de cada petición: `Authorization: Bearer <token>`. Los JWT se usan como Bearer tokens.
 
+**Cifrado Simétrico vs. Seudonimización (Blindaje sin Clave Maestra)**  
+Estrategia arquitectónica (`YAGNI`) por la cual se descarta el cifrado de columnas con clave maestra simétrica (`ENCRYPTION_KEY` / `Fernet`) para evitar el riesgo catastrófico de pérdida irrecoverable de datos ante un extravío o corrupción de la clave en `.env`. En su lugar, la privacidad y protección de los datos sensibles del alumnado (`[D-023]`) se resuelve de raíz mediante **Seudonimización Estricta (`HitL Client-Side`)**: en la base de datos de la nube solo se almacena un identificador anónimo (`alumno_id = "A-14"`), mientras que la tabla de equivalencias con la identidad real permanece exclusivamente en el cuaderno y XADE local de la profesora, haciendo que la base de datos sea intrínsecamente inocua sin depender de claves criptográficas frágiles.
+
+**Hacheo Unidireccional (`bcrypt` / Password Hashing)**  
+Algoritmo criptográfico irreversible (de un solo sentido) utilizado en `backend/services/auth_service.py` para almacenar las contraseñas (`hashed_password`) en la tabla `profesores` (`[v0.2-002]`). A diferencia del cifrado simétrico, no requiere ni depende de ninguna clave maestra secreta en `.env` para funcionar; aplica un cálculo matemático complejo sobre la contraseña (`salt + hash`). Para validar un login, el motor aplica la misma fórmula al texto ingresado y compara los hashes resultantes, garantizando seguridad absoluta ante filtraciones y cero riesgo de pérdida por reinicios o migraciones de servidor.
+
 **.env**  
 Archivo de texto que contiene variables de entorno (claves de API, contraseñas, configuración sensible). Nunca se sube a GitHub — está en el `.gitignore`. El archivo `.env.example` muestra qué variables existen sin revelar sus valores.
 
 **ENS (Esquema Nacional de Seguridad)**  
+
 Regulamento y marco normativo obligatorio que fija los requisitos y políticas de ciberseguridad en la Administración Pública y en los sistemas que tratan datos institucionales o de ciudadanos (como XADE en Galicia). Debido a las rigurosas exigencias del ENS y de AMTEGA sobre la protección de datos de menores, se prohíbe la conexión o inyección externa por APIs privadas comerciales directamente en XADE, justificando que el trasvase desde api-correccion-formativa-ia-galicia se realice localmente mediante exportación de ficheros o scripts locales en el navegador del funcionario (`[D-025]`).
 
 **JWT** (JSON Web Token — Token Web JSON)  
