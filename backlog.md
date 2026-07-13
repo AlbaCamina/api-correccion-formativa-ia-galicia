@@ -142,15 +142,15 @@
 **para** poder empezar a añadir endpoints de forma ordenada.
 
 **Criterios de aceptación:**
-- [ ] Carpeta `backend/` con `main.py`, `routers/`, `models/`, `services/`
-- [ ] Entorno virtual Python configurado (`venv` o `poetry`)
-- [ ] FastAPI instalado y servidor arrancando en `localhost:8000`
-- [ ] Endpoint de health check `GET /health` devuelve `{ "status": "ok" }`
-- [ ] `.gitignore` configurado (excluye `venv/`, `.env`, `__pycache__/`)
-- [ ] Repositorio Git inicializado (`git init`) y vinculado al repositorio en GitHub (`git remote add origin...`)
-- [ ] Primer commit y push realizados a GitHub exclusivamente con la documentación de arquitectura y diseño (`*.md`) antes de escribir la primera línea de código
-- [ ] `AGENTS.md` generado en la raíz del proyecto ejecutando `/init` en OpenCode (contexto persistente para el agente en todas las sesiones)
-- [ ] Reglas de **PonyTail** añadidas al `AGENTS.md`: el agente aplica el principio de mínimo código (YAGNI + decisión ladder) para reducir tokens y sobre-ingeniería
+- [x] Carpeta `backend/` con `main.py`, `routers/`, `models/`, `services/`
+- [x] Entorno virtual Python configurado (`venv` o `poetry`)
+- [x] FastAPI instalado y servidor arrancando en `localhost:8000`
+- [x] Endpoint de health check `GET /health` devuelve `{ "status": "ok" }`
+- [x] `.gitignore` configurado (excluye `venv/`, `.env`, `__pycache__/`)
+- [x] Repositorio Git inicializado (`git init`) y vinculado al repositorio en GitHub (`git remote add origin...`)
+- [x] Primer commit y push realizados a GitHub exclusivamente con la documentación de arquitectura y diseño (`*.md`) antes de escribir la primera línea de código
+- [x] `AGENTS.md` generado en la raíz del proyecto ejecutando `/init` en OpenCode (contexto persistente para el agente en todas las sesiones)
+- [x] Reglas de **PonyTail** añadidas al `AGENTS.md`: el agente aplica el principio de mínimo código (YAGNI + decisión ladder) para reducir tokens y sobre-ingeniería
 
 **Etiquetas:** `v0.1` `backend` `infra`
 
