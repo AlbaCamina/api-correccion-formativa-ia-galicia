@@ -216,11 +216,11 @@
 **para** saber exactamente qué ha fallado sin tener que leer logs del servidor.
 
 **Criterios de aceptación:**
-- [ ] `400` si el body de la petición está mal formado o faltan campos
-- [ ] `422` si los datos no pasan validación de Pydantic
-- [ ] `500` si la IA falla o devuelve JSON inválido tras el reintento
-- [ ] Todos los errores devuelven `{ "error": string, "detail": string }`
-- [ ] Los errores se registran en log con timestamp
+- [x] `400` si el body de la petición está mal formado o faltan campos
+- [x] `422` si los datos no pasan validación de Pydantic
+- [x] `500` si la IA falla o devuelve JSON inválido tras el reintento
+- [x] Todos los errores devuelven `{ "error": string, "detail": string }`
+- [x] Los errores se registran en log con timestamp
 
 **Etiquetas:** `v0.1` `backend`
 
@@ -233,10 +233,10 @@
 **para** no exponer credenciales en el repositorio.
 
 **Criterios de aceptación:**
-- [ ] Archivo `.env.example` con todas las variables necesarias (sin valores reales)
-- [ ] `API_KEY_OPENAI` o `API_KEY_ANTHROPIC` cargadas desde `.env`
-- [ ] El servidor no arranca si falta una variable de entorno requerida
-- [ ] `.env` añadido a `.gitignore`
+- [x] Archivo `.env.example` con todas las variables necesarias (sin valores reales)
+- [x] `API_KEY_OPENAI` o `API_KEY_ANTHROPIC` cargadas desde `.env`
+- [x] El servidor no arranca si falta una variable de entorno requerida
+- [x] `.env` añadido a `.gitignore`
 
 **Etiquetas:** `v0.1` `backend` `infra`
 
@@ -249,11 +249,11 @@
 **para** evaluar el trabajo o contribuir.
 
 **Criterios de aceptación:**
-- [ ] Descripción del proyecto y propuesta de valor diferencial
-- [ ] Instrucciones de instalación y ejecución local
-- [ ] Ejemplo de petición y respuesta del endpoint `POST /api/v1/evaluate`
-- [ ] Sección `## AI Development Methodology` con los 4 elementos del marco narrativo de BLOQUE 8: qué diseñé yo / qué ejecutaron los agentes / cómo validé / qué aprendí — usando el lenguaje de arquitecta/orquestadora, no el lenguaje defensivo
-- [ ] Badges de versión y estado
+- [x] Descripción del proyecto y propuesta de valor diferencial
+- [x] Instrucciones de instalación y ejecución local
+- [x] Ejemplo de petición y respuesta del endpoint `POST /api/v1/evaluate`
+- [x] Sección `## AI Development Methodology` con los 4 elementos del marco narrativo de BLOQUE 8: qué diseñé yo / qué ejecutaron los agentes / cómo validé / qué aprendí — usando el lenguaje de arquitecta/orquestadora, no el lenguaje defensivo
+- [x] Badges de versión y estado
 
 **Etiquetas:** `v0.1` `docs`
 
