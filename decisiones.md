@@ -704,6 +704,29 @@ El proyecto alcanza el máximo nivel de cumplimiento normativo (RGPD, ENS, AI Ac
 
 ---
 
+### D-032
+## Trazabilidad Bidireccional Git-Web (`Bidirectional Traceability`) y Gobernanza de Milestones
+
+**Estado:** ✅ Adoptada (`[v0.2]`)  
+**Fecha:** Julio 2026 (13/07/2026)  
+**Contexto:**  
+En proyectos individuales o de desarrollo por parejas (`Phase Ninja`), la gestión de tareas puede bifurcarse entre archivos de texto locales dentro del repositorio (`backlog.md`) y herramientas de gestión de producto en la nube (tableros de GitHub Issues y Milestones). Se evaluó cómo evitar la burocracia pesada de abrir decenas de micro-issues en la web manteniendo, al mismo tiempo, una presentación directiva corporativa e impecable ante tribunales o reclutadores.
+
+**Opciones consideradas:**
+- **Exclusivamente gestión web en GitHub Issues:** Rechazada por introducir latencia en el flujo de pair programming y crear dependencia externa si se inspecciona el código local offline.
+- **Exclusivamente archivo local `backlog.md` sin rastro en la web:** Rechazada por desaprovechar la potencia visual de GitHub Projects/Releases ante evaluadores o inversores.
+- **Trazabilidad Bidireccional (`Local <-> Web`) con Épicas por Versión:** **Elegida por su equilibrio perfecto entre agilidad PonyTail/YAGNI y excelencia de escaparate corporativo**.
+
+**Decisión:**  
+Se establece como invariante de gobernanza del proyecto la **Trazabilidad Bidireccional de Milestones**:
+1. **En GitHub Web:** Se abre una **única Issue Épica por Versión/Milestone** (`Issue #1 v0.1`, `Issue #2 v0.2`, `Issue #3 v0.3`), agrupando en su cuerpo el listado de historias de usuario y ADRs. Si durante el desarrollo surge un pivote arquitectónico, la Issue se edita o se cierra formalmente con el motivo nativo **`Close as not planned`** argumentando el ADR de respaldo.
+2. **En el Repositorio Local (`backlog.md`):** Se enlaza explícitamente cada cabecera de versión con su número de Issue web correspondiente (`[GitHub Issue #X]`), permitiendo una trazabilidad instantánea bidireccional desde cualquier entorno.
+
+**Consecuencias:**  
+El proyecto mantiene velocidad máxima en el desarrollo en terminal, a la vez que proyecta una madurez de gestión de producto y control de cambios al nivel de los estándares internacionales más exigentes.
+
+---
+
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 13/07/2026 — añadidas D-027 (Modo Dual), D-028 (Groq como Motor Primario), D-029 (Protocolo de Pausa Arquitectónica), D-030 (Persistencia y Migraciones) y D-031 (Blindaje sin Clave Maestra)*  
-*Total de decisiones registradas: 31*
+*Actualizado el 13/07/2026 — añadidas D-027 (Modo Dual), D-028 (Groq como Motor Primario), D-029 (Protocolo de Pausa Arquitectónica), D-030 (Persistencia y Migraciones), D-031 (Blindaje sin Clave Maestra) y D-032 (Trazabilidad Bidireccional)*  
+*Total de decisiones registradas: 32*

@@ -106,7 +106,7 @@
 
 ---
 
-## 🚀 Versión 0.1 — Motor Síncrono (Prueba de concepto)
+## 🚀 Versión 0.1 — Motor Síncrono (Prueba de concepto) [GitHub Issue #1 (Closed)]
 
 **Objetivo:** Demostrar que la IA puede recibir texto y devolver un JSON estructurado con nota y análisis formativo. Sin base de datos, sin imágenes, sin asincronía.
 
@@ -260,7 +260,7 @@
 
 ---
 
-## 🗄️ Versión 0.2 — Base de Datos
+## 🗄️ Versión 0.2 — Base de Datos [GitHub Issue #2 (Open)]
 
 **Objetivo:** La normativa gallega (Decretos 156/157/2022, Xunta de Galicia) y las rúbricas del profesor dejan de estar hardcoded y pasan a ser datos dinámicos almacenados en PostgreSQL.
 
@@ -389,7 +389,7 @@
 
 ---
 
-## 📸 Versión 0.3 — Subida de Imágenes y OCR
+## 📸 Versión 0.3 — Subida de Imágenes y OCR [GitHub Issue #3 (Open)]
 
 **Objetivo:** El profesor puede subir una foto del examen manuscrito. El sistema la procesa con un modelo multimodal y devuelve el análisis.
 
