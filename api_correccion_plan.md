@@ -414,23 +414,21 @@ api-correccion/                              ← workspace único de VS Code
 ## Calendario Orientativo
 
 > [!NOTE]
-> La **reunión con el contacto de la AESIA** es una oportunidad puntual, no un paso bloqueante del roadmap. Se puede producir en cualquier momento del desarrollo. El BLOQUE 3 documenta las preguntas a llevar preparadas; la reunión en sí se agenda cuando haya disponibilidad. **La apertura del repositorio en GitHub** se hace al arrancar el código (v0.1), no al finalizar el proyecto — el repo público desde el primer commit es parte de la narrativa de portfolio.
+> **Ubicación estratégica de la reunión con la AESIA:** No es un requisito para iniciar la base de datos (**v0.2**), pero se ubica en el momento ideal justo al completar la v0.2 y antes de abordar la subida de imágenes (**v0.3**). De esta forma, se acude al encuentro con un backend funcional y conectado a PostgreSQL, obteniendo el criterio institucional exacto sobre OCR, asincronía y seudonimización pre-nube para diseñar las versiones v0.3 y v0.4 con un sello de autoridad inexpugnable.
 
-| Sesión | Bloque | Contenido | Estado |
+| Sesión | Bloque / Versión | Contenido | Estado |
 |---|---|---|---|
 | ✅ | Bloque 1 | Stack tecnológico — CERRADO | 💬 Antigravity |
-| ✅ | Bloque 2 | Síncrono/Asíncrono + Colas de tareas | 💬 Antigravity |
-| ✅ | Bloque 2 | Object Storage + Structured Outputs + Presigned URLs | 💬 Antigravity |
+| ✅ | Bloque 2 | Síncrono/Asíncrono + Colas de tareas + Object Storage | 💬 Antigravity |
+| ✅ | Bloque 4-8 | Marco legal, modelo de datos, contrato JSON, servicios y versiones | 📋 Diseñado (`decisiones.md` y `backlog.md`) |
 | ✅ | Bloque 9 | Entorno de desarrollo configurado (WSL + OpenCode + Gemini + Groq) | 🛠️ Completado |
-| — | Bloque 3 | **Preparación preguntas reunión AESIA** (leer BLOQUE 3 del plan) | 📋 Pendiente |
-| ⭐ | — | **Reunión con contacto AESIA** *(fecha libre, no bloqueante)* | 🤝 Cuando haya disponibilidad |
-| ✅ | — | **Apertura repo en GitHub y v0.1 completada (Motor Síncrono Validado)** | 🖥️ OpenCode + Antigravity |
-| — | Bloque 4 | Marco legal: RGPD, AI Act, trazabilidad | 💬 Antigravity |
-| — | Bloque 5 | Diseño del modelo de datos | 💬 Antigravity |
-| — | Bloque 5 | JSON de salida y pipeline asíncrono | 💬 Antigravity |
-| — | Bloque 6 | Servicios y configuración de entorno | 💬 Antigravity |
-| — | Bloque 7 | Programa de versiones definitivo | 💬 Antigravity |
-| — | Bloque 8 | Portfolio/README profesional (v1.0) | 💬 Antigravity |
+| ✅ | **v0.1** | **Motor Síncrono y Contrato JSON Validados (`origin/main`)** | 🖥️ Completado |
+| 🚀 | **v0.2** | **Capa de Datos:** PostgreSQL + SQLAlchemy (`marcos_evaluacion` y `rubricas_docente` Modo Dual [D-027]) | 📋 **En curso / Siguiente paso** |
+| ⭐ | **Bloque 3** | **Reunión con contacto AESIA (A Coruña):** Validación de pipeline multimodal, privacidad pre-nube y networking TIC | 🤝 **Al completar v0.2 (Puente a v0.3)** |
+| — | **v0.3** | **Multimodalidad y OCR:** Subida de fotos de exámenes y procesado visual con LLM Vision | ⏳ Pendiente de v0.2 y reunión AESIA |
+| — | **v0.4** | **Asincronía y Colas:** Celery + Redis para concurrencia masiva de correcciones | ⏳ Pendiente de v0.3 |
+| — | **v0.5** | **Frontend PWA React + Vite:** Interfaz móvil para profesorado y firma HitL | ⏳ Pendiente de v0.3 |
+| — | **v1.0** | **Compliance & Portfolio Final:** Seudonimización pre-nube ([D-022]), Cold Storage ([D-021]) y README | ⏳ Pendiente de v0.5 |
 
 ---
 
