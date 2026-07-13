@@ -163,12 +163,12 @@
 **para** que el servidor rechace automáticamente respuestas malformadas.
 
 **Criterios de aceptación:**
-- [ ] Modelo `EvaluacionIA` con campos: `transcription`, `rubricBreakdown`, `visualMarkers`, `qualitativeAnalysis`
-- [ ] `qualitativeAnalysis` incluye: `strengths[]`, `improvementNeeds.immediate[]`, `improvementNeeds.mediumLongTerm[]`, `teacherSummary`
-- [ ] Modelo incluye `calificacion_cualitativa: Literal["IN","SU","BI","NT","SB"]`, `siguiente_paso_accionable: str` y `confidence_score: float` según [D-024]
-- [ ] `visual_markers: Optional[List[VisualMarker]] = []` — array vacío válido en v0.1 (texto plano, sin imagen). El prompt instruye al LLM a devolver `[]` cuando no hay imagen.
-- [ ] Si la IA devuelve un JSON sin algún campo obligatorio, Pydantic lanza error 422
-- [ ] Test unitario que valida un JSON correcto, uno incorrecto, y uno con `visual_markers: []`
+- [x] Modelo `EvaluacionIA` con campos: `transcription`, `rubricBreakdown`, `visualMarkers`, `qualitativeAnalysis`
+- [x] `qualitativeAnalysis` incluye: `strengths[]`, `improvementNeeds.immediate[]`, `improvementNeeds.mediumLongTerm[]`, `teacherSummary`
+- [x] Modelo incluye `calificacion_cualitativa: Literal["IN","SU","BI","NT","SB"]`, `siguiente_paso_accionable: str` y `confidence_score: float` según [D-024]
+- [x] `visual_markers: Optional[List[VisualMarker]] = []` — array vacío válido en v0.1 (texto plano, sin imagen). El prompt instruye al LLM a devolver `[]` cuando no hay imagen.
+- [x] Si la IA devuelve un JSON sin algún campo obligatorio, Pydantic lanza error 422
+- [x] Test unitario que valida un JSON correcto, uno incorrecto, y uno con `visual_markers: []`
 
 **Etiquetas:** `v0.1` `backend`
 
