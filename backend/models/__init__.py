@@ -1,4 +1,5 @@
 from .evaluation import EvaluacionIA, RubricItem, VisualMarker, ImprovementNeeds, QualitativeAnalysis
+from .database import Base, engine, SessionLocal, get_db
 
 __all__ = [
     "EvaluacionIA",
@@ -6,4 +7,9 @@ __all__ = [
     "VisualMarker",
     "ImprovementNeeds",
     "QualitativeAnalysis",
+    "Base",
+    "engine",
+    "SessionLocal",
+    "get_db",
 ]
+

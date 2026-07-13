@@ -655,6 +655,25 @@ Garantiza que toda solución técnica mantenga una estructura plana, limpia y f�
 
 ---
 
+### D-030
+## Capa de Persistencia y Migraciones Transaccionales en Modularidad Plana (`SQLAlchemy + Alembic sobre PostgreSQL 16 Alpine en Puerto Dedicado 5433`)
+
+**Estado:** Adoptada (`[v0.2-001]`)  
+**Fecha:** Julio 2026 (13/07/2026)  
+**Contexto:**  
+En el arranque de la v0.2, es necesario integrar el motor relacional de PostgreSQL para almacenar las entregas, rúbricas y valoraciones cualitativas de la IA. Surgieron dos requerimientos críticos: por un lado, evitar conflictos en el puerto nativo `5432` de Windows/WSL provocados por bases de datos de prácticas anteriores o servicios locales; y por otro, mantener la arquitectura fiel a las reglas del proyecto (`YAGNI` y `Modularidad Plana`), evitando sobreingeniería con patrones de repositorio redundantes.
+
+**Decisión:**  
+Se adopta la siguiente arquitectura técnica de persistencia:
+1. **Puerto Dedicado Exclusivo (`5433:5432`):** El contenedor de Docker (`postgres:16-alpine`) se expone en el puerto externo `5433` de Windows/WSL, eliminando por diseño la posibilidad de colisión (`Bind failed`) con cualquier otra base de datos o proyecto local en el PC de la desarrolladora.
+2. **Modularidad Plana (`backend/models/database.py`):** Siguiendo la Regla 2 de `AGENTS.md`, todo el acceso a datos, motor (`engine`), sesión (`SessionLocal`) e inyecciones de dependencia (`get_db`) residen de forma plana y directa en `backend/models/database.py`, exportando los objetos en `backend/models/__init__.py`. Se rechaza crear capas abstractas como `repositories/` o `DAO/` innecesarias para la escala de la API.
+3. **Migraciones Transaccionales (`Alembic`):** Se configura `Alembic` leyendo de forma dinámica la variable de entorno `DATABASE_URL` y vinculándose a `Base.metadata`.
+
+**Consecuencias:**  
+El proyecto se vuelve 100% autoinstalable e independiente en cualquier entorno local (`Docker Compose up -d` y `alembic upgrade head`), garantizando persistencia relacional transaccional y coherencia estricta con el estilo *PonyTail*.
+
+---
+
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 13/07/2026 — añadidas D-027 (Modo Dual), D-028 (Groq como Motor Primario) y D-029 (Protocolo de Pausa Arquitectónica)*  
-*Total de decisiones registradas: 29*
+*Actualizado el 13/07/2026 — añadidas D-027 (Modo Dual), D-028 (Groq como Motor Primario), D-029 (Protocolo de Pausa Arquitectónica) y D-030 (Persistencia y Migraciones en Modularidad Plana)*  
+*Total de decisiones registradas: 30*

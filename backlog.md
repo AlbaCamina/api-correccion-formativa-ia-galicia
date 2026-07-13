@@ -273,10 +273,11 @@
 **para** poder persistir y recuperar datos de forma transaccional.
 
 **Criterios de aceptación:**
-- [ ] Docker Compose con servicio PostgreSQL levantando en `localhost:5432`
-- [ ] SQLAlchemy configurado con connection pool
-- [ ] Alembic configurado para migraciones
-- [ ] Primera migración vacía ejecutada correctamente
+- [x] Docker Compose con servicio PostgreSQL levantando en `localhost:5433` (`[D-030]`)
+- [x] SQLAlchemy configurado con connection pool (`backend/models/database.py`)
+- [x] Alembic configurado para migraciones (`alembic.ini` + `alembic/env.py`)
+- [x] Primera migración vacía ejecutada correctamente (`initial empty revision`)
+
 
 **Etiquetas:** `v0.2` `database` `infra`
 

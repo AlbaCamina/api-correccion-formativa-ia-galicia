@@ -68,7 +68,8 @@ Estándar para describir y documentar APIs REST. FastAPI lo integra nativamente:
 ## 2. Python y backend
 
 **Alembic**  
-Herramienta de migraciones para SQLAlchemy. Guarda un historial de todos los cambios que has hecho en la estructura de la base de datos, como un control de versiones para las tablas.
+Herramienta oficial de migraciones transaccionales para SQLAlchemy. Funciona como un "Git para la estructura de tu base de datos": en lugar de crear o modificar tablas a mano con comandos SQL sueltos (lo que causaría caos entre entornos), Alembic genera archivos de revisión temporales en Python (`alembic revision -m "nombre"`) dentro de `alembic/versions/` que describen exactamente cómo subir (`upgrade`) o retroceder (`downgrade`) el esquema. Al ejecutar `alembic upgrade head`, el motor aplica las revisiones en orden estricto, garantizando que la estructura de la base de datos sea siempre auditable, reproducible y 100% idéntica entre tu WSL local, tu Docker y el servidor de producción (`[D-030]`).
+
 
 **FastAPI**  
 El framework (marco de trabajo) de Python con el que se construye la API. Es moderno, muy rápido y genera documentación automática. Equivalente a Fastify pero en Python.
@@ -99,7 +100,8 @@ Registro al que solo se pueden añadir entradas, nunca modificar ni borrar las e
 Tabla de auditoría que registra todas las acciones importantes del sistema con timestamp: quién hizo qué y cuándo. Requerido por el AI Act para demostrar que el humano tuvo siempre la última palabra.
 
 **Connection pool**  
-Conjunto de conexiones a la base de datos que se reutilizan en lugar de abrirse y cerrarse con cada petición. Mejora el rendimiento bajo carga.
+Conjunto de conexiones abiertas a la base de datos que se mantienen activas y se reutilizan entre peticiones en lugar de abrir y cerrar una conexión física con cada endpoint. En api-correccion-formativa-ia-galicia se implementa nativamente en `backend/models/database.py` (`pool_size=10, max_overflow=20`), evitando saturar PostgreSQL y garantizando latencias mínimas en concurrencia (`[D-030]`).
+
 
 **CRUD** (Create, Read, Update, Delete — Crear, Leer, Actualizar, Eliminar)  
 Las cuatro operaciones básicas sobre cualquier dato. Decir "CRUD completo" significa que se pueden hacer las cuatro.
@@ -116,7 +118,11 @@ Herramienta que permite trabajar con la base de datos usando objetos del lenguaj
 **PostgreSQL**  
 Base de datos relacional de código abierto. Guarda los datos estructurados del proyecto (profesores, exámenes, evaluaciones). La misma que usaste en QUANTIA.
 
+**Puerto Dedicado / Mapeo de Puertos (Port Mapping)**  
+Asignación de un puerto externo exclusivo y reservado en `docker-compose.yml` (ej. `ports: - "5433:5432"`) para aislar el contenedor de base de datos del proyecto frente a otras instancias o servicios locales del sistema operativo. Aunque internamente PostgreSQL sigue operando en su puerto nativo 5432, desde Windows o WSL nos conectamos al puerto 5433 (`DATABASE_URL`). Esto previene colisiones (`Bind for 0.0.0.0:5432 failed`) cuando conviven varios proyectos o prácticas profesionales en el mismo ordenador (`[D-030]`).
+
 **Seed**  
+
 Datos iniciales que se insertan en la base de datos al crearla para que no esté vacía. En este proyecto: al menos un marco de evaluación de Bachillerato o ESO según el decreto autonómico de la Xunta de Galicia.
 
 **UUID** (Universally Unique Identifier — Identificador Único Universal)  
@@ -144,7 +150,11 @@ Modelo arquitectónico multinivel de api-correccion-formativa-ia-galicia que des
 **LLM** (Large Language Model — Modelo de Lenguaje Grande)  
 Modelo de inteligencia artificial entrenado con enormes cantidades de texto. Es la IA que corrige los exámenes en este proyecto (GPT-4o o Claude).
 
+**Modo Dual de Rúbrica (`COMBINADO` vs `AUDITORIA_CURRICULAR`)**  
+Parámetro arquitectónico de interacción pedagógica (`[D-027]`, `modo_evaluacion`) que resuelve la tensión entre los criterios oficiales de la Xunta y las rúbricas ad-hoc de los docentes sin sobreingeniería en el backend. En modo `COMBINADO`, la IA fusiona los saberes de la ley con la rúbrica de la profesora para calificar entregas diarias con agilidad. En modo `AUDITORIA_CURRICULAR`, la IA corrige la tarea y adicionalmente orienta al docente contrastando su rúbrica contra los Decretos 156/157/2022, advirtiendo en `teacherSummary` de posibles omisiones competenciales.
+
 **Multimodal / Omni-canal**  
+
 Un modelo de IA que procesa texto, imagen y estructuras combinadas de forma simultánea (ej. GPT-4o o Claude 3.5 Sonnet). En api-correccion-formativa-ia-galicia esto permite evaluar **cualquier tipo de prueba evaluable**: no solo fotos de exámenes manuscritos, sino murales de cartulina de aula, redacciones en campos de texto online (`Form Text`) y PDFs o capturas de presentaciones hechas a ordenador (como *Canva* o *Google Slides*).
 
 **OCR** (Optical Character Recognition — Reconocimiento Óptico de Caracteres)  
@@ -240,7 +250,11 @@ Sistema de control de versiones. Guarda el historial completo de cambios del có
 **GitHub**  
 Plataforma web donde se aloja el repositorio Git del proyecto. Es donde los empleadores y reclutadores verán el código y el historial de trabajo.
 
+**Blindaje de Privacidad y Carpeta `scratch/`**  
+Estrategia de gobernanza del repositorio por la que se aísla de forma estricta el código e historial público profesional (`models/`, `routers/`, `decisiones.md`) frente a documentación confidencial de trabajo intermedio del desarrollador (guiones de presentaciones en vídeo, notas preparatorias de entrevistas, listas de contactos y planes relacionales de networking). Estos documentos privados residen exclusivamente dentro del directorio local `scratch/`, el cual está bloqueado en el `.gitignore` para garantizar que jamás asciendan a la nube pública de GitHub ni dejen rastro en los commits.
+
 **.gitignore**  
+
 Archivo que le dice a Git qué archivos ignorar y no incluir en el repositorio. Los archivos con claves de API (`.env`), dependencias (`venv/`) y cachés (`__pycache__/`) nunca deben subirse.
 
 **Push**  
@@ -259,7 +273,11 @@ Archivo de texto en la raíz del proyecto que OpenCode lee automáticamente al a
 **Antigravity**  
 El agente de IA integrado en VS Code (este). Se usa para arquitectura, decisiones de diseño, revisiones críticas y documentación. Consume cuota de Claude Sonnet.
 
+**Diversificación de Tokens (Token Multiplexing)**  
+Estrategia de finanzas operativas (*FinOps*) orientada a maximizar la productividad y esquivar límites de cuota gratuita sin sobrecostes. Consiste en combinar múltiples entornos de IA en paralelo (ej. Antigravity en VS Code para arquitectura global + Warp AI Agent en terminal independiente para comandos/DevOps + Groq LPU en el backend), repartiendo la carga de trabajo entre diversos motores y modelos.
+
 **Gemini**  
+
 Familia de modelos de lenguaje de Google. El modelo `gemini-2.5-flash` es el predeterminado en OpenCode por su cota gratuita generosa (1.500 peticiones/día).
 
 **Groq**  
@@ -345,11 +363,17 @@ Forma de describir una funcionalidad desde el punto de vista del usuario final. 
 **Milestone**  
 Punto de referencia en el roadmap del proyecto. En este proyecto equivale a una versión (v0.1, v0.2...). Cada milestone agrupa las historias de usuario de esa versión.
 
+**Modo Copiloto / Trabajo en Terminal (HitL Técnico)**  
+Metodología de desarrollo en parejas por la que la Inteligencia Artificial asume el rol de arquitecta y generadora de andamiaje de código (`Punto 2: Qué hicieron los agentes`), mientras que la desarrolladora humana ejerce el liderazgo operativo ejecutando en su propia terminal (WSL/Warp) todos los comandos de validación, levantamiento de base de datos (`docker compose`), migraciones (`alembic upgrade head`) y commits (`Punto 3: Cómo validé yo`). Esto preserva la memoria muscular técnica, el control soberano del entorno y la autoría intelectual superior del portfolio (`[D-029]`).
+
 **MVP** (Minimum Viable Product — Producto Mínimo Viable)  
 La versión más pequeña del producto que ya aporta valor real. En este proyecto: v1.0 desplegada y funcionando.
 
 **Ponderación Criterial vs. Instrumental**  
 Mandato legal de la LOMLOE en Galicia según el cual la calificación y ponderación recae siempre sobre los **Criterios de Evaluación (`criterio_id`)** del currículo, y nunca sobre los instrumentos en sí mismos. Los instrumentos (exámenes, murales de cartulina o exposiciones en *Canva*) son únicamente el soporte o medio omni-canal de recogida de evidencias de aprendizaje.
+
+**Protocolo Stop & Consult (Pausa Arquitectónica y Freno Conductual)**  
+Norma de co-piloteo (`Regla 5 de AGENTS.md`) que prohibe terminantemente a los agentes de IA aplicar parches ad-hoc, fallbacks o modificaciones de archivos ante errores técnicos de API/código sin antes consultar. El agente debe detener su turno, entregar un diagnóstico técnico riguroso y presentar al menos dos opciones arquitectónicas contrastadas contra el principio YAGNI para tomar una decisión en equipo (`[D-029]`). Asimismo, separa de forma estricta las órdenes de revisión e inspección ("analiza", "piensa") de las órdenes de edición ("modifica", "aplica").
 
 **Situación de Aprendizaje (SdA)**  
 Propuesta metodológica o tarea reto contextualizada (real o simulada) que permite al alumnado movilizar saberes básicos para resolver un problema, siguiendo la trazabilidad `Reto → Saberes → Competencias Específicas → Criterios → Descriptores Operativos`. En api-correccion-formativa-ia-galicia actúa como el Contenedor Padre (`situacion_aprendizaje_id` en Capa 2) para agrupar todas las pruebas evaluables omni-canal del alumno en esa unidad y calcular el logro de sus competencias.
@@ -358,6 +382,7 @@ Propuesta metodológica o tarea reto contextualizada (real o simulada) que permi
 Principio fundamental del Derecho Público español y del *AI Act* que dictamina que la responsabilidad jurídica, formal y humana y el poder de decisión sobre una calificación oficial (*que constituye un acto administrativo con efectos en la promoción o titulación del alumno*) recae exclusiva e intransferiblemente en el docente o tribunal que firma el acta en XADE. Una IA o aplicación comercial jamás puede ser autora ni titular legal del acto administrativo; por ello, api-correccion-formativa-ia-galicia asiste y calcula, pero exige siempre la validación y firma humana final del profesor (*Human-in-the-Loop*).
 
 **Smoke test**  
+
 Prueba muy básica que verifica que lo más fundamental funciona antes de construir nada encima. En este proyecto: `v0.1-000` comprueba que la IA devuelve el JSON correcto antes de construir FastAPI.
 
 **XADE (`Xestión Administrativa da Educación`)**  
