@@ -290,10 +290,11 @@
 **para** que mis rúbricas y correcciones sean privadas.
 
 **Criterios de aceptación:**
-- [ ] Tabla `profesores` con campos: `id`, `email`, `nombre`, `created_at`
-- [ ] `POST /api/v1/auth/register` crea un profesor
-- [ ] `POST /api/v1/auth/login` devuelve JWT
-- [ ] Rutas protegidas requieren JWT válido en header `Authorization`
+- [x] Tabla `profesores` con campos: `id`, `email`, `nombre`, `created_at` (`[ADR D-031 hacheo bcrypt]`)
+- [x] `POST /api/v1/auth/register` crea un profesor
+- [x] `POST /api/v1/auth/login` devuelve JWT (`OAuth2PasswordBearer` / `login-json`)
+- [x] Rutas protegidas requieren JWT válido en header `Authorization` (`get_current_profesor`)
+
 
 **Etiquetas:** `v0.2` `backend` `database`
 

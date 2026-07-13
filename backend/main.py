@@ -5,7 +5,7 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from dotenv import load_dotenv
-from backend.routers import evaluation_router
+from backend.routers import evaluation_router, auth_router
 
 # Configurar logging principal del servidor con marcas de tiempo (v0.1-005)
 logging.basicConfig(
@@ -20,11 +20,13 @@ load_dotenv()
 app = FastAPI(
     title="API de Corrección Formativa con IA - Galicia",
     description="Backend oficial para el sistema de corrección formativa adaptada al Decreto 157/2022 de la Xunta de Galicia.",
-    version="0.1-001",
+    version="0.2-002",
 )
 
 # Registro de enrutadores
 app.include_router(evaluation_router)
+app.include_router(auth_router)
+
 
 # Configuración de CORS
 app.add_middleware(

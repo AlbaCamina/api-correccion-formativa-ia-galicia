@@ -683,7 +683,7 @@ El proyecto se vuelve 100% autoinstalable e independiente en cualquier entorno l
 En el diseño del modelo de datos de profesores (`[v0.2-002]`) y la planificación del almacenamiento de adaptaciones curriculares del alumnado (`[D-023]`, `v0.2-007`), se debatió la conveniencia de implementar Cifrado Simétrico en Reposo a nivel de columna (`Application-Level Encryption` mediante `AES / Fernet` y una `ENCRYPTION_KEY` en el archivo `.env`). Se evaluaron el coste computacional, la complejidad técnica y los riesgos de pérdida de datos.
 
 **Opciones consideradas:**
-- **Cifrado Simétrico en Reposo (`cryptography / Fernet`) para todas las columnas sensibles:** Rechazado por introducir el riesgo crítico y catastrófico de pérdida irrecoverable de toda la base de datos ante un extravío o corrupción de la variable `ENCRYPTION_KEY` durante reinicios o migraciones del servidor (`Key Loss Gotcha`), violando la simplicidad del principio *PonyTail/YAGNI*.
+- **Cifrado Simétrico en Reposo (`cryptography / Fernet`) para todas las columnas sensibles:** Rechazado por introducir el riesgo crítico y catastrófico de pérdida irrecuperable de toda la base de datos ante un extravío o corrupción de la variable `ENCRYPTION_KEY` durante reinicios o migraciones del servidor (`Key Loss Gotcha`), violando la simplicidad del principio *PonyTail/YAGNI*.
 - **Almacenamiento en texto claro sin protección:** Rechazado categóricamente por incumplir el RGPD, la LOPDGDD (art. 7 protección de menores) y el Esquema Nacional de Seguridad (ENS).
 - **Seudonimización Estricta (`HitL Client-Side`) para el alumnado + Hacheo Unidireccional (`bcrypt`) para el docente:** **Elegida por su solidez jurídica y técnica absoluta con cero riesgo de pérdida de datos**.
 
@@ -693,8 +693,14 @@ Se adopta la siguiente estrategia multinivel de seguridad y privacidad:
 2. **Autenticación Docente por Hacheo Unidireccional (`bcrypt` + `JWT` en `v0.2-002`):** Las contraseñas no utilizan cifrado simétrico ni dependen de una clave secreta del servidor; se transforman mediante el algoritmo matemático irreversible `bcrypt` (`passlib[bcrypt]`). La validación del login compara hashes, lo que inmuniza el sistema frente a pérdidas de variables de entorno y garantiza que el reinicio o cambio de servidor no afecte el acceso de las profesoras.
 3. **Cifrado en Tránsito (`TLS 1.3 / HTTPS`):** Toda la comunicación cliente-servidor se encapsula por túnel seguro como requisito para la PWA.
 
+**Justificación Institución-Auditor (Audit Defense frente a Tribunal/ENS):**
+1. **Descarte por Análisis de Riesgos Operativos (no por desconocimiento):** Se documenta expresamente que el cifrado simétrico en columnas no se omite por ignorancia técnica, sino tras un riguroso análisis de riesgos. En el contexto educacional y administrativo del proyecto, la probabilidad de gestión defectuosa, subida accidental a Git o pérdida irrecuperable de la clave maestra supera con creces el beneficio marginal frente a una seudonimización bien diseñada.
+2. **Complementariedad y Cifrado de Volumen Cloud (`TDE`):** La seudonimización no actúa en vacío; se complementa con controles de acceso transaccional (`JWT`), minimización de datos guardados y el **Cifrado Transparente a Nivel de Volumen/Servicio (`Transparent Data Encryption - TDE`)** gestionado de forma nativa por el proveedor de base de datos cloud (`Railway / Azure PostgreSQL`), prescindiendo de criptografía ad-hoc en columnas por el principio YAGNI.
+3. **Alcance Exclusivo de `bcrypt`:** Queda establecido como invariante arquitectónica que `bcrypt` se utiliza estricta y exclusivamente para las contraseñas del profesorado. Ningún otro identificador o dato personal sensible se almacena directamente en claro en la base de datos principal.
+
 **Consecuencias:**  
 El proyecto alcanza el máximo nivel de cumplimiento normativo (RGPD, ENS, AI Act) eliminando por diseño la deuda técnica y el peligro mortal de corromper la base de datos por pérdida de claves maestras.
+
 
 ---
 
