@@ -187,6 +187,7 @@
 - [x] Si la IA devuelve JSON inválido, el servidor reintenta una vez antes de devolver error 500
 - [x] Devuelve el objeto `EvaluacionIA` completo con código 200
 - [x] Tiempo de respuesta documentado en los logs
+- [x] El cliente del LLM (`llm_client.py`) implementa bifurcación plana de formato según `LLM_PROVIDER` (`OpenAI .parse()` vs `Groq json_object` directo con inyección textual de esquema, [D-028]), refactorizado bajo el *Protocolo de Pausa Arquitectónica* ([D-029])
 
 **Etiquetas:** `v0.1` `backend`
 
@@ -320,17 +321,19 @@
 **para** que interactúen con la normativa oficial al evaluar.
 
 > [!NOTE]
-> **Decisión pendiente antes de implementar esta historia:** ¿cómo interactúan la rúbrica del docente y el marco normativo en el prompt? Dos opciones a evaluar cuando llegue v0.2:
+> **Dilema arquitectónico original planteado en v0.1:** ¿cómo interactúan la rúbrica del docente y el marco normativo en el prompt? Dos opciones evaluadas:
 > - **Opción A — Combinación:** rúbrica y normativa se fusionan en el prompt como criterios complementarios.
 > - **Opción B — Coherencia:** la IA usa la rúbrica del docente y verifica que sea coherente con la normativa, señalando contradicciones.
 >
-> Registrar la decisión en `decisiones.md` antes de escribir código.
+> ✅ **Decisión Resuelta (`[D-027]`):** En lugar de excluir una opción, se adopta un **Modo Dual de Evaluación** seleccionable desde la PWA (`modo_evaluacion: Literal["COMBINADO", "AUDITORIA_CURRICULAR"]`):
+> - **`COMBINADO` (Evaluación Rápida Cotidiana):** El motor LLM fusiona de forma aditiva los saberes básicos oficiales y los criterios específicos de la rúbrica del docente para calificar con agilidad tareas del día a día, controles cortos o exposiciones.
+> - **`AUDITORIA_CURRICULAR` (Coherencia e Inspección Pedagógica):** Diseñado para evaluaciones formales de fin de trimestre o revisión de nuevas rúbricas. El motor corrige la entrega pero además audita pedagógicamente la coherencia de la rúbrica docente contra la ley, informando confidencialmente en `teacherSummary` si la rúbrica omite competencias básicas obligatorias o entra en contradicción normativa.
 
 **Criterios de aceptación:**
 - [ ] Tabla `rubricas_docente` con campos: `id`, `profesor_id`, `nombre`, `criterios` (JSONB), `created_at`
 - [ ] CRUD completo: `POST`, `GET`, `PUT`, `DELETE /api/v1/rubricas`
 - [ ] Una rúbrica solo puede ser editada por su propietario
-- [ ] Validación con Pydantic de la estructura de `criterios`
+- [ ] Validación con Pydantic de la estructura de `criterios` y soporte de `modo_evaluacion` en peticiones de evaluación ([D-027])
 
 **Etiquetas:** `v0.2` `backend` `database`
 

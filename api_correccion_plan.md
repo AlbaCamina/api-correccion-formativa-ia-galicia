@@ -100,6 +100,9 @@ Estos puntos ya tienen consenso y no deben consumir más tiempo de análisis. Ca
 | **Estrategia móvil MVP** | **PWA (Progressive Web App)** | Acceso a cámara sin app nativa; app nativa = Versión 2.0 |
 | **Adaptaciones NEAE/NEE** | **Variable inyectada en prompt (`JSONB`)** | Excluye penalización por dislexia/TDAH sin ocultar el error detectado ([D-023]) |
 | **Stack tecnológico** | **Python/FastAPI + React/Vite** | Ver Bloque 1 |
+| **Modo rúbrica-normativa** | **Dual: COMBINADO vs AUDITORIA_CURRICULAR** | Flexibilidad pedagógica e inspección de coherencia ([D-027]) |
+| **Motor LLM y formato** | **Groq (`llama-3.3-70b`) + bifurcación plana** | Coste 0 en dev, velocidad LPU y modularidad YAGNI sin parches ([D-028]) |
+| **Supervisión de agentes IA** | **Protocolo Stop & Consult (AGENTS.md Regla 5)** | Freno conductual ante parches ad-hoc y control humano YAGNI ([D-029]) |
 
 ### Modelo de negocio dual explicado
 
@@ -421,7 +424,7 @@ api-correccion/                              ← workspace único de VS Code
 | ✅ | Bloque 9 | Entorno de desarrollo configurado (WSL + OpenCode + Gemini + Groq) | 🛠️ Completado |
 | — | Bloque 3 | **Preparación preguntas reunión AESIA** (leer BLOQUE 3 del plan) | 📋 Pendiente |
 | ⭐ | — | **Reunión con contacto AESIA** *(fecha libre, no bloqueante)* | 🤝 Cuando haya disponibilidad |
-| 🚀 | — | **Apertura repo en GitHub + primera línea de código — v0.1** | 🖥️ OpenCode + Antigravity |
+| ✅ | — | **Apertura repo en GitHub y v0.1 completada (Motor Síncrono Validado)** | 🖥️ OpenCode + Antigravity |
 | — | Bloque 4 | Marco legal: RGPD, AI Act, trazabilidad | 💬 Antigravity |
 | — | Bloque 5 | Diseño del modelo de datos | 💬 Antigravity |
 | — | Bloque 5 | JSON de salida y pipeline asíncrono | 💬 Antigravity |
