@@ -181,12 +181,12 @@
 **para** recibir una corrección estructurada con nota y análisis formativo.
 
 **Criterios de aceptación:**
-- [ ] `POST /api/v1/evaluate` acepta `{ "student_answer": string, "rubric": string }`
-- [ ] El servidor llama a la API de OpenAI/Anthropic con un prompt estructurado
-- [ ] La respuesta de la IA se valida con el modelo Pydantic de `v0.1-002`
-- [ ] Si la IA devuelve JSON inválido, el servidor reintenta una vez antes de devolver error 500
-- [ ] Devuelve el objeto `EvaluacionIA` completo con código 200
-- [ ] Tiempo de respuesta documentado en los logs
+- [x] `POST /api/v1/evaluate` acepta `{ "student_answer": string, "rubric": string }`
+- [x] El servidor llama a la API de OpenAI/Anthropic con un prompt estructurado
+- [x] La respuesta de la IA se valida con el modelo Pydantic de `v0.1-002`
+- [x] Si la IA devuelve JSON inválido, el servidor reintenta una vez antes de devolver error 500
+- [x] Devuelve el objeto `EvaluacionIA` completo con código 200
+- [x] Tiempo de respuesta documentado en los logs
 
 **Etiquetas:** `v0.1` `backend`
 
@@ -199,11 +199,11 @@
 **para** que evalúe con criterios pedagógicos reales y devuelva siempre el formato correcto.
 
 **Criterios de aceptación:**
-- [ ] System prompt en archivo separado `services/prompt_builder.py`
-- [ ] El prompt instruye a la IA a actuar como "evaluador formativo experto en **Filosofía de Bachillerato**, educación secundaria gallega (Decreto 157/2022, Xunta de Galicia)" (asignatura hardcoded en v0.1 — dinámica desde v0.2 vía `marco_id`)
-- [ ] El prompt exige explícitamente el formato JSON del contrato
-- [ ] El prompt diferencia entre mejoras inmediatas y a medio/largo plazo
-- [ ] Probado con al menos 3 respuestas de alumno distintas (buena, regular, mala)
+- [x] System prompt en archivo separado `services/prompt_builder.py`
+- [x] El prompt instruye a la IA a actuar como "evaluador formativo experto en **Filosofía de Bachillerato**, educación secundaria gallega (Decreto 157/2022, Xunta de Galicia)" (asignatura hardcoded en v0.1 — dinámica desde v0.2 vía `marco_id`)
+- [x] El prompt exige explícitamente el formato JSON del contrato
+- [x] El prompt diferencia entre mejoras inmediatas y a medio/largo plazo
+- [x] Probado con al menos 3 respuestas de alumno distintas (buena, regular, mala)
 
 **Etiquetas:** `v0.1` `backend`
 
