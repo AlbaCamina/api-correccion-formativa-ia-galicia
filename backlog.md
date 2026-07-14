@@ -307,10 +307,10 @@
 **para** que cambios legislativos solo requieran actualizar un registro (no el código), y para que el sistema pueda escalar a otras comunidades autónomas sin modificar la arquitectura.
 
 **Criterios de aceptación:**
-- [ ] Tabla `marcos_evaluacion` con campos: `id`, `nombre`, `asignatura`, `curso`, `estado_activo`, `rubrica_completa` (JSONB)
-- [ ] Seed con al menos un marco de evaluación real de Bachillerato o ESO (Decreto autonómico de la Xunta de Galicia)
-- [ ] `GET /api/v1/marcos` devuelve todos los marcos activos
-- [ ] El endpoint de evaluación acepta `marco_id` para usar el marco correspondiente
+- [x] Tabla `marcos_evaluacion` con campos: `id`, `nombre`, `asignatura`, `curso`, `estado_activo`, `rubrica_completa` (JSONB) y metadatos de vigencia legislativa: `ultima_verificacion_manual` (DATE/nullable) y `fuente_legislativa_url` (VARCHAR/nullable) [D-033]
+- [x] Seed con al menos un marco de evaluación real de Bachillerato o ESO (Decreto autonómico de la Xunta de Galicia) incluyendo fecha de verificación actual
+- [x] `GET /api/v1/marcos` devuelve todos los marcos activos
+- [x] El endpoint de evaluación acepta `marco_id` para usar el marco correspondiente
 
 **Etiquetas:** `v0.2` `backend` `database`
 
@@ -323,19 +323,17 @@
 **para** que interactúen con la normativa oficial al evaluar.
 
 > [!NOTE]
-> **Dilema arquitectónico original planteado en v0.1:** ¿cómo interactúan la rúbrica del docente y el marco normativo en el prompt? Dos opciones evaluadas:
-> - **Opción A — Combinación:** rúbrica y normativa se fusionan en el prompt como criterios complementarios.
-> - **Opción B — Coherencia:** la IA usa la rúbrica del docente y verifica que sea coherente con la normativa, señalando contradicciones.
->
-> ✅ **Decisión Resuelta (`[D-027]`):** En lugar de excluir una opción, se adopta un **Modo Dual de Evaluación** seleccionable desde la PWA (`modo_evaluacion: Literal["COMBINADO", "AUDITORIA_CURRICULAR"]`):
-> - **`COMBINADO` (Evaluación Rápida Cotidiana):** El motor LLM fusiona de forma aditiva los saberes básicos oficiales y los criterios específicos de la rúbrica del docente para calificar con agilidad tareas del día a día, controles cortos o exposiciones.
-> - **`AUDITORIA_CURRICULAR` (Coherencia e Inspección Pedagógica):** Diseñado para evaluaciones formales de fin de trimestre o revisión de nuevas rúbricas. El motor corrige la entrega pero además audita pedagógicamente la coherencia de la rúbrica docente contra la ley, informando confidencialmente en `teacherSummary` si la rúbrica omite competencias básicas obligatorias o entra en contradicción normativa.
+> **Dilema arquitectónico original planteado en v0.1:** ¿cómo interactúan la rúbrica del docente y el marco normativo en el prompt? 
+> ✅ **Decisión Resuelta (`[D-027]`):** Se adopta un **Modo Flexible y Multicriterio de Evaluación** seleccionable desde la PWA:
+> - **`RÚBRICA PURA` (Evaluación General):** Se activa si no se proporciona `marco_id` (`marco_id` es `null`). El motor LLM evalúa utilizando únicamente la rúbrica del docente, sin cruzar con legislación.
+> - **`COMBINADO` (Evaluación Rápida Cotidiana):** Requiere `marco_id`. El motor LLM fusiona de forma aditiva los saberes básicos oficiales y los criterios específicos de la rúbrica del docente para calificar con agilidad bajo la LOMLOE.
+> - **`AUDITORIA_CURRICULAR` (Coherencia e Inspección Pedagógica):** Requiere `marco_id`. El motor corrige la entrega pero además audita la coherencia de la rúbrica docente contra la ley, informando confidencialmente en `teacherSummary` si la rúbrica omite competencias básicas obligatorias.
 
 **Criterios de aceptación:**
-- [ ] Tabla `rubricas_docente` con campos: `id`, `profesor_id`, `nombre`, `criterios` (JSONB), `created_at`
-- [ ] CRUD completo: `POST`, `GET`, `PUT`, `DELETE /api/v1/rubricas`
-- [ ] Una rúbrica solo puede ser editada por su propietario
-- [ ] Validación con Pydantic de la estructura de `criterios` y soporte de `modo_evaluacion` en peticiones de evaluación ([D-027])
+- [x] Tabla `rubricas_docente` con campos: `id`, `profesor_id`, `nombre`, `criterios` (JSONB), `created_at`
+- [x] CRUD completo: `POST`, `GET`, `PUT`, `DELETE /api/v1/rubricas`
+- [x] Una rúbrica solo puede ser editada por su propietario
+- [x] Validación con Pydantic de la estructura de `criterios` y soporte del modo flexible en peticiones de evaluación ([D-027])
 
 **Etiquetas:** `v0.2` `backend` `database`
 
@@ -348,9 +346,9 @@
 **para** mantener el anonimato del estudiante en la nube mediante seudonimización y que la profesora pueda cruzar después ese identificador con su lista local de clase sin exponer datos personales (cumplimiento RGPD).
 
 **Criterios de aceptación:**
-- [ ] Tabla `submissions` con campos: `id`, `profesor_id`, `marco_id`, `rubrica_id`, `alumno_id` (nullable, anonimizado), `adaptaciones_alumno` (JSONB, nullable) [D-023], `estado` (PENDING/ANALYZING/REVIEW/GRADED), `created_at`, `updated_at`
-- [ ] Tabla `evaluaciones` con campos: `id`, `submission_id`, `resultado_ia` (JSONB), `nota_final`, `aprobado_por_profesor`, `created_at`
-- [ ] Tabla `changelog` con campos: `id`, `submission_id`, `accion`, `actor`, `datos_anteriores` (JSONB), `datos_nuevos` (JSONB), `timestamp`
+- [x] Tabla `submissions` con campos: `id`, `profesor_id`, `marco_id` (nullable), `rubrica_id`, `alumno_id` (nullable, anonimizado), `adaptaciones_alumno` (JSONB, nullable) [D-023], `estado` (PENDING/ANALYZING/REVIEW/GRADED), `created_at`, `updated_at`
+- [x] Tabla `evaluaciones` con campos: `id`, `submission_id`, `resultado_ia` (JSONB), `nota_final`, `aprobado_por_profesor`, `created_at`
+- [x] Tabla `changelog` con campos: `id`, `submission_id`, `accion`, `actor`, `datos_anteriores` (JSONB), `datos_nuevos` (JSONB), `timestamp`
 
 **Etiquetas:** `v0.2` `database`
 
@@ -359,14 +357,14 @@
 ### [v0.2-006] Endpoint de evaluación actualizado con BBDD
 
 **Como** profesor,  
-**quiero** que la corrección use mi rúbrica y el marco normativo seleccionado  
-**para** que la evaluación sea coherente con la legislación y mis criterios propios.
+**quiero** que la corrección use mi rúbrica y opcionalmente el marco normativo seleccionado  
+**para** que la evaluación sea flexible y aplicable tanto a actividades diarias como a exámenes formales.
 
 **Criterios de aceptación:**
-- [ ] `POST /api/v1/evaluate` ahora acepta `marco_id` y `rubrica_id`
-- [ ] El sistema recupera ambos de la BBDD y los inyecta en el prompt según la estrategia arquitectónica elegida en v0.2-004 (Combinación vs. Coherencia)
-- [ ] El resultado se guarda en `submissions` y `evaluaciones`
-- [ ] El changelog registra la corrección con `actor = "IA"`
+- [x] `POST /api/v1/evaluate` ahora acepta `marco_id` (opcional/nullable) y `rubrica_id`
+- [x] Si `marco_id` es null/None, evalúa en Modo Rúbrica Pura (ignora legislación). Si está presente, recupera el marco de la BBDD e inyecta en el prompt la estrategia elegida (Combinado vs. Auditoría).
+- [x] El resultado se guarda en `submissions` y `evaluaciones`
+- [x] El changelog registra la corrección con `actor = "IA"`
 
 **Etiquetas:** `v0.2` `backend` `database`
 
@@ -715,6 +713,21 @@
 
 ---
 
+## 🔮 Roadmap — Mejoras a Futuro
+
+### [Roadmap-001] Sincronización y Auditoría Automática de Vigencia Legislativa (DOG / BOE Tracker)
+**Como** administradora del sistema,  
+**quiero** que la plataforma verifique periódicamente si los decretos cargados en BBDD siguen vigentes  
+**para** evitar que la IA evalúe al alumnado con criterios obsoletos o derogados de forma involuntaria.
+
+* **Dependencias:** `[v0.2-003]` (Modelos base), `[v0.2-005]` (Changelog de auditoría), `feedparser` / `beautifulsoup4` (Scraping oficial).
+* **Criterios de aceptación:**
+  - Un worker en segundo plano realiza un rastreo periódico (mensual/trimestral) de los boletines oficiales buscando cambios en los decretos rectores.
+  - Si detecta un cambio de versión legal, marca el marco antiguo como histórico y el nuevo como borrador pendiente de revisión.
+  - Se registra el cambio de vigencia en el `changelog` con actor = "SYSTEM_UPDATE".
+
+---
+
 *Backlog generado el 07/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 09/07/2026 — sincronizadas reglas de trabajo, seudonimización legal [D-022], compresión en cliente [D-020] y Cold Storage [D-021]*  
-*Total de historias: 29 | Versiones: 6 (0.1 → 1.0)*
+*Actualizado el 14/07/2026 — Sincronizadas reglas de trabajo, metadatos de vigencia legislativa en [v0.2-003] y añadido [Roadmap-001] de auditoría de vigencia.*  
+*Total de historias: 30 | Versiones: 6 (0.1 → 1.0)*

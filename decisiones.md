@@ -609,12 +609,13 @@ El contrato de la base de datos y la interfaz de la PWA incorporan el campo y el
 En el diseño del hito `[v0.2-004]`, surgió el debate técnico sobre cómo deben interactuar los criterios del marco normativo autonómico (Decreto 157/2022 de la Xunta de Galicia) y la rúbrica personalizada creada por la profesora. Se plantearon inicialmente dos opciones mutuamente excluyentes: combinación simple o auditoría pedagógica de coherencia.
 
 **Decisión:**  
-En lugar de forzar una única estrategia fija en el backend, se implementa un **Modo Dual de Evaluación** configurable por la profesora directamente desde la interfaz PWA y transmitido en cada petición de corrección (`modo_evaluacion` en el JSON / columna en `submissions`):
-1. `COMBINADO` (Evaluación Rápida Cotidiana): El motor LLM fusiona de forma aditiva los saberes básicos oficiales y los criterios específicos de la rúbrica del docente para calificar con agilidad tareas del día a día, controles cortos o exposiciones.
-2. `AUDITORIA_CURRICULAR` (Coherencia e Inspección Pedagógica): Diseñado para evaluaciones formales de fin de trimestre o revisión de nuevas rúbricas. El motor corrige la entrega pero además actúa como orientador pedagógico para el docente, contrastando la rúbrica de aula contra el Decreto 157/2022 e informando confidencialmente en `teacherSummary` si la rúbrica omite competencias básicas obligatorias o entra en contradicción normativa.
+En lugar de forzar una única estrategia fija en el backend, se implementa un **Modo Flexible y Multicriterio de Evaluación** configurable por la profesora directamente desde la interfaz PWA y transmitido en cada petición de corrección (`modo_evaluacion` en el JSON / columna en `submissions`):
+1. **Modo Rúbrica Pura (Evaluación General):** Se activa de forma natural si la petición **no especifica un `marco_id`** (`marco_id = None/null`). El motor LLM evalúa y corrige la entrega utilizando en exclusiva los criterios de la rúbrica personalizada de la profesora, ignorando cualquier currículo oficial. Esto permite agilidad en tareas rápidas diarias y el uso de la app fuera de la región o del marco español.
+2. `COMBINADO` (Evaluación Rápida Cotidiana): Requiere `marco_id`. El motor LLM fusiona de forma aditiva los saberes básicos oficiales y los criterios específicos de la rúbrica del docente para calificar con agilidad tareas del día a día, controles cortos o exposiciones bajo la LOMLOE.
+3. `AUDITORIA_CURRICULAR` (Coherencia e Inspección Pedagógica): Requiere `marco_id`. Diseñado para evaluaciones formales de fin de trimestre. El motor corrige la entrega pero además actúa como orientador pedagógico para el docente, contrastando la rúbrica de aula contra el Decreto de la Xunta de Galicia e informando confidencialmente en `teacherSummary` si la rúbrica omite competencias básicas obligatorias.
 
 **Consecuencias:**  
-Otorga una flexibilidad total al docente y aporta un valor diferencial extraordinario ante directores de centro e inspección educativa, posicionando a api-correccion-formativa-ia-galicia como un escudo legal y pedagógico del profesor sin sobrecargar la complejidad técnica del backend.
+Otorga una flexibilidad total al docente (permitiendo evaluar de forma informal con rúbricas propias rápidas) y aporta un valor diferencial extraordinario ante inspección educativa en las evaluaciones formales, posicionando al sistema como un copiloto adaptable y robusto.
 
 ---
 
@@ -727,6 +728,31 @@ El proyecto mantiene velocidad máxima en el desarrollo en terminal, a la vez qu
 
 ---
 
+---
+
+### D-033
+## Gestión de Vigencia Legislativa Curricular en el Modelo de Datos (`Metadatos Estáticos de Validación YAGNI vs Crawler Automático de Boletines`)
+
+**Estado:** ✅ Adoptada (`[v0.2-003]`)  
+**Fecha:** Julio 2026 (14/07/2026)  
+**Contexto:**  
+Las leyes educativas autonómicas y estatales (decretos de la Xunta de Galicia / LOMLOE) son susceptibles de cambios, enmiendas y derogaciones parciales a lo largo del tiempo. Evaluar a estudiantes bajo un marco legal obsoleto viola el principio de equidad y podría comprometer el cumplimiento de la EU AI Act en materia de precisión y gobernanza de sistemas de alto riesgo. Se evaluó la conveniencia de implementar un sistema dinámico y automatizado de sincronización web (BOE/DOG Tracker).
+
+**Opciones consideradas:**
+- **Sistema Automatizado de Scraping y Parseo Curricular (BOE/DOG Tracker):** Rechazado por introducir una altísima complejidad técnica, dependencias de bibliotecas externas de parseo web y gran fragilidad ante cambios estructurales en los portales gubernamentales. Esto violaría flagrantemente el principio YAGNI para una base de datos que se modifica de forma muy infrecuente (frecuencia anual o plurianual).
+- **Esquema de Metadatos de Verificación Manual (Enfoque YAGNI-friendly):** **Elegido por su simplicidad y efectividad**. Se añaden al modelo del marco de evaluación campos estáticos que indican la fecha de la última validación humana del decreto y la URL de la fuente legislativa oficial. Permite proyectar total transparencia jurídica al docente y a la inspección sin añadir código complejo o inestable.
+
+**Decisión:**  
+Se adopta el esquema de metadatos estáticos en el modelo de datos `MarcoEvaluacion`:
+1. **Campos en Base de Datos:** Se incorporan las columnas `ultima_verificacion_manual` (DATE, nullable) y `fuente_legislativa_url` (VARCHAR, nullable) a la tabla `marcos_evaluacion`.
+2. **Visualización Docente:** La interfaz de usuario expondrá estos metadatos para que el docente tenga la certeza jurídica de la ley aplicada y su fecha de última validación.
+3. **Roadmap de Automatización:** Se relega el rastreo automático a un ítem a futuro del Roadmap (`[Roadmap-001]`), justificando que la versión actual se mantiene manual por criterios de agilidad, estabilidad y minimización de deuda técnica.
+
+**Consecuencias:**  
+El sistema cumple de manera transparente con las obligaciones de gobernanza de datos y trazabilidad de la EU AI Act de forma inmediata, manteniendo la base de código libre de integraciones inestables y scrapers redundantes.
+
+---
+
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 13/07/2026 — añadidas D-027 (Modo Dual), D-028 (Groq como Motor Primario), D-029 (Protocolo de Pausa Arquitectónica), D-030 (Persistencia y Migraciones), D-031 (Blindaje sin Clave Maestra) y D-032 (Trazabilidad Bidireccional)*  
-*Total de decisiones registradas: 32*
+*Actualizado el 14/07/2026 — añadidas D-027 (Modo Dual), D-028 (Groq como Motor Primario), D-029 (Protocolo de Pausa Arquitectónica), D-030 (Persistencia y Migraciones), D-031 (Blindaje sin Clave Maestra), D-032 (Trazabilidad Bidireccional) y D-033 (Vigencia Legislativa)*  
+*Total de decisiones registradas: 33*
