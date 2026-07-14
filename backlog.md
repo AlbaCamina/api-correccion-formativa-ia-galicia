@@ -387,9 +387,9 @@
 
 ---
 
-## 📸 Versión 0.3 — Subida de Imágenes y OCR [GitHub Issue #3 (Open)]
+## 📸 Versión 0.3 — Subida de Imágenes, Anonimización y OCR [GitHub Issue #3 (Open)]
 
-**Objetivo:** El profesor puede subir una foto del examen manuscrito. El sistema la procesa con un modelo multimodal y devuelve el análisis.
+**Objetivo:** El profesor puede subir una foto o PDF del examen manuscrito. El sistema garantiza la privacidad recortando el nombre localmente con `Pillow` pre-nube, gestiona de forma resiliente el almacenamiento y procesa la corrección con un motor multimodal (Groq Vision / OpenAI).
 
 ---
 
@@ -410,51 +410,53 @@
 
 ---
 
-### [v0.3-002] Almacenamiento en Cloudinary
+### [v0.3-002] Anonimización y Recorte de Cabecera pre-nube (`Pillow`)
 
-**Como** desarrolladora,  
-**quiero** almacenar las imágenes en Cloudinary  
-**para** no saturar el servidor con archivos pesados y tener URLs públicas estables.
+**Como** desarrolladora (y en estricto cumplimiento RGPD/LOPDGDD art. 7 y AI Act),  
+**quiero** que el sistema recorte o difumine la cabecera del examen localmente (`Pillow`) antes de enviarlo o persistirlo externamente,  
+**para** garantizar que los datos identificativos del alumno jamás viajen a servicios de terceros ni a la nube.
 
 **Criterios de aceptación:**
-- [ ] Credenciales de Cloudinary en `.env`
-- [ ] El archivo (o múltiples imágenes) se sube a Cloudinary y se reciben la URL o lista de URLs
-- [ ] La lista de URLs se guarda en la tabla `submissions` en el campo `archivos_urls` (JSONB o Array para soportar múltiples folios/PDF)
-- [ ] Los archivos temporales del backend se eliminan tras subir a la nube, donde el histórico permanece resguardado ante reclamaciones bajo política de Cold Storage y retención legal [D-021]
+- [ ] El backend utiliza `Pillow` para procesar y recortar localmente la imagen inmediatamente tras su recepción en el servidor (o en memoria pre-persistencia).
+- [ ] Se recorta o difumina el área superior del folio (cabecera con nombre del alumno, aprox. primeros 15-20% de altura del margen superior o coordenadas especificadas).
+- [ ] El archivo original con datos identificativos del menor se purga o sobrescribe localmente de forma irreversible, dejando únicamente el archivo anonimizado (`anon_{uuid}.jpg`).
+- [ ] El campo `alumno_id` o seudonimización se asigna por el docente y se vincula transaccionalmente al UUID en base de datos.
+- [ ] Tests de integración que comprueban que las dimensiones y contenido del archivo resultante han sido procesados por `Pillow` y el original eliminado.
+
+**Etiquetas:** `v0.3` `backend` `legal` `rgpd`
+
+---
+
+### [v0.3-003] Almacenamiento Resiliente y Desacoplado (`STORAGE_PROVIDER=local|cloudinary`)
+
+**Como** desarrolladora y docente,  
+**quiero** contar con una capa de almacenamiento flexible controlada por variable de entorno (`STORAGE_PROVIDER=local|cloudinary`),  
+**para** operar de forma autónoma en modo local/stealth y escalar a Cloudinary cuando se requiera persistencia en nube.
+
+**Criterios de aceptación:**
+- [ ] Creación de servicio abstracto `StorageService` capaz de alternar de proveedor según la configuración en `.env`.
+- [ ] Si `STORAGE_PROVIDER=local`, las imágenes anonimizadas se sirven desde el sistema de archivos local (`/uploads`) y se registran en `submissions.archivos_urls` como rutas locales/relativas.
+- [ ] Si `STORAGE_PROVIDER=cloudinary`, las imágenes ya anonimizadas (`[v0.3-002]`) se suben a la nube vía SDK de Cloudinary y se almacena la lista de URLs públicas seguras en `submissions.archivos_urls`.
+- [ ] Eliminación de archivos temporales de trabajo tras completarse con éxito la subida o persistencia final (`Cold Storage` [D-021]).
 
 **Etiquetas:** `v0.3` `backend` `infra`
 
 ---
 
-### [v0.3-003] Integración con modelo multimodal (visión)
+### [v0.3-004] Integración con Modelo Multimodal de Visión (`Groq LPU Vision` / Fallback)
 
 **Como** profesora,  
-**quiero** que el sistema lea el examen manuscrito automáticamente  
-**para** no tener que transcribirlo yo.
+**quiero** que el sistema lea el examen manuscrito automáticamente desde la imagen anonimizada  
+**para** transcribir su contenido y evaluarlo contra la rúbrica sin intervención manual de picado de datos.
 
 **Criterios de aceptación:**
-- [ ] El sistema recupera el array `archivos_urls` y envía la imagen (o lista ordenada de URLs si son varios folios/páginas) a GPT-4o Vision o Claude con el prompt de evaluación
-- [ ] El modelo devuelve el JSON estructurado incluyendo `transcription` (texto extraído)
-- [ ] Si la caligrafía es ilegible, el campo `transcription` incluye `[ILEGIBLE]` con coordenadas aproximadas
-- [ ] El resultado completo se guarda en `evaluaciones.resultado_ia`
+- [ ] El cliente LLM (`llm_client.py`) incorpora soporte para modelos multimodales (ej. `llama-3.2-11b-vision-preview` o `llama-3.2-90b-vision-preview` en Groq, con fallback a `gpt-4o`).
+- [ ] El servicio recupera `submissions.archivos_urls` (o rutas locales) y adjunta la imagen (en Base64 si es local o URL si es nube) al payload del prompt formativo.
+- [ ] El modelo multimodal retorna el contrato JSON estructurado (`EvaluacionIA`), incluyendo la transcripción fiel (`transcription`) del examen manuscrito.
+- [ ] Si la caligrafía presenta tramos ilegibles, el modelo los marca pedagógicamente con `[ILEGIBLE]` y sus coordenadas aproximadas sin romper la validación Pydantic del contrato.
+- [ ] El resultado y los marcadores visuales (`visualMarkers`) calculados se guardan en `evaluaciones.resultado_ia`.
 
-**Etiquetas:** `v0.3` `backend`
-
----
-
-### [v0.3-004] Anonimización básica de imagen
-
-**Como** desarrolladora (y como cumplimiento RGPD),  
-**quiero** que los nombres del alumno en la cabecera del examen no se envíen a la IA  
-**para** cumplir con la normativa de protección de datos de menores.
-
-**Criterios de aceptación:**
-- [ ] El sistema recorta o difumina la cabecera del folio (primeros 3 cm) en memoria local antes de subir el archivo a la nube
-- [ ] La imagen ya anonimizada es la única que se sube a Cloudinary/S3 y la que se envía a la IA
-- [ ] El archivo temporal original con el nombre del alumno se purga de inmediato y nunca se almacena en la nube (cumplimiento total RGPD/Regla 9)
-- [ ] El campo `alumno_id` se asigna manualmente por el profesor (ej. número de lista)
-
-**Etiquetas:** `v0.3` `backend` `legal`
+**Etiquetas:** `v0.3` `backend` `ia` `vision`
 
 ---
 
