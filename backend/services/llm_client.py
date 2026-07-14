@@ -1,3 +1,4 @@
+import asyncio
 import os
 import time
 import logging
@@ -41,7 +42,7 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "") 
 
     if provider == "mock":
         logger.info("Modo MOCK activado. Generando respuesta simulada.")
-        time.sleep(0.5)  # Simular latencia de red
+        await asyncio.sleep(0.5)  # Simular latencia de red sin bloquear el event loop
         from backend.models.evaluation import RubricItem, QualitativeAnalysis, ImprovementNeeds, VisualMarker
         return EvaluacionIA(
             transcription=student_answer,
@@ -140,6 +141,6 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "") 
             logger.error(f"Fallo en intento {attempt} ({duration:.2f}s): {e}")
             last_exception = e
             if attempt < max_attempts:
-                time.sleep(0.5)
+                await asyncio.sleep(0.5)  # Espera no bloqueante entre reintentos
 
     raise RuntimeError(f"Error tras {max_attempts} intentos de llamada formativa a la IA: {last_exception}")

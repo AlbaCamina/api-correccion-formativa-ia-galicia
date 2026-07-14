@@ -77,6 +77,12 @@ async def startup_validation():
         logger.critical(error_msg)
         raise RuntimeError(error_msg)
 
+    secret_key = os.getenv("SECRET_KEY", "super-secret-key-galicia-2026-hitl-ninja")
+    if secret_key == "super-secret-key-galicia-2026-hitl-ninja":
+        error_msg = "La variable SECRET_KEY contiene el valor por defecto inseguro. Configura una clave secreta real en .env antes de desplegar."
+        logger.critical(error_msg)
+        raise RuntimeError(error_msg)
+
     logger.info("¡Validación de variables de entorno exitosa! El servidor está listo.")
 
 # ==========================================
