@@ -5,7 +5,7 @@
 [![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16--Alpine-316192?style=flat&logo=postgresql)](https://www.postgresql.org/)
 [![Groq](https://img.shields.io/badge/LLM-Groq%20%2F%20OpenAI-orange?style=flat)](https://groq.com/)
 [![Decreto 157/2022](https://img.shields.io/badge/Normativa-Decreto%20157%2F2022%20Galicia-lightblue?style=flat)](#)
-[![Version](https://img.shields.io/badge/Version-v0.2--CLOSED-green?style=flat)](#)
+[![Version](https://img.shields.io/badge/Version-v0.3--001-brightgreen?style=flat)](#)
 
 API de Corrección Formativa con IA diseñada para asistir al profesorado de **Filosofía de Bachillerato** en la Comunidad Autónoma de Galicia. Estructurada bajo el marco pedagógico oficial de la **LOMLOE**, el **Decreto 157/2022 (Xunta de Galicia)**, y las directrices de privacidad de la Unión Europea (**RGPD / AI Act / ENS**).
 
@@ -56,6 +56,11 @@ cp .env.example .env
 ```
 
 Abre `.env` y configura tus API Keys reales de Groq/OpenAI, la cadena `DATABASE_URL` y tu `SECRET_KEY` transaccional para los tokens Bearer.
+
+> ⚠️ **IMPORTANTE — `SECRET_KEY`:** El servidor valida en el arranque que esta variable contenga un valor personalizado y único. Si se deja el valor por defecto del `.env.example`, el proceso **abortará con error crítico**. Genera una clave segura con:
+> ```bash
+> openssl rand -hex 32
+> ```
 
 ### 4. Ejecutar las Migraciones Transaccionales de Alembic
 
