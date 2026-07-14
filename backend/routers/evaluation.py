@@ -87,6 +87,21 @@ async def evaluate_submission(
         for c in rubrica.criterios
     ])
 
+    adaptaciones_str = ""
+    if request.adaptaciones_alumno:
+        adaptaciones_str += "\n\nADAPTACIONES CURRICULARES DEL ALUMNO APLICADAS (NEAE/NEE):\n"
+        for k, v in request.adaptaciones_alumno.items():
+            adaptaciones_str += f"- {k}: {v}\n"
+        if request.adaptaciones_alumno.get("excluir_ortografia") is True:
+            adaptaciones_str += (
+                "\nINSTRUCCIÓN DE ADAPTACIÓN CRÍTICA (RGPD/NEAE):\n"
+                "El alumno tiene adaptaciones curriculares oficiales por dificultades de aprendizaje (ej. dislexia).\n"
+                "1. Identifica y lista TODAS las faltas de ortografía o gramática detectadas en la respuesta del alumno en el campo 'ortografia_detectada'.\n"
+                "2. Registra esas mismas faltas de ortografía en el campo 'errores_excluidos_por_adaptacion'.\n"
+                "3. Asegúrate de que estas faltas de ortografía NO afecten ni penalicen la puntuación final de ningún criterio de la rúbrica, ni influyan negativamente en la calificación cualitativa general.\n"
+                "4. Si creas marcadores visuales para estos errores de ortografía excluidos, clasifícalos con tipo 'error_excluido' (en lugar de 'ERROR') para que la PWA pueda mostrarlos en gris/neutro.\n"
+            )
+
     if marco:
         marco_str = f"Currículo Oficial Xunta de Galicia ({marco.asignatura} - {marco.curso}):\n"
         marco_str += json.dumps(marco.rubrica_completa, indent=2, ensure_ascii=False)
@@ -112,6 +127,8 @@ async def evaluate_submission(
             f"Instrucción: Corrige la entrega del alumno utilizando única y exclusivamente los criterios de la rúbrica de la profesora.\n\n"
             f"Rúbrica de la Profesora:\n{rubric_str}"
         )
+
+    rubric_prompt += adaptaciones_str
 
     # 5. Invocar al motor LLM
     try:

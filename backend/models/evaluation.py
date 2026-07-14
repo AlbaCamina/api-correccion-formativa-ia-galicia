@@ -10,7 +10,10 @@ class RubricItem(BaseModel):
 class VisualMarker(BaseModel):
     x: float = Field(..., description="Coordenada X sobre el documento/imagen (0 en v0.1 de texto plano).")
     y: float = Field(..., description="Coordenada Y sobre el documento/imagen (0 en v0.1 de texto plano).")
-    type: str = Field(..., description="Tipo de marcador: ERROR, MEJORA o CORRECTO.")
+    type: Literal["ERROR", "MEJORA", "CORRECTO", "error_excluido"] = Field(
+        ..., 
+        description="Tipo de marcador: ERROR (rojo), MEJORA (amarillo), CORRECTO (verde) u error_excluido (gris/neutro para NEAE)."
+    )
     comment: str = Field(..., description="Comentario o explicación del marcador visual.")
 
 class ImprovementNeeds(BaseModel):
@@ -41,3 +44,14 @@ class EvaluacionIA(BaseModel):
         ..., 
         description="Índice de Confianza IA (0.0 a 1.0) en la claridad de lectura/interpretación de la respuesta."
     )
+
+    # Campos de Adaptaciones Curriculares NEAE/NEE (Hito v0.2-007 y ADR D-023)
+    ortografia_detectada: Optional[List[str]] = Field(
+        default_factory=list,
+        description="Lista de faltas de ortografía o errores gramaticales detectados en la respuesta."
+    )
+    errores_excluidos_por_adaptacion: Optional[List[str]] = Field(
+        default_factory=list,
+        description="Subconjunto de errores ortográficos que han sido detectados pero excluidos de la penalización de nota final por adaptaciones del alumno."
+    )
+

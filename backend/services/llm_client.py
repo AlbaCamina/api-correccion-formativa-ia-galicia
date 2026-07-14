@@ -42,7 +42,7 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "") 
     if provider == "mock":
         logger.info("Modo MOCK activado. Generando respuesta simulada.")
         time.sleep(0.5)  # Simular latencia de red
-        from backend.models.evaluation import RubricItem, QualitativeAnalysis, ImprovementNeeds
+        from backend.models.evaluation import RubricItem, QualitativeAnalysis, ImprovementNeeds, VisualMarker
         return EvaluacionIA(
             transcription=student_answer,
             rubricBreakdown=[
@@ -59,7 +59,14 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "") 
                     reasoning="Menciona correctamente el deber moral y político del retorno del filósofo a la caverna, pero falta desarrollar el giro del alma (periagoge)."
                 )
             ],
-            visualMarkers=[],
+            visualMarkers=[
+                VisualMarker(
+                    x=12.5,
+                    y=45.0,
+                    type="error_excluido",
+                    comment="El término 'esfuerço' contiene un error ortográfico pero se excluye de penalización por la adaptación de dislexia del alumno."
+                )
+            ],
             qualitativeAnalysis=QualitativeAnalysis(
                 strengths=[
                     "Identificación correcta del Sol como la Idea de Bien en el sistema platónico.",
@@ -77,7 +84,9 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "") 
             ),
             calificacion_cualitativa="NT",
             siguiente_paso_accionable="En tu próximo repaso de hoy, redacta una frase de 3 líneas donde conectes la palabra 'paideia' con la metáfora de 'girar la mirada' desde las sombras hacia la luz del conocimiento real.",
-            confidence_score=0.92
+            confidence_score=0.92,
+            ortografia_detectada=["esfuerço"],
+            errores_excluidos_por_adaptacion=["esfuerço"]
         )
 
     client = get_llm_client(provider)

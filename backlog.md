@@ -377,11 +377,11 @@
 **para** que el sistema detecte y reporte los errores lingüísticos u ortográficos, pero los excluya automáticamente de la penalización en la nota del examen [D-023].
 
 **Criterios de aceptación:**
-- [ ] La tabla `submissions` incluye la columna `adaptaciones_alumno (JSONB, nullable)` con estructura: `{"tipo": ["dislexia"], "excluir_ortografia": true, "tiempo_extra_pct": 35}`
-- [ ] `POST /api/v1/evaluate` extrae las adaptaciones de la entrega y condicionalmente añade al prompt del LLM instrucciones precisas para separar faltas ortográficas del cálculo penalizador de nota
-- [ ] El contrato JSON devuelto por el LLM incorpora los campos `ortografia_detectada` y `errores_excluidos_por_adaptacion`
-- [ ] Los marcadores visuales sobre la imagen correspondientes a errores ortográficos excluidos por adaptación se clasifican como neutros (`tipo: "ortografia_excluida"`) para mostrarse en gris/neutro y no en rojo en la PWA
-- [ ] Protección de privacidad (LOPDGDD art.7): la IA jamás infiere o diagnostica NEAE; solo ejecuta la instrucción recibida y solo el profesor asignado puede acceder a dicha configuración
+- [x] La tabla `submissions` incluye la columna `adaptaciones_alumno (JSONB, nullable)` con estructura: `{"tipo": ["dislexia"], "excluir_ortografia": true, "tiempo_extra_pct": 35}`
+- [x] `POST /api/v1/evaluate` extrae las adaptaciones de la entrega y condicionalmente añade al prompt del LLM instrucciones precisas para separar faltas ortográficas del cálculo penalizador de nota
+- [x] El contrato JSON devuelto por el LLM incorpora los campos `ortografia_detectada` y `errores_excluidos_por_adaptacion`
+- [x] Los marcadores visuales sobre la imagen correspondientes a errores ortográficos excluidos por adaptación se clasifican como neutros (`tipo: "ortografia_excluida"`) para mostrarse en gris/neutro y no en rojo en la PWA
+- [x] Protección de privacidad (LOPDGDD art.7): la IA jamás infiere o diagnostica NEAE; solo ejecuta la instrucción recibida y solo el profesor asignado puede acceder a dicha configuración
 
 **Etiquetas:** `v0.2` `backend` `ia` `compliance`
 

@@ -5,7 +5,7 @@
 [![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16--Alpine-316192?style=flat&logo=postgresql)](https://www.postgresql.org/)
 [![Groq](https://img.shields.io/badge/LLM-Groq%20%2F%20OpenAI-orange?style=flat)](https://groq.com/)
 [![Decreto 157/2022](https://img.shields.io/badge/Normativa-Decreto%20157%2F2022%20Galicia-lightblue?style=flat)](#)
-[![Version](https://img.shields.io/badge/Version-v0.2--002-green?style=flat)](#)
+[![Version](https://img.shields.io/badge/Version-v0.2--CLOSED-green?style=flat)](#)
 
 API de Corrección Formativa con IA diseñada para asistir al profesorado de **Filosofía de Bachillerato** en la Comunidad Autónoma de Galicia. Estructurada bajo el marco pedagógico oficial de la **LOMLOE**, el **Decreto 157/2022 (Xunta de Galicia)**, y las directrices de privacidad de la Unión Europea (**RGPD / AI Act / ENS**).
 
@@ -123,57 +123,87 @@ curl -X GET http://127.0.0.1:8000/api/v1/auth/me \
 
 ---
 
-## 📡 Corrección Formativa con IA: POST `/api/v1/evaluate`
+## 📡 Corrección Formativa con IA: POST `/api/v1/evaluate` (`[v0.2-004]` - `[v0.2-007]`)
 
-Envía la respuesta de un alumno y la rúbrica asociada para obtener la evaluación cualitativa estructurada en base al contrato estricto de Pydantic.
+Endpoint protegido por **Token Bearer JWT transaccional** conectado a base de datos PostgreSQL. Valida la pertenencia de la rúbrica al docente que realiza la petición (`[v0.2-004]`), inyecta el marco normativo gallego si se solicita (`modo_evaluacion`), aplica las instrucciones de exclusión pedagógica para adaptaciones NEAE/NEE (Decreto 229/2011) (`[v0.2-007]`), y registra la entrega y la evaluación de forma inmutable (`submissions`, `evaluaciones`, `changelog`).
 
 ### Ejemplo de Petición (Request)
 
+Requiere cabecera de autenticación `Authorization: Bearer <token>` transaccional:
+
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/evaluate \
+  -H "Authorization: Bearer <TU_TOKEN_JWT_AQUI>" \
   -H "Content-Type: application/json" \
   -d '{
-    "student_answer": "El prisionero sale de la caverna y ve la luz.",
-    "rubric": "Criterio 1: Simbolismo conceptual y precisión platónica (0-5 pts)",
-    "question": "¿Qué simboliza la salida del prisionero de la caverna?"
+    "student_answer": "El prisionero sale de la caverna y ve el sol o la luz...",
+    "rubrica_id": 1,
+    "marco_id": 1,
+    "modo_evaluacion": "COMBINADO",
+    "question": "¿Qué simboliza la salida del prisionero de la caverna?",
+    "alumno_id": "A-14",
+    "adaptaciones_alumno": {
+      "tipo": ["dislexia"],
+      "excluir_ortografia": true,
+      "tiempo_extra_pct": 35
+    }
   }'
 ```
 
-### Ejemplo de Respuesta (Response)
+### Ejemplo de Respuesta (Response: `EvaluacionResponse`)
+
+El servidor guarda la entrega en PostgreSQL y devuelve la evaluación estructurada con marcadores visuales neutros (`type: "error_excluido"`) y registro de ortografía excluida por adaptación:
 
 ```json
 {
-  "transcription": "El prisionero sale de la caverna y ve la luz.",
-  "rubricBreakdown": [
-    {
-      "category": "Criterio 1: Simbolismo conceptual",
-      "score": 3.0,
-      "maxScore": 5.0,
-      "reasoning": "La respuesta menciona la salida de la caverna y ver la luz, lo cual es parte del simbolismo de la alegoría de la caverna de Platón. Sin embargo, no profundiza en qué representa la caverna o la luz en términos de conocimiento y realidad."
-    }
-  ],
-  "visualMarkers": [],
-  "qualitativeAnalysis": {
-    "strengths": [
-      "Menciona elementos clave de la alegoría de la caverna como la salida y la luz."
+  "submission_id": "8905b4e7-91f8-4cb2-a723-8c43919e1e23",
+  "evaluacion_id": "f47ac10b-58cc-4372-a567-0e02b2c3d479",
+  "estado": "REVIEW",
+  "resultado_ia": {
+    "transcription": "El prisionero sale de la caverna y ve el sol o la luz...",
+    "rubricBreakdown": [
+      {
+        "category": "Precisión conceptual y simbolismo platónico",
+        "score": 4.0,
+        "maxScore": 5.0,
+        "reasoning": "El estudiante identifica correctamente el Sol y el exterior como símbolos platónicos. Se valora el contenido sin penalizar ortografía según adaptación."
+      }
     ],
-    "improvementNeeds": {
-      "immediate": [
-        "Desarrollar una explicación más detallada sobre qué representa la caverna en el contexto filosófico."
+    "visualMarkers": [
+      {
+        "x": 12.5,
+        "y": 45.0,
+        "type": "error_excluido",
+        "comment": "Error ortográfico detectado pero NO penalizado (Adaptación Dislexia activa)."
+      }
+    ],
+    "qualitativeAnalysis": {
+      "strengths": [
+        "Comprende la alegoría y su relación con la luz inteligible."
       ],
-      "mediumLongTerm": [
-        "Relacionar la salida del prisionero con conceptos como la realidad inteligible de las Ideas."
-      ]
+      "improvementNeeds": {
+        "immediate": [
+          "Vincular el papel del filósofo con el retorno a la caverna."
+        ],
+        "mediumLongTerm": [
+          "Relacionar el mito con el dualismo epistemológico platónico."
+        ]
+      },
+      "teacherSummary": "Excelente base conceptual adaptada al perfil NEAE del alumno."
     },
-    "teacherSummary": "El alumno muestra una comprensión inicial de la alegoría de la caverna, pero necesita profundizar en su significado filosófico."
-  },
-  "calificacion_cualitativa": "SU",
-  "siguiente_paso_accionable": "Investiga y explica qué representan la luz del Sol y el exterior en la alegoría platónica frente a las sombras de la caverna.",
-  "confidence_score": 0.95
+    "calificacion_cualitativa": "NT",
+    "siguiente_paso_accionable": "Explica en un párrafo por qué el prisionero liberado debe regresar con sus compañeros en la oscuridad.",
+    "confidence_score": 0.95,
+    "ortografia_detectada": true,
+    "errores_excluidos_por_adaptacion": [
+      "Falta de tilde en término aislado (excluido por dislexia)."
+    ]
+  }
 }
 ```
 
 ---
+
 
 ## 🧠 AI Development & Governance Methodology (`Phase Ninja`)
 

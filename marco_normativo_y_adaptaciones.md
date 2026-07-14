@@ -198,11 +198,12 @@ Cuando el prompt del motor recibe el campo `adaptaciones_alumno`, el comportamie
       }
     ]
   },
-  "marcadores_visuales": [
+  "visualMarkers": [
     {
-      "tipo": "ERROR_EXCLUIDO_NEAE",
-      "color_interfaz": "GRAY_NEUTRAL",
-      "mensaje": "Falta de ortografía detectada pero NO penalizada (Adaptación Dislexia activa)"
+      "x": 12.5,
+      "y": 45.0,
+      "type": "error_excluido",
+      "comment": "El término 'esfuerço' contiene un error ortográfico pero se excluye de penalización por la adaptación de dislexia del alumno."
     }
   ],
   "siguiente_paso_accionable": "Tu argumentación teórica sobre las causas del conflicto es excelente y muy clara. Como próximo reto de contenido, añade un ejemplo histórico concreto en el tercer párrafo para consolidar el nivel Sobresaliente."
