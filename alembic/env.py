@@ -10,7 +10,7 @@ from alembic import context
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 from backend.models.database import Base
-from backend.models.user import Profesor
+from backend.models import Profesor, MarcoEvaluacion, RubricaDocente, Submission, Evaluacion, ChangeLog
 
 
 # this is the Alembic Config object, which provides
