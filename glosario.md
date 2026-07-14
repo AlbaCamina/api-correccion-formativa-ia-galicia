@@ -51,6 +51,12 @@ Versión segura y cifrada de HTTP (el candado en el navegador). Es un requisito 
 **JSON** (JavaScript Object Notation — Notación de Objetos de JavaScript)  
 Formato estándar para intercambiar datos entre sistemas. Parece un diccionario de Python con llaves y valores. Es el formato que devuelve la IA con la corrección del examen.
 
+**Pipeline** (Cadena de Procesamiento o Tubería de Datos)  
+Secuencia ordenada y automatizada de pasos donde la salida (*output*) de un proceso se convierte directamente en la entrada (*input*) del siguiente paso, similar a una cadena de montaje industrial. En api-correccion-formativa-ia-galicia se analiza en la Versión 0.3 (`sesion_03_ocr_vs_multimodal_vision.md`) comparando un *Pipeline en 2 pasos* (Foto $\rightarrow$ OCR $\rightarrow$ LLM $\rightarrow$ JSON) frente a un *Pipeline Unificado Multimodal en 1 paso* (Foto $\rightarrow$ Vision LLM $\rightarrow$ JSON con marcadores espaciales x,y).
+
+**Scaffolding** (Andamiaje o Estructura Inicial de Código)  
+Generación automática o manual del esqueleto básico de un proyecto antes de empezar a escribir la lógica interna de negocio. Consiste en crear la jerarquía de carpetas principales, archivos de configuración (como `package.json`, `.env.example`, `main.py` o `docker-compose.yml`) y plantillas estructurales vacías. Proporciona los cimientos ordenados sobre los que evoluciona el código.
+
 **Refactor**  
 Reescribir código para que sea más limpio o eficiente sin cambiar lo que hace. Como reordenar una habitación sin tirar nada.
 
