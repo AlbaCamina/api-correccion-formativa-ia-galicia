@@ -19,6 +19,9 @@ La parte del sistema que no ve el usuario. Procesa los datos, llama a la IA, gua
 **Boilerplate**  
 Código repetitivo y estructural que hay que escribir en casi todo proyecto aunque no hace nada específico del negocio (imports, configuración inicial, estructura de carpetas). Los agentes de IA lo generan bien.
 
+**CORS** (Cross-Origin Resource Sharing — Intercambio de Recursos de Origen Cruzado)  
+Mecanismo de seguridad de los navegadores web que restringe las peticiones HTTP realizadas desde un dominio o puerto (ej. `http://localhost:5173` en Vite) hacia otro diferente (`http://127.0.0.1:8000` en FastAPI). Por especificación oficial, cuando se permite el envío de credenciales o tokens Bearer (`allow_credentials=True`), está prohibido usar un comodín (`allow_origins=["*"]`) por riesgo de seguridad; se exige declarar explícitamente los orígenes confiables.
+
 **Debug / Debugging**  
 Proceso de encontrar y corregir errores en el código. Literalmente "quitar los bichos".
 
@@ -57,6 +60,9 @@ Secuencia ordenada y automatizada de pasos donde la salida (*output*) de un proc
 **Scaffolding** (Andamiaje o Estructura Inicial de Código)  
 Generación automática o manual del esqueleto básico de un proyecto antes de empezar a escribir la lógica interna de negocio. Consiste en crear la jerarquía de carpetas principales, archivos de configuración (como `package.json`, `.env.example`, `main.py` o `docker-compose.yml`) y plantillas estructurales vacías. Proporciona los cimientos ordenados sobre los que evoluciona el código.
 
+**Stateless vs. Stateful** (Sin Estado vs. con Estado / Transaccional)  
+Un sistema es **Stateless** cuando el servidor no conserva memoria ni registro de las peticiones previas (como nuestra API v0.1: evaluaba un texto y olvidaba al usuario instantáneamente). Un sistema es **Stateful o Transaccional** cuando mantiene un estado coherente y persistente en el tiempo (como nuestra API v0.2: autentica al docente con JWT, verifica la propiedad de la rúbrica en base de datos, almacena la entrega en la tabla `Submission` y audita cada acción en un `ChangeLog` inmutable).
+
 **Refactor**  
 Reescribir código para que sea más limpio o eficiente sin cambiar lo que hace. Como reordenar una habitación sin tirar nada.
 
@@ -79,6 +85,12 @@ Herramienta oficial de migraciones transaccionales para SQLAlchemy. Funciona com
 
 **FastAPI**  
 El framework (marco de trabajo) de Python con el que se construye la API. Es moderno, muy rápido y genera documentación automática. Equivalente a Fastify pero en Python.
+
+**Event Loop & Corrutina (`async / await`)**  
+El **Event Loop** (Bucle de Eventos de `asyncio`) es el motor que permite al servidor Uvicorn gestionar cientos de peticiones concurrentes en un solo hilo de procesador. Una **Corrutina** (`async def`) cede el control al bucle cuando encuentra una operación de entrada/salida precedida por `await` (como una llamada HTTP a Groq o consulta a base de datos), permitiendo que el servidor atienda a otros profesores mientras la red responde (`I/O-Bound`). Si se usa código síncrono bloqueante como `time.sleep()`, todo el bucle se paraliza.
+
+**Inyección de Dependencias** (`Dependency Injection` — `Depends()`)  
+Patrón de diseño central en FastAPI por el cual una función o endpoint no instancia ni busca directamente sus recursos externos (como una conexión a base de datos `get_db` o la validación de un usuario `get_current_profesor`), sino que el framework se los suministra automáticamente en la firma de la función. Este desacoplamiento permite inyectar dependencias simuladas o transaccionales en memoria (`sqlite:///:memory:`) durante los tests (`dependency_overrides`) sin modificar el código de producción.
 
 **Pydantic**  
 Librería de Python que valida datos automáticamente. Defines cómo debe ser un objeto (campos, tipos) y Pydantic rechaza cualquier dato que no encaje. En este proyecto actúa como guardián del JSON que devuelve la IA.
@@ -347,6 +359,9 @@ Metodología pedagógica innovadora (ej. *No More Marking* en Reino Unido) donde
 
 **Doble Circuito de Calificación (Materias vs. Competencias Clave)**  
 Modelo operativo dual vigente en los IES gallegos (Decretos 156/157/2022) y reflejado en XADE/api-correccion-formativa-ia-galicia: 1) **Circuito de Materias:** Las asignaturas se califican y cierran en los boletines trimestrales y ordinarios con **números enteros del 1 al 10** derivados de las notas cotidianas numéricas de las pruebas evaluables. 2) **Circuito de Competencias Clave:** Las 8 competencias oficiales (*CCL, STEM, CD...*) se califican al final del curso de forma cualitativa (*IN, SU, BI, NT, SB*) mediante el **cruce e intersección matricial inter-materias** de todos los criterios evaluados en las diferentes asignaturas del alumno.
+
+**Deuda Técnica (`Technical Debt` / Deuda Consciente)**  
+Coste estratégico de ingeniería que se asume al aplazar o simplificar deliberadamente una implementación en la fase actual para priorizar la entrega rápida y limpia de un hito, con el compromiso explícito de refactorizarla o completarla en una iteración posterior. En api-correccion-formativa-ia-galicia, un ejemplo es no persistir aún los binarios de subida en la tabla `Submission` durante `[v0.3-001]` porque dicha lógica se rediseñará integralmente al introducir el recorte de cabecera pre-nube con `Pillow` en `[v0.3-002]` (*YAGNI*).
 
 **Equipotencialidad Criterial (`Decreto 156/157/2022`)**  
 Regla pedagógica general y por defecto por la que todos los Criterios de Evaluación (`criterio_id`) asociados a las competencias específicas de una materia tienen idéntico valor o peso en el cálculo de la nota final, salvo que el departamento establezca porcentajes diferenciados en su Programación Didáctica (`Capa 2`).
