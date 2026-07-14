@@ -400,11 +400,11 @@
 **para** que el sistema la procese sin necesidad de transcribir el texto manualmente.
 
 **Criterios de aceptación:**
-- [ ] `POST /api/v1/submissions/upload` acepta `multipart/form-data` con imagen (JPG, PNG, HEIC) o PDF
-- [ ] Tamaño máximo en backend: 25 MB (tolerancia para fotos puras o PDFs escaneados de múltiples páginas sin dar error al usuario)
-- [ ] Nota de arquitectura [D-020]: aunque el servidor acepte hasta 25 MB, la PWA en `v0.5-002` comprimirá y redimensionará localmente el archivo antes de enviarlo para optimizar red y tokens.
-- [ ] Formatos rechazados devuelven 400 con mensaje claro
-- [ ] El archivo se guarda en carpeta local `/uploads` (simulando S3) con nombre UUID
+- [x] `POST /api/v1/submissions/upload` acepta `multipart/form-data` con imagen (JPG, PNG, HEIC) o PDF
+- [x] Tamaño máximo en backend: 25 MB (tolerancia para fotos puras o PDFs escaneados de múltiples páginas sin dar error al usuario)
+- [x] Nota de arquitectura [D-020]: aunque el servidor acepte hasta 25 MB, la PWA en `v0.5-002` comprimirá y redimensionará localmente el archivo antes de enviarlo para optimizar red y tokens.
+- [x] Formatos rechazados devuelven 400 con mensaje claro
+- [x] El archivo se guarda en carpeta local `/uploads` (simulando S3) con nombre UUID
 
 **Etiquetas:** `v0.3` `backend`
 

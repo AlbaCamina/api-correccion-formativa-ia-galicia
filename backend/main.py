@@ -5,7 +5,8 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
 from dotenv import load_dotenv
-from backend.routers import evaluation_router, auth_router, marco_router, rubrica_router
+from fastapi.staticfiles import StaticFiles
+from backend.routers import evaluation_router, auth_router, marco_router, rubrica_router, submission_router
 
 # Configurar logging principal del servidor con marcas de tiempo (v0.1-005)
 logging.basicConfig(
@@ -20,7 +21,7 @@ load_dotenv()
 app = FastAPI(
     title="API de Corrección Formativa con IA - Galicia",
     description="Backend oficial para el sistema de corrección formativa adaptada al Decreto 157/2022 de la Xunta de Galicia.",
-    version="0.2-006",
+    version="0.3-001",
 )
 
 # Registro de enrutadores
@@ -28,6 +29,12 @@ app.include_router(evaluation_router)
 app.include_router(auth_router)
 app.include_router(marco_router)
 app.include_router(rubrica_router)
+app.include_router(submission_router)
+
+# Asegurar existencia del directorio y servir archivos de /uploads (simulando S3)
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
 
 
 # Configuración de CORS
