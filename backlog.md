@@ -41,7 +41,7 @@
 
 **Criterios de aceptación:**
 - [x] Adoptado modelo *Human-in-the-Loop* (HitL): la IA propone un borrador formativo; la profesora toma y aprueba la decisión final (`[D-002]`)
-- [x] Diseñado el mecanismo de seudonimización pre-nube: el cliente (Canvas) o buffer local recorta y elimina los 3 cm superiores de cabecera con datos identificativos antes del envío al almacenamiento externo (`[D-022]`)
+- [x] Diseñado el mecanismo de seudonimización pre-nube: recorte de cabecera con `Pillow` (`[D-022]`) más herramienta de tampón manual en Canvas de la PWA para casos de borde fotográficos (nombre en pie o lateral) (`[D-034]`)
 - [x] Almacenamiento nube en *Cold Storage* con purga automática por *Lifecycle Policy* (*Zero Data Retention* / expiración legal `[D-021]`)
 - [x] Inmutabilidad probatoria (*append-only*): las correcciones aprobadas (`GRADED`) se bloquean contra edición para preservar la cadena de custodia educativa (`[v0.5-005]`)
 
@@ -567,7 +567,8 @@
 - [ ] En móvil/tablet: botón para capturar uno o múltiples folios con la cámara trasera
 - [ ] En PC: input de subida de archivos múltiples (JPG, PNG) o documento PDF multi-página
 - [ ] Compresión y redimensión en cliente [D-020]: las imágenes se reducen automáticamente a ~2048px en su lado largo (~800 KB) antes del envío
-- [ ] Seudonimización en cliente [D-022]: recorte o difuminado automático de la cabecera superior (primeros 3 cm) sobre el Canvas
+- [ ] Seudonimización en cliente [`D-022`]: recorte automático de la cabecera superior (primeros 3 cm) sobre el Canvas
+- [ ] **`[D-034]` Herramienta de Tampón/Blackout Box:** vista previa pre-subida donde el docente puede arrastrar recuadros negros adicionales con el dedo o ratón sobre cualquier nombre desplazado al pie, lateral o centro del folio. Los píxeles se destruyen en el navegador antes del `fetch` a la nube
 - [ ] Vista previa y reordenación de folios antes de confirmar
 - [ ] Botón de envío que transmite el array y datos a `POST /api/v1/submissions`
 - [ ] Indicador de carga mientras el servidor encola la corrección asíncrona
@@ -730,6 +731,19 @@
 
 ---
 
+### [Roadmap-002] Escáner Local Offline de Datos Personales Pre-Nube (`Automated Offline PII Shield`)
+**Como** administradora de ciberseguridad del sistema,  
+**quiero** que el backend local pase la imagen por un micro-motor OCR offline en RAM (*Tesseract / Microsoft Presidio*) antes de conectar con la nube exterior  
+**para** detectar y bloquear automáticamente cualquier nombre o rastro de PII del alumnado que haya escapado al recorte manual de cabecera (`[D-034]`).
+
+* **Dependencias:** `[v0.3-002]` (Recorte pre-nube Pillow), `pytesseract` / `presidio-image-redactor`.
+* **Criterios de aceptación:**
+  - Un middleware local en WSL/Docker inspecciona el buffer de la imagen en memoria antes de llamar al SDK de Cloudinary o al motor de Groq.
+  - Si detecta coincidencias con nombres del listado de la clase (`PII Confidence > 0.8`), aborta la subida y devuelve error HTTP `422` alertando al docente para redacción visual en la PWA.
+  - El intento bloqueado queda registrado en el `changelog` con `actor = "PII_SHIELD"` para trazabilidad AI Act.
+
+---
+
 *Backlog generado el 07/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 14/07/2026 — Sincronizadas reglas de trabajo, metadatos de vigencia legislativa en [v0.2-003] y añadido [Roadmap-001] de auditoría de vigencia.*  
-*Total de historias: 30 | Versiones: 6 (0.1 → 1.0)*
+*Actualizado el 15/07/2026 — Sincronizados [D-034] en [v0.0-001] y [v0.5-002]; añadido [Roadmap-002] Escáner Offline de PII.*  
+*Total de historias: 30 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 2*

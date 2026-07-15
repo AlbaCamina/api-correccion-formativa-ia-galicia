@@ -44,6 +44,11 @@
 | [D-027](#d-027) | Modo dual de interacción rúbrica-normativa seleccionable en PWA (`COMBINADO` vs `AUDITORIA_CURRICULAR`) | Jul 2026 | ✅ Adoptada |
 | [D-028](#d-028) | Adopción de Groq (`llama-3.3-70b-versatile`) como motor LLM primario de coste cero y alta velocidad | Jul 2026 | ✅ Adoptada |
 | [D-029](#d-029) | Protocolo de Pausa Arquitectónica (*Stop & Consult*) y Modularidad Plana ante límites técnicos en agentes de IA | Jul 2026 | ✅ Adoptada |
+| [D-030](#d-030) | Capa de Persistencia y Migraciones Transaccionales en Modularidad Plana (`SQLAlchemy + Alembic`) | Jul 2026 | ✅ Adoptada |
+| [D-031](#d-031) | Blindaje de Privacidad y Seguridad sin Claves Maestras (`Seudonimización Estricta + bcrypt`) | Jul 2026 | ✅ Adoptada |
+| [D-032](#d-032) | Trazabilidad Bidireccional Git-Web (`Bidirectional Traceability`) y Gobernanza de Milestones | Jul 2026 | ✅ Adoptada |
+| [D-033](#d-033) | Gestión de Vigencia Legislativa Curricular en el Modelo de Datos (`Metadatos Estáticos de Validación YAGNI`) | Jul 2026 | ✅ Adoptada |
+| [D-034](#d-034) | Segunda Capa de Comprobación y Redacción PII ante Casos de Borde Fotográficos (`Client-Side Blackout Tool` + Freno Pre-Nube) | Jul 2026 | ✅ Adoptada |
 
 ---
 
@@ -753,6 +758,29 @@ El sistema cumple de manera transparente con las obligaciones de gobernanza de d
 
 ---
 
+### D-034
+## Segunda Capa de Comprobación y Redacción PII ante Casos de Borde Fotográficos (`Client-Side Blackout Tool en PWA + Freno Offline Pre-Nube`)
+
+**Estado:** ✅ Adoptada (`[v0.3-005]` / `Roadmap v0.8`)  
+**Fecha:** Julio 2026 (15/07/2026)  
+**Contexto:**  
+Aunque el patrón de **Cámara de Exclusión Pre-Nube (`[D-022]`)** recorta automáticamente el margen superior del examen mediante `Pillow`, en la práctica real del aula de secundaria se producen **casos de borde fotográficos (`Edge Cases`)**: alumnos que escriben su nombre y apellidos en el centro del folio debajo de un dibujo, en el margen lateral derecho o como firma al final de la última respuesta. Si el recorte mecánico superior actúa en solitario, el nombre del estudiante superviviente viajaría intacto a los servidores de la nube (`Cloudinary / Groq`), cometiendo una cesión internacional ilegal de datos de menores identificables bajo el RGPD y la LOPDGDD.
+
+**Opciones consideradas:**
+- **Subida a ciegas confiando exclusivamente en el recorte superior:** Rechazado categóricamente por dejar expuesto al centro educativo a multas por fugas de PII (*Personally Identifiable Information*) cuando el alumno no escribe en el encabezado.
+- **Segunda Capa de Verificación Visual y Redacción en PWA (`HitL Client-Side Blackout Box`):** La PWA de la profesora (`React / Canvas`) muestra una vista previa pre-subida con la franja superior negra por defecto y permite al docente arrastrar recuadros negros adicionales sobre cualquier nombre descolocado o firma lateral antes de confirmar la subida. Los píxeles del nombre se funden y eliminan en el propio navegador del cliente (*Zero Data Retention* absoluto). — **Elegido como estándar innegociable para la PWA desde `v0.5-002` / `v0.3-005`**.
+- **Escáner Local Offline de PII en Servidor (`Automated Offline PII Shield` con `Microsoft Presidio / Tesseract`):** Como capa secundaria automática en servidor local pre-nube (`v0.8+`), antes de salir hacia la nube exterior el archivo es escaneado offline en RAM. Si detecta texto compatible con nombres propios o coincidentes con el listado oficial del curso (`PII Confidence > 0.8`), bloquea el envío y arroja un error 422 alertando al docente para su revisión visual en pantalla.
+
+**Decisión:**  
+Se adopta una defensa multinivel pre-nube para casos de borde de PII:
+1. **Inspección Visual y Tampón en Navegador (`Client-Side HitL Blackout Box` en `v0.5-002`):** El docente es el soberano legal de la purga. Si advierte que el alumno escribió fuera del margen superior, difumina/recorta la zona infractora con el dedo o ratón directamente sobre el Canvas de la PWA antes de autorizar el `fetch` a la nube.
+2. **Evolución Offline en Backend (`Roadmap v0.8`):** Se planifica la integración de una comprobación automática offline en memoria como salvaguarda secundaria en el servidor antes de conectar con APIs externas de IA.
+
+**Consecuencias:**  
+Se elimina al 100% el riesgo de fuga de datos en folios atípicos, demostrando ante agencias de supervisión (*AESIA / AEPD*) una cultura de ingeniería de ciberseguridad *Privacy by Design / Privacy by Default* superior al estándar del sector.
+
+---
+
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 14/07/2026 — añadidas D-027 (Modo Dual), D-028 (Groq como Motor Primario), D-029 (Protocolo de Pausa Arquitectónica), D-030 (Persistencia y Migraciones), D-031 (Blindaje sin Clave Maestra), D-032 (Trazabilidad Bidireccional) y D-033 (Vigencia Legislativa)*  
-*Total de decisiones registradas: 33*
+*Actualizado el 15/07/2026 — añadidas D-027 a D-034 (Segunda Capa de Comprobación PII y Casos de Borde)*  
+*Total de decisiones registradas: 34*

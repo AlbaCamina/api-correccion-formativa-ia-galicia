@@ -29,7 +29,31 @@ Proceso de encontrar y corregir errores en el código. Literalmente "quitar los 
 Publicar el código en un servidor accesible desde internet. Antes solo funciona en tu máquina local; tras el deploy, cualquiera puede usarlo.
 
 **Endpoint**  
-Una URL concreta de la API a la que se puede hacer una petición. Ejemplo: `POST /api/v1/evaluate` es el endpoint que recibe el examen y devuelve la corrección.
+Una URL concreta de la API a la que se puede hacer una petición HTTP con un verbo específico. Cada endpoint tiene una responsabilidad única y bien definida. Los verbos más usados en este proyecto son:
+- `POST` — crea o procesa algo nuevo (subir examen, registrar profesor, evaluar)
+- `GET` — consulta o recupera datos sin modificar nada (ver historial, listar rúbricas)
+- `PATCH` — modifica parcialmente un recurso existente (aprobar una evaluación con `actor=PROFESOR`)
+- `PUT` — reemplaza un recurso completo (editar una rúbrica)
+- `DELETE` — elimina un recurso
+
+**Endpoints públicos vs. protegidos por JWT:**
+- **Públicos** (no requieren token): `POST /api/v1/auth/register`, `POST /api/v1/auth/login`, `GET /health`
+- **Protegidos** (requieren `Authorization: Bearer <token>` en la cabecera): todos los demás — el servidor verifica la identidad del docente antes de procesar la petición
+
+**Endpoints reales de api-correccion-formativa-ia-galicia (por versión):**
+
+| Versión | Endpoint | Verbo | Función |
+|---|---|---|---|
+| v0.1 | `/api/v1/evaluate` | `POST` | Corrección síncrona con texto plano |
+| v0.2 | `/api/v1/auth/register` | `POST` | Registro de profesora |
+| v0.2 | `/api/v1/auth/login` | `POST` | Login → devuelve JWT |
+| v0.2 | `/api/v1/rubricas` | `POST/GET` | Crear y listar rúbricas |
+| v0.2 | `/api/v1/evaluate` | `POST` | Corrección con BBDD + marco normativo |
+| v0.3 | `/api/v1/submissions/upload` | `POST` | Subida de imagen/PDF del examen |
+| v0.3 | `/api/v1/evaluaciones/{id}/approve` | `PATCH` | Aprobación HitL docente (`REVIEW → GRADED`) |
+| v0.4 | `/api/v1/submissions` | `GET` | Lista paginada de entregas del docente |
+| v0.4 | `/api/v1/submissions/{id}/events` | `GET` (SSE) | Stream de estado en tiempo real |
+| v1.0 | `/api/v1/submissions/{id}/changelog` | `GET` | Historial inmutable de auditoría AI Act |
 
 **Frontend**  
 La parte del sistema que ve el usuario: botones, pantallas, formularios. En este proyecto: React + Vite (se implementa en v0.5).
@@ -45,14 +69,38 @@ El protocolo que usa internet para enviar y recibir datos. Define los códigos d
 - `200 OK` — todo bien
 - `202 Accepted` — recibido, procesando
 - `400 Bad Request` — la petición está mal formada
-- `422 Unprocessable Entity` — los datos no pasan validación
+- `422 Unprocessable Entity` — los datos no pasan validación Pydantic
+- `500 Internal Server Error` — algo falló en el servidor
 
 **HTTPS** (HyperText Transfer Protocol Secure — Protocolo HTTP Seguro)  
 Versión segura y cifrada de HTTP (el candado en el navegador). Es un requisito estricto en dispositivos móviles para permitir instalar una PWA y para autorizar el acceso a la cámara o micrófono.
-- `500 Internal Server Error` — algo falló en el servidor
 
 **JSON** (JavaScript Object Notation — Notación de Objetos de JavaScript)  
 Formato estándar para intercambiar datos entre sistemas. Parece un diccionario de Python con llaves y valores. Es el formato que devuelve la IA con la corrección del examen.
+
+**Librería / Framework (Biblioteca de código)**  
+Una **librería** es un conjunto de código ya escrito y empaquetado que resuelve un problema concreto y que puedes reutilizar en tu proyecto sin escribirlo desde cero. Un **framework** es similar, pero con una diferencia clave: la librería tú la llamas cuando quieres; el framework llama a tu código según sus propias reglas (él manda la estructura).
+
+Librerías y frameworks clave de api-correccion-formativa-ia-galicia:
+
+| Librería / Framework | Tipo | Para qué sirve |
+|---|---|---|
+| `fastapi` | Framework | Construye todos los endpoints REST del backend |
+| `pydantic` | Librería | Valida que el JSON de la IA tenga exactamente los campos correctos |
+| `sqlalchemy` | Librería | Habla con PostgreSQL escribiendo Python en vez de SQL crudo |
+| `alembic` | Librería | Gestiona cambios de estructura de BBDD con control de versiones |
+| `passlib[bcrypt]` | Librería | Hashea contraseñas de profesoras de forma irreversible |
+| `pyjwt` | Librería | Genera y verifica tokens Bearer JWT de autenticación |
+| `pillow` | Librería | Recorta la cabecera del examen (nombre del alumno) en memoria pre-nube |
+| `python-dotenv` | Librería | Carga variables de entorno del archivo `.env` |
+| `pytesseract` | Librería | *(Roadmap v0.8)* OCR offline para el escáner de PII pre-nube (`[D-034]`) |
+| `react` | Framework | Construye la interfaz de usuario de la PWA del docente |
+
+**Nativo / Integración Nativa (`Native / Built-in`)**  
+Capacidad o funcionalidad que viene incorporada de fábrica en el núcleo de una herramienta o tecnología, sin necesidad de instalar librerías de terceros, añadir capas intermedias o usar parches artesanales. En nuestra arquitectura priorizamos soluciones nativas para mantener un código limpio, rápido y con mínimas dependencias (`YAGNI`): por ejemplo, la validación gramatical nativa de `Structured Outputs` con `.parse()` en OpenAI, la generación de documentación Swagger en `/docs` nativa de FastAPI, y la gestión del pool de conexiones nativo en SQLAlchemy.
+
+**Parseo / Parsear (`Parsing` / `.parse()`)**  
+Proceso informático de analizar, desgranar y convertir una cadena de datos en bruto (como un texto plano o una respuesta JSON por red) en una estructura de datos tipada, navegable y comprensible para el lenguaje de programación (como un objeto o instancia Pydantic en Python). En nuestro backend, cuando el modelo de IA responde con un string, el método `.parse()` o `model_validate_json` *parsea* ese texto, verificando rigurosamente campo por campo y tipo por tipo que el contrato `EvaluacionIA` se cumpla al 100% antes de procesar la nota en base de datos.
 
 **Pipeline** (Cadena de Procesamiento o Tubería de Datos)  
 Secuencia ordenada y automatizada de pasos donde la salida (*output*) de un proceso se convierte directamente en la entrada (*input*) del siguiente paso, similar a una cadena de montaje industrial. En api-correccion-formativa-ia-galicia se analiza en la Versión 0.3 (`sesion_03_ocr_vs_multimodal_vision.md`) comparando un *Pipeline en 2 pasos* (Foto $\rightarrow$ OCR $\rightarrow$ LLM $\rightarrow$ JSON) frente a un *Pipeline Unificado Multimodal en 1 paso* (Foto $\rightarrow$ Vision LLM $\rightarrow$ JSON con marcadores espaciales x,y).
@@ -69,6 +117,14 @@ Reescribir código para que sea más limpio o eficiente sin cambiar lo que hace.
 **README**  
 Archivo de texto en la raíz del repositorio que explica qué es el proyecto, cómo instalarlo y cómo usarlo. Es lo primero que ve cualquier persona que visita el repositorio en GitHub.
 
+**REST / Arquitectura REST (`RESTful`)**  
+Estilo arquitectónico que define cómo deben comunicarse los sistemas en internet mediante HTTP. No es un protocolo ni una librería — es un conjunto de principios de diseño que, si se cumplen, la API se denomina "RESTful". Los principios clave que aplica api-correccion-formativa-ia-galicia son:
+- **Cliente-Servidor:** React (PWA) y FastAPI son independientes y se comunican solo por HTTP.
+- **Sin estado (`Stateless`):** Cada petición lleva toda la información necesaria en la cabecera JWT — el servidor no recuerda sesiones entre peticiones.
+- **Interfaz Uniforme:** Las URLs nombran *recursos* y los verbos HTTP nombran *acciones* (`POST /rubricas` crea, `GET /rubricas` lista, `DELETE /rubricas/{id}` elimina). Una API no REST pondría el verbo en la URL: `POST /deleteRubrica`.
+- **Sistema en Capas:** El docente llama a FastAPI; FastAPI llama a Groq y PostgreSQL internamente sin que la PWA lo sepa.
+- **Recursos Identificables:** Cada entidad tiene su propia URL única (`/api/v1/evaluaciones/f47ac10b` identifica una sola evaluación).
+
 **Stack tecnológico**  
 El conjunto de tecnologías que usa un proyecto. En api-correccion-formativa-ia-galicia: Python + FastAPI + PostgreSQL + React + Vite + Redis + Celery.
 
@@ -84,7 +140,19 @@ Herramienta oficial de migraciones transaccionales para SQLAlchemy. Funciona com
 
 
 **FastAPI**  
-El framework (marco de trabajo) de Python con el que se construye la API. Es moderno, muy rápido y genera documentación automática. Equivalente a Fastify pero en Python.
+El framework de Python con el que se construye toda la API REST de este proyecto. Su característica más importante es el uso de **decoradores** — instrucciones que se ponen encima de una función para que FastAPI sepa que esa función es un endpoint:
+
+```python
+@router.post("/evaluate")          # ← decorador: "este POST /evaluate llama a esta función"
+async def evaluate(                # ← función asíncrona (no bloquea el servidor)
+    body: EvaluarRequest,          # ← Pydantic valida el cuerpo automáticamente
+    db: Session = Depends(get_db), # ← inyección de dependencias: FastAPI da la BBDD
+    profesor = Depends(get_current_profesor) # ← FastAPI verifica el JWT
+):
+    ...
+```
+
+Ventajas clave sobre Django o Flask: tipado nativo con Pydantic, async/await nativo, y generación automática de Swagger UI en `/docs` sin configuración adicional.
 
 **Event Loop & Corrutina (`async / await`)**  
 El **Event Loop** (Bucle de Eventos de `asyncio`) es el motor que permite al servidor Uvicorn gestionar cientos de peticiones concurrentes en un solo hilo de procesador. Una **Corrutina** (`async def`) cede el control al bucle cuando encuentra una operación de entrada/salida precedida por `await` (como una llamada HTTP a Groq o consulta a base de datos), permitiendo que el servidor atienda a otros profesores mientras la red responde (`I/O-Bound`). Si se usa código síncrono bloqueante como `time.sleep()`, todo el bucle se paraliza.
@@ -140,7 +208,6 @@ Base de datos relacional de código abierto. Guarda los datos estructurados del 
 Asignación de un puerto externo exclusivo y reservado en `docker-compose.yml` (ej. `ports: - "5433:5432"`) para aislar el contenedor de base de datos del proyecto frente a otras instancias o servicios locales del sistema operativo. Aunque internamente PostgreSQL sigue operando en su puerto nativo 5432, desde Windows o WSL nos conectamos al puerto 5433 (`DATABASE_URL`). Esto previene colisiones (`Bind for 0.0.0.0:5432 failed`) cuando conviven varios proyectos o prácticas profesionales en el mismo ordenador (`[D-030]`).
 
 **Seed**  
-
 Datos iniciales que se insertan en la base de datos al crearla para que no esté vacía. En este proyecto: al menos un marco de evaluación de Bachillerato o ESO según el decreto autonómico de la Xunta de Galicia.
 
 **UUID** (Universally Unique Identifier — Identificador Único Universal)  
@@ -155,6 +222,9 @@ Modelo de lenguaje de la empresa Anthropic. Alternativa a GPT-4o. Se considera e
 
 **Confidence Score** (Índice de Confianza IA)  
 Medida numérica devuelta por el modelo (`0.0` a `1.0`) que indica la certeza o fiabilidad de la interpretación y lectura de un examen. En api-correccion-formativa-ia-galicia (`[D-024]`), si la confianza es `< 0.75` (caligrafía confusa, borrones), el sistema emite una alerta visual para que la profesora revise con especial atención prioritaria.
+
+**Contrato JSON (`[D-024]` / `EvaluacionIA`)**  
+Acuerdo estricto de estructura y tipado definido con Pydantic v2 que transforma a los motores de Inteligencia Artificial (por naturaleza generadores probabilísticos de texto libre) en componentes deterministas de software. Al exigir la validación estricta (`Structured Outputs` / `.parse()`), se prohíbe al LLM emitir saludos, texto libre o formatos alucinados, garantizando que el backend reciba invariablemente campos tipados (calificaciones, marcadores x-y, desglose de rúbricas y `confidence_score`) listos para persistirse en PostgreSQL y mostrarse en la PWA del profesor.
 
 **Generador Asistido de Rúbricas (Copiloto Pre-Corrección)**  
 Funcionalidad de asistencia de api-correccion-formativa-ia-galicia (`Capa 4` relacional) por la que el docente solo necesita subir o describir el enunciado de una prueba o tarea evaluable. El motor LLM cruza automáticamente la normativa general (`Capa 1`), la programación del departamento (`Capa 2`) y el acuerdo transversal del centro (`Capa 3`) para generar una propuesta de rúbrica en 4 niveles de logro (*Insuficiente, Suficiente/Bien, Notable y Sobresaliente*). El profesor la valida con un clic en su PWA, reduciendo un 90% del tiempo burocrático de diseño de baremos.
@@ -172,7 +242,6 @@ Modelo de inteligencia artificial entrenado con enormes cantidades de texto. Es 
 Parámetro arquitectónico de interacción pedagógica (`[D-027]`, `modo_evaluacion`) que resuelve la tensión entre los criterios oficiales de la Xunta y las rúbricas ad-hoc de los docentes sin sobreingeniería en el backend. En modo `COMBINADO`, la IA fusiona los saberes de la ley con la rúbrica de la profesora para calificar entregas diarias con agilidad. En modo `AUDITORIA_CURRICULAR`, la IA corrige la tarea y adicionalmente orienta al docente contrastando su rúbrica contra los Decretos 156/157/2022, advirtiendo en `teacherSummary` de posibles omisiones competenciales.
 
 **Multimodal / Omni-canal**  
-
 Un modelo de IA que procesa texto, imagen y estructuras combinadas de forma simultánea (ej. GPT-4o o Claude 3.5 Sonnet). En api-correccion-formativa-ia-galicia esto permite evaluar **cualquier tipo de prueba evaluable**: no solo fotos de exámenes manuscritos, sino murales de cartulina de aula, redacciones en campos de texto online (`Form Text`) y PDFs o capturas de presentaciones hechas a ordenador (como *Canva* o *Google Slides*).
 
 **OCR** (Optical Character Recognition — Reconocimiento Óptico de Caracteres)  
@@ -182,17 +251,40 @@ Tecnología integrada en la IA multimodal que extrae y convierte la caligrafía 
 Cualquier evidencia de aprendizaje del alumno sometida a corrección formativa. En api-correccion-formativa-ia-galicia abarca los 3 formatos del aula moderna: papel manuscrito (foto), creación plástica/visual (foto de mural o cartulina) y entregas digitales (redacciones online o exportaciones PDF/PNG de presentaciones de Canva).
 
 **Prompt**  
-El texto de instrucciones que se le da al modelo de IA para que sepa cómo comportarse. En este proyecto, el prompt le dice a la IA que actúe como "evaluador formativo experto en educación secundaria de Galicia" y le especifica el formato JSON que debe devolver.
+El texto de instrucciones que se envía al modelo de IA. Se divide en dos partes con roles distintos:
+
+- **`system prompt` (instrucción de rol):** Define quién es la IA y cómo debe comportarse en todas sus respuestas. En este proyecto: *"Eres un evaluador formativo experto en Filosofía de Bachillerato del sistema educativo gallego (Decreto 157/2022, Xunta de Galicia). Devuelves ÚNICAMENTE JSON estructurado con el esquema EvaluacionIA. Jamás diagnosticas condiciones médicas ni educativas."* — establece el rol, el idioma, las restricciones legales y el contrato de salida.
+- **`user prompt` (la tarea concreta):** Contiene los datos variables de cada corrección: la respuesta del alumno, la rúbrica de la profesora, el marco normativo y las adaptaciones NEAE. Cambia en cada petición.
+
+El `prompt_builder.py` construye dinámicamente el `user prompt` combinando estos datos. El `system prompt` permanece constante en todas las correcciones.
 
 **Structured Outputs** (Salidas Estructuradas)  
 Mecanismo que fuerza al modelo de IA a devolver siempre un JSON con un esquema fijo, en lugar de responder en texto libre. Explicado en detalle en `sesion_02_storage_y_structured_outputs.md`.
 
 **Token** (en contexto de IA)  
-La unidad mínima de texto que procesa un modelo de lenguaje. Aproximadamente 1 token = 0,75 palabras en español. Los modelos de IA cobran por tokens consumidos (tanto los del prompt como los de la respuesta).
+La unidad mínima de texto que procesa un modelo de lenguaje. Aproximadamente `1 token ≈ 0,75 palabras` en español (o 4 caracteres en inglés). Los modelos cobran por tokens consumidos en ambas direcciones:
+
+| Motor | Precio input | Precio output | Contexto máximo |
+|---|---|---|---|
+| `Groq llama-3.3-70b` | **Gratuito** (cota) | **Gratuito** (cota) | 128.000 tokens |
+| `GPT-4o` | ~$2,50 / M tokens | ~$10 / M tokens | 128.000 tokens |
+| `Claude Sonnet` | ~$3 / M tokens | ~$15 / M tokens | 200.000 tokens |
+
+**Ventana de contexto (`context window`):** el límite de tokens que el modelo puede leer de una vez (prompt + respuesta juntos). Si un examen escaneado con mucho texto supera ese límite, el modelo trunca o falla — por eso en `[D-020]` se comprime la imagen en la PWA antes de enviarla.
+
+**En este proyecto:** Groq es el motor primario (`[D-028]`) precisamente porque su cota gratuita permite desarrollar y demostrar el sistema sin coste, con inferencia ultrarrápida.
 
 ---
 
 ## 5. Almacenamiento e infraestructura
+
+**BLOB / Objeto Binario Grande (Binary Large Object)**  
+Colección o bloque en crudo de datos en formato binario (como imágenes en alta resolución `.webp/.jpg` o documentos `.pdf` de exámenes escaneados). En nuestra arquitectura es un antipatrón almacenar BLOBs directamente dentro de las tablas de PostgreSQL porque encarecen el disco y ralentizan las consultas relacionales de auditoría; en su lugar, el archivo físico viaja a un *Object Storage* externo (S3/Cloudinary) y la base de datos solo almacena su URL ligera y metadatos.
+
+**Buffer (en memoria / en disco)**  
+Zona intermedia y temporal donde se almacenan datos en tránsito antes de que sean procesados o persistidos definitivamente. En api-correccion-formativa-ia-galicia aparece en dos variantes con implicaciones legales distintas:
+- **Buffer en RAM (`BytesIO`):** La imagen del examen se carga directamente en la memoria del proceso Python sin escribirse en ningún fichero físico del disco. `Pillow` recorta la cabecera con el nombre del alumno dentro de ese bloque de bytes en memoria y el resultado anonimizado se envía a la nube. El archivo original con PII **nunca toca el disco** del servidor (`[D-022]`, estándar *Datenschutz* alemán).
+- **Buffer local en disco (`/uploads/`):** El archivo temporal se escribe en disco con un nombre UUID y se borra inmediatamente tras completar la subida a la nube (`[D-021]`). Es la opción más simple para el MVP `[v0.3-001]`.
 
 **Broker**  
 En el contexto de colas de tareas: el intermediario que recibe las tareas pendientes y las distribuye a los workers. En este proyecto Redis actúa como broker de Celery.
@@ -207,7 +299,16 @@ Almacenamiento en la nube de muy bajo coste diseñado para archivar archivos que
 Servicio de almacenamiento y gestión de imágenes en la nube. Las fotos de los exámenes se guardan aquí, no en la base de datos. Tiene capa gratuita generosa. Explicado en `sesion_02_storage_y_structured_outputs.md`.
 
 **Docker** / **Docker Compose**  
-Docker permite empaquetar una aplicación con todo lo que necesita para funcionar en un "contenedor" aislado. Docker Compose orquesta varios contenedores a la vez (por ejemplo: la app de FastAPI + PostgreSQL + Redis arrancando juntos con un solo comando).
+Docker permite empaquetar una aplicación con todo lo que necesita en una unidad aislada llamada **contenedor**. La diferencia clave entre sus dos conceptos:
+
+- **Imagen:** la receta — un archivo estático que describe el sistema operativo, las dependencias y la configuración (ej. `postgres:16-alpine` es una imagen de PostgreSQL lista para usar)
+- **Contenedor:** la receta ejecutándose — una instancia viva de la imagen, con su propia memoria y red aislada
+
+**Por qué lo usas en este proyecto en lugar de instalar Postgres directamente:**
+1. Aislas el PostgreSQL del proyecto del resto del sistema — sin colisiones con otras instalaciones
+2. Con un solo `docker compose up -d` levantas la BBDD en el puerto `5433` sin instalar nada en Windows
+3. Con `docker compose down` lo apagas todo limpiamente
+4. El `docker-compose.yml` del repositorio documenta exactamente cómo reproducir el entorno en cualquier máquina
 
 **Presigned URL** (URL Prefirmada)  
 Un enlace temporal y firmado que permite subir un archivo directamente a Cloudinary o S3 sin pasar por el servidor. Explicado con la analogía del aparcacoches en `sesion_02_storage_y_structured_outputs.md`.
@@ -263,7 +364,23 @@ Una línea de desarrollo paralela en Git. Permite trabajar en una funcionalidad 
 Un punto de guardado en el historial de Git. Cada commit tiene un mensaje que describe qué cambió. Ejemplo: `feat: add evaluate endpoint`.
 
 **Git**  
-Sistema de control de versiones. Guarda el historial completo de cambios del código, permite volver atrás y trabajar en paralelo con ramas.
+Sistema de control de versiones. Guarda el historial completo de cambios del código, permite volver atrás y trabajar en paralelo con ramas. Los 4 comandos que usas en cada sesión de trabajo:
+
+```bash
+git status              # ¿qué archivos he cambiado?
+git add .               # prepara todos los cambios para el commit
+git commit -m "feat(hitl): implement approve endpoint" # crea el punto de guardado
+git push origin main    # sube los commits a GitHub
+```
+
+**Convención de mensajes de commit en este proyecto (`Conventional Commits`):**
+- `feat:` — nueva funcionalidad
+- `fix:` — corrección de un bug
+- `docs:` — cambios en documentación
+- `refactor:` — código mejorado sin cambiar su función
+- `test:` — tests añadidos o modificados
+
+El historial de commits es parte de tu portfolio — cada `feat:` con su ADR referenciado demuestra madurez de ingeniería.
 
 **GitHub**  
 Plataforma web donde se aloja el repositorio Git del proyecto. Es donde los empleadores y reclutadores verán el código y el historial de trabajo.
@@ -406,6 +523,9 @@ Principio fundamental del Derecho Público español y del *AI Act* que dictamina
 
 Prueba muy básica que verifica que lo más fundamental funciona antes de construir nada encima. En este proyecto: `v0.1-000` comprueba que la IA devuelve el JSON correcto antes de construir FastAPI.
 
+**Trade-off (`Trade-off` / Compromiso Arquitectónico)**  
+Principio universal de ingeniería y diseño de sistemas por el cual no existe una solución perfecta o gratuita, sino que para obtener una ventaja en una dimensión (como precisión, resiliencia o velocidad) se debe ceder o asumir un coste en otra (como latencia, consumo de tokens o complejidad de infraestructura). En nuestro proyecto se evalúan conscientemente en cada decisión: por ejemplo, asumir mayor consumo de tokens multimodales en la Versión 0.3 por ganar precisión pedagógica y marcadores x-y, o asumir la necesidad de contenedores extra en la Versión 0.1 con Celery y Redis por ganar resiliencia inmutable al 100% bajo el AI Act.
+
 **XADE (`Xestión Administrativa da Educación`)**  
 Aplicación informática oficial de la Xunta de Galicia (Consellería de Educación) para todos los centros docentes gallegos. Es donde las secretarías y equipos docentes matriculan al alumnado e introducen las notas numéricas por materia y cualitativas por competencias clave para cerrar actas e imprimir boletines en cada junta de evaluación. api-correccion-formativa-ia-galicia asiste y calcula el día a día para que el trasvase final de datos de corrección a XADE sea rápido, seguro y 100% auditable.
 
@@ -425,6 +545,9 @@ Tipo de token de autenticación que se envía en la cabecera HTTP de cada petici
 **Cifrado Simétrico vs. Seudonimización (Blindaje sin Clave Maestra)**  
 Estrategia arquitectónica (`YAGNI`) por la cual se descarta el cifrado de columnas con clave maestra simétrica (`ENCRYPTION_KEY` / `Fernet`) para evitar el riesgo catastrófico de pérdida irrecoverable de datos ante un extravío o corrupción de la clave en `.env`. En su lugar, la privacidad y protección de los datos sensibles del alumnado (`[D-023]`) se resuelve de raíz mediante **Seudonimización Estricta (`HitL Client-Side`)**: en la base de datos de la nube solo se almacena un identificador anónimo (`alumno_id = "A-14"`), mientras que la tabla de equivalencias con la identidad real permanece exclusivamente en el cuaderno y XADE local de la profesora, haciendo que la base de datos sea intrínsecamente inocua sin depender de claves criptográficas frágiles.
 
+**Client-Side Blackout Tool (`Herramienta de Tampón o Redacción Visual en Navegador`)**  
+Segunda capa de verificación y redacción en PWA (`[D-034]`). Además del recorte automático superior (`[D-022]`), permite a la profesora difuminar o plantar recuadros negros manualmente con el dedo/ratón sobre la vista previa del Canvas antes de confirmar el envío a la nube si un alumno escribió su nombre fuera del encabezado. La destrucción de píxeles ocurre en el propio dispositivo del cliente, asegurando *Zero Data Retention*.
+
 **Hacheo Unidireccional (`bcrypt` / Password Hashing)**  
 Algoritmo criptográfico irreversible (de un solo sentido) utilizado en `backend/services/auth_service.py` para almacenar las contraseñas (`hashed_password`) en la tabla `profesores` (`[v0.2-002]`). A diferencia del cifrado simétrico, no requiere ni depende de ninguna clave maestra secreta en `.env` para funcionar; aplica un cálculo matemático complejo sobre la contraseña (`salt + hash`). Para validar un login, el motor aplica la misma fórmula al texto ingresado y compara los hashes resultantes, garantizando seguridad absoluta ante filtraciones y cero riesgo de pérdida por reinicios o migraciones de servidor.
 
@@ -435,8 +558,29 @@ Archivo de texto que contiene variables de entorno (claves de API, contraseñas,
 
 Regulamento y marco normativo obligatorio que fija los requisitos y políticas de ciberseguridad en la Administración Pública y en los sistemas que tratan datos institucionales o de ciudadanos (como XADE en Galicia). Debido a las rigurosas exigencias del ENS y de AMTEGA sobre la protección de datos de menores, se prohíbe la conexión o inyección externa por APIs privadas comerciales directamente en XADE, justificando que el trasvase desde api-correccion-formativa-ia-galicia se realice localmente mediante exportación de ficheros o scripts locales en el navegador del funcionario (`[D-025]`).
 
+**Escáner Local Offline de PII (`Automated Offline PII Shield`)**  
+Mecanismo secundario en servidor local (`Roadmap v0.8` en `[D-034]`) que procesa la imagen en memoria local con un micro-motor OCR/PII offline (*Tesseract / Microsoft Presidio*) antes de enviarla a la nube. Si detecta texto compatible con nombres propios del listado de la clase que hayan escapado del recorte superior, bloquea la subida con error 422 y protege al colegio de infracciones RGPD.
+
 **JWT** (JSON Web Token — Token Web JSON)  
-Un token firmado digitalmente que el servidor entrega al usuario al hacer login. El usuario lo incluye en cada petición posterior para demostrar que está autenticado, sin que el servidor tenga que consultar la base de datos en cada petición.
+Token firmado digitalmente que el servidor entrega al docente tras el login. Tiene **3 partes separadas por puntos**, cada una codificada en Base64:
+- **Header:** algoritmo de firma usado (`HS256`)
+- **Payload:** datos del usuario (`profesor_id`, fecha de expiración)
+- **Signature:** firma criptográfica generada con la `SECRET_KEY` del servidor — garantiza que el token no fue manipulado
+
+**Flujo completo en api-correccion-formativa-ia-galicia:**
+1. La profesora hace `POST /api/v1/auth/login` con su contraseña
+2. El servidor verifica el hash `bcrypt` — si coincide, genera el JWT firmado con la `SECRET_KEY`
+3. La profesora guarda el JWT en el navegador (localStorage o cookie)
+4. Cada petición protegida incluye la cabecera: `Authorization: Bearer <JWT>`
+5. El servidor verifica la firma con la `SECRET_KEY` — si es válida, sabe quién es sin consultar la BBDD
+
+**Por qué importa ante la AESIA:**
+- **Stateless:** el servidor no guarda sesiones en memoria — cumple el principio REST (`[D-031]`)
+- **La `SECRET_KEY`** es lo que hace la firma inviolable — el servidor aborta al arrancar si está vacía o es el valor por defecto (`startup_validation()`)
+- **Expiración automática:** el token caduca tras un tiempo definido — el docente debe hacer login de nuevo
+
+**PII (`Personally Identifiable Information` / Información Personalmente Identificable)**  
+Cualquier dato o rastro identificativo (como nombre completo, DNI, firma, correo electrónico o foto de rostro) que permita vincular directa o indirectamente un examen con una persona física. Su subida o cesión no anonimizada a servidores de IA en terceros países está estrictamente prohibida por el RGPD cuando se trata de menores de edad.
 
 **Variables de entorno**  
 Valores de configuración que se inyectan en el programa desde el sistema operativo o desde un archivo `.env`, sin escribirlos directamente en el código. Separa la configuración del código.

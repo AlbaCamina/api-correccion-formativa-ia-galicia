@@ -86,6 +86,35 @@ python3 -m unittest discover -s backend/tests/
 
 ---
 
+## 📡 API Endpoints
+
+### Implementados
+
+| Endpoint | Verbo | Auth | Descripción |
+|---|---|---|---|
+| `/health` | `GET` | ❌ Pública | Estado del servidor |
+| `/api/v1/auth/register` | `POST` | ❌ Pública | Registro de profesora |
+| `/api/v1/auth/login` | `POST` | ❌ Pública | Login → devuelve JWT Bearer |
+| `/api/v1/auth/login-json` | `POST` | ❌ Pública | Login en JSON (compatible Swagger) |
+| `/api/v1/auth/me` | `GET` | ✅ JWT | Verificar sesión activa |
+| `/api/v1/marcos` | `GET` | ✅ JWT | Listar marcos normativos (Xunta) |
+| `/api/v1/rubricas` | `POST / GET` | ✅ JWT | Crear y listar rúbricas del docente |
+| `/api/v1/evaluate` | `POST` | ✅ JWT | Corrección formativa con IA (`REVIEW`) |
+
+### Próximos (Roadmap)
+
+| Endpoint | Verbo | Versión | Descripción |
+|---|---|---|---|
+| `/api/v1/submissions/upload` | `POST` | 🔜 v0.3 | Subida de imagen/PDF del examen |
+| `/api/v1/evaluaciones/{id}/approve` | `PATCH` | 🔜 v0.3 | Aprobación HitL docente (`REVIEW → GRADED`) |
+| `/api/v1/submissions` | `GET` | 🔜 v0.4 | Lista paginada de entregas |
+| `/api/v1/submissions/{id}/events` | `GET SSE` | 🔜 v0.4 | Notificación en tiempo real |
+| `/api/v1/submissions/{id}/changelog` | `GET` | 🔜 v1.0 | Historial inmutable de auditoría AI Act |
+
+> La documentación interactiva completa (Swagger UI) está disponible en `http://127.0.0.1:8000/docs` al ejecutar el servidor en local.
+
+---
+
 ## 🔒 Autenticación y Seguridad: Endpoints `/api/v1/auth/*` (`[v0.2-002]`)
 
 El backend incorpora autenticación transaccional por token Bearer transaccional, separando el registro docente del login y la validación de sesión.
@@ -123,6 +152,62 @@ Ruta protegida que valida la cabecera `Authorization: Bearer <token>` transaccio
 
 ```bash
 curl -X GET http://127.0.0.1:8000/api/v1/auth/me \
+  -H "Authorization: Bearer <TU_TOKEN_JWT_AQUI>"
+```
+
+---
+
+## 📚 Marco Normativo Gallego: GET `/api/v1/marcos` (`[v0.2-003]`)
+
+Devuelve los marcos de evaluación oficiales cargados en la base de datos (Decretos 156/157/2022 de la Xunta de Galicia). El motor de corrección usa estos marcos para evaluar competencias según la legislación vigente (`modo_evaluacion: COMBINADO` o `AUDITORIA_CURRICULAR`).
+
+```bash
+curl -X GET http://127.0.0.1:8000/api/v1/marcos \
+  -H "Authorization: Bearer <TU_TOKEN_JWT_AQUI>"
+```
+
+Respuesta de ejemplo:
+
+```json
+[
+  {
+    "id": 1,
+    "nombre": "Filosofía de Bachillerato — Galicia",
+    "asignatura": "Filosofía",
+    "curso": "1º Bachillerato",
+    "estado_activo": true,
+    "fuente_legislativa_url": "https://www.xunta.gal/dog/Publicados/2022/20220804/AnuncioG0655-280722-0001_es.html",
+    "ultima_verificacion_manual": "2026-07-10"
+  }
+]
+```
+
+---
+
+## 📋 Rúbricas del Docente: POST / GET `/api/v1/rubricas` (`[v0.2-004]`)
+
+Permite al docente crear y recuperar sus rúbricas de corrección personalizadas. Una rúbrica pertenece exclusivamente a la profesora que la creó — ningún otro docente puede acceder ni modificarla.
+
+### Crear una rúbrica: POST `/api/v1/rubricas`
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/v1/rubricas \
+  -H "Authorization: Bearer <TU_TOKEN_JWT_AQUI>" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "nombre": "Rúbrica Alegoría de la Caverna",
+    "criterios": {
+      "precision_conceptual": {"peso": 0.5, "descripcion": "Identifica correctamente el simbolismo platónico"},
+      "argumentacion": {"peso": 0.3, "descripcion": "Justifica con coherencia filosófica"},
+      "expresion_escrita": {"peso": 0.2, "descripcion": "Claridad y estructura del texto"}
+    }
+  }'
+```
+
+### Listar mis rúbricas: GET `/api/v1/rubricas`
+
+```bash
+curl -X GET http://127.0.0.1:8000/api/v1/rubricas \
   -H "Authorization: Bearer <TU_TOKEN_JWT_AQUI>"
 ```
 

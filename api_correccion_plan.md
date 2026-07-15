@@ -23,9 +23,9 @@ El valor diferencial de la herramienta frente a otras opciones del mercado se ba
 
 Por diseño y para cumplir con la **EU AI Act** y el **RGPD** al tratar datos de menores, la herramienta utiliza un modelo *Human-in-the-Loop*: la IA actúa exclusivamente como asistente (copiloto) que propone un borrador de corrección, recayendo siempre la aprobación y decisión final en el profesor.
 
-### 🌍 Respaldo y Benchmarking Internacional (`[D-022]`, `[D-023]`, `[D-024]`)
+### 🌍 Respaldo y Benchmarking Internacional (`[D-022]`, `[D-023]`, `[D-024]`, `[D-034]`)
 El diseño y la viabilidad de **api-correccion-formativa-ia-galicia** están directamente avalados por las prácticas y normativas de los ecosistemas educativos más rigurosos de Europa y el mundo:
-- **Alemania (Privacidad por diseño / *Datenschutz*):** Al igual que herramientas punteras en colegios alemanes como *Fobizz*, nuestro sistema opera bajo una "cámara de exclusión pre-nube" que recorta cabeceras y seudonimiza los datos locales antes de cualquier subida, cumpliendo con las estrictas directrices de la *KMK* y los delegados de protección de datos de los *Länder*.
+- **Alemania (Privacidad por diseño / *Datenschutz*):** Al igual que herramientas punteras en colegios alemanes como *Fobizz*, nuestro sistema opera bajo una "cámara de exclusión pre-nube" que recorta cabeceras en RAM (`[D-022]`), ofrece herramientas de redacción manual en navegador (`[D-034]`) y seudonimiza los datos antes de cualquier subida, cumpliendo con las estrictas directrices de la *KMK* y los delegados de protección de datos de los *Länder*.
 - **Países Nórdicos — Finlandia y Suecia (Evaluación cualitativa y equidad):** Siguiendo el modelo pedagógico de *Abitti* y *FeedbackFruits*, la IA se autoriza como copiloto formativo para liberar tiempo administrativo y dedicarlo a la tutoría individual humana con alumnos NEAE, priorizando calificaciones cualitativas competenciales congruentes con los Decretos 156/157/2022 de la Xunta de Galicia.
 - **Reino Unido y EE.UU. (Acción inmediata y certeza):** Integración obligatoria de *Actionable Next Steps* (*Feed Forward* del modelo Hattie) y un *Confidence Score* que alerta visualmente cuando la caligrafía o respuesta requiere revisión humana prioritaria.
 
@@ -37,7 +37,7 @@ El éxito de adopción de **api-correccion-formativa-ia-galicia** por parte de d
 1. **Ahorro masivo para humanizar la enseñanza:** api-correccion-formativa-ia-galicia no sustituye al profesor ni quita autoridad; actúa como un copiloto que elimina hasta el 70% del tiempo burocrático de corrección mecánica en grupos de 30 alumnos. El docente recupera sus tardes y fines de semana para invertir ese tiempo en atención humana y tutoría directa con los estudiantes que más lo necesitan.
 2. **El fin de la "caja negra" y del feedback inútil:** A diferencia de las correcciones genéricas ("mejorar redacción"), cada alumno recibe un **Siguiente Paso Accionable (*Feed Forward*)** que le dice exactamente qué acción única y realizable debe hacer hoy para progresar. Además, el docente visualiza un *Confidence Score* que le advierte cuándo una caligrafía confusa o respuesta ambigua requiere su inspección manual prioritaria.
 3. **100% A prueba de inspección y normativa autonómica:** Todas las correcciones cualitativas se cruzan de forma nativa con los criterios y competencias de los **Decretos 156/2022 y 157/2022** y la **Orden de 26 de mayo de 2023 de la Xunta de Galicia**, además de garantizar la inclusión educativa de alumnos NEAE/NEE según la LOMLOE (`Decreto 229/2011`) sin que el docente tenga que hacer cálculos paralelos ni arriesgarse a penalizar por error a un alumno con dislexia.
-4. **Privacidad blindada al nivel del *Datenschutz* alemán:** El profesorado y el centro pueden estar tranquilos: ninguna imagen con el nombre y apellidos del alumno llega a internet ni a los servidores de la nube o las empresas de IA. El recorte y la seudonimización pre-nube (`[D-022]`) garantizan un cumplimiento impecable del RGPD y de la LOPDGDD.
+4. **Privacidad blindada al nivel del *Datenschutz* alemán (`[D-022] + [D-034]`):** El profesorado y el centro pueden estar tranquilos: ninguna imagen con el nombre y apellidos del alumno llega a internet ni a los servidores de la nube o las empresas de IA. El recorte en memoria RAM (`[D-022]`), la herramienta visual de redacción o tampón en la PWA del docente (`[D-034]`) y la seudonimización pre-nube garantizan un cumplimiento impecable del RGPD y de la LOPDGDD.
 5. **Omni-canal y 100% Multimodal:** Un único motor para todo el aula. Corrige con el mismo rigor y en la misma interfaz los exámenes de papel fotografiados, los murales o cartulinas infográficas colgados en la pared y las entregas digitales o presentaciones en *Canva* o *Google Slides*.
 
 ---
@@ -222,8 +222,8 @@ B2B — Canal institucional / integración
 **Pregunta 2 — Asincronía:**
 > "¿Celery + Redis es suficiente para el MVP o hay una alternativa más sencilla para empezar?"
 
-**Pregunta 3 — Regulación AI Act:**
-> "Si la herramienta actúa como copiloto (el profesor tiene la última palabra), ¿qué nivel de anonimización exige la AESIA antes de enviar la imagen a OpenAI tratándose de datos de menores?"
+**Pregunta 3 — Regulación AI Act y PII (`[D-022] + [D-034]`):**
+> "He diseñado una defensa multinivel pre-nube que recorta la cabecera en RAM (`Pillow`) y ofrece al docente una herramienta en la PWA (`Blackout Tool`) para tachar nombres en los márgenes antes de subir a Groq/OpenAI. ¿Consideras que con esta cámara de exclusión y purga temporal es suficiente ante una inspección o añadirías alguna barrera criptográfica adicional por ser un sistema de Alto Riesgo?"
 
 ---
 
@@ -283,8 +283,8 @@ B2B — Canal institucional / integración
 | **0.2** | PostgreSQL + ORM, normativa como JSONB, rúbrica editable | Normativa como variable dinámica |
 | **0.3** | Subida de imágenes, modelo multimodal, OCR real | Primer examen corregido desde foto |
 | **0.4** | Celery + Redis, estados de Submission, notificación al cliente | 5 exámenes simultáneos sin colapso |
-| **0.5** | Panel dual React, marcadores visuales, botón HitL | Producto demostrable a un profesor |
-| **1.0** | Anonimización, ChangeLog, README Compliance, desplegado | Portfolio — Fase Demo (presentar a empresas y AESIA) |
+| **0.5** | Panel dual React, marcadores visuales, botón HitL, tampón PII `[D-034]` | Producto demostrable a un profesor con blindaje visual en cliente |
+| **1.0** | Anonimización completa, ChangeLog, README Compliance, desplegado | Portfolio — Fase Demo (presentar a empresas y AESIA) |
 
 ---
 
@@ -296,7 +296,7 @@ B2B — Canal institucional / integración
 - **Apertura del repo:** al iniciar v0.1 — repo público desde el primer commit
 - README profesional con arquitectura, motivación y capturas
 - Sección `## AI Development Methodology` — aparece desde **v0.1** (ver desarrollo completo abajo)
-- Sección `## Compliance & EU AI Act Readiness` — aparece solo en **v1.0** (RGPD, AI Act, seudonimización [Regla 9], retención legal en Cold Storage [D-021] y HitL [D-002] ya implementados)
+- Sección `## Compliance & EU AI Act Readiness` — aparece solo en **v1.0** (RGPD, AI Act, defensa multinivel de PII [D-022 + D-034], retención legal en Cold Storage [D-021] y HitL [D-002] ya implementados)
 - Commits semánticos: `feat:`, `fix:`, `refactor:`, `docs:`
 - Ramas por versión: `v0.1-sync-engine`, `v0.2-database`, etc.
 
@@ -392,7 +392,7 @@ api-correccion/                              ← workspace único de VS Code
 6. **Sin siglas solas** — cualquier acrónimo se escribe con su nombre completo entre paréntesis la primera vez que aparece. Ejemplo: ADR (Architecture Decision Records — Registro de Decisiones de Arquitectura).
 7. **Glosario vivo** — cada término técnico nuevo que aparezca en el proyecto se añade a `glosario.md` con su explicación en castellano.
 8. **Credenciales nunca en el código** — ninguna API key, contraseña o dato sensible se escribe directamente en un archivo `.py` o cualquier archivo que vaya al repositorio. Siempre van en `.env` (que está en `.gitignore`). Los bots escanean GitHub continuamente: una clave expuesta puede generar facturas de miles de euros en minutos.
-9. **Datos personales nunca expuestos (seudonimización en nube)** — ningún dato personal o nombre de menor se sube a internet ni al repositorio. En BBDD: los alumnos se identifican solo por `alumno_id`. En la nube y la IA: la imagen se recorta localmente antes de subirse a Cloudinary/S3 o enviarse al LLM. Ninguna imagen original con el nombre real toca la nube ni se conserva tras la subida. Con los proveedores de IA: contratos de Zero Data Retention.
+9. **Datos personales nunca expuestos (defensa multinivel PII en nube - `[D-022] + [D-034]`)** — ningún dato personal o nombre de menor se sube a internet ni al repositorio. En BBDD: los alumnos se identifican solo por `alumno_id`. En la nube y la IA: la imagen es procesada en un buffer en RAM (`BytesIO`) donde se recorta la cabecera (`[D-022]`); si el alumno escribió el nombre en los márgenes o pie de folio, el docente usa la herramienta visual de tampón en la PWA (`Client-Side Blackout Tool [D-034]`) para destruirlo antes del envío. Con los proveedores de IA: contratos de Zero Data Retention.
 10. **Respuestas concisas** — sin repetir lo que el usuario ya sabe, sin introducciones, sin conclusiones que resumen lo dicho. Las explicaciones con analogía son bienvenidas cuando el concepto lo requiere — la analogía aporta valor. Resumir lo obvio no.
 11. **Output de tests mínimo** — los scripts y tests imprimen solo lo imprescindible para validar el resultado. Sin volcar JSON completos en terminal salvo que sea necesario para depurar. Usar resúmenes (`✅ campo X presente`) en lugar de dumps completos.
 
@@ -462,4 +462,5 @@ api-correccion/                              ← workspace único de VS Code
 
 *Documento generado el 07/07/2026 — Antigravity para Alba Camiña García*  
 *Actualizado el 08/07/2026 — BLOQUE 9 reescrito con entorno real desplegado*  
-*Actualizado el 09/07/2026 — sincronizadas reglas de trabajo (9, 10, 11), modelo multi-folio archivos_urls, compresión en cliente [D-020] y retención en Cold Storage [D-021]*
+*Actualizado el 09/07/2026 — sincronizadas reglas de trabajo (9, 10, 11), modelo multi-folio archivos_urls, compresión en cliente [D-020] y retención en Cold Storage [D-021]*  
+*Actualizado el 15/07/2026 — armonizada Defensa Multinivel de PII (`[D-022] + [D-034]`: Buffer RAM + Client-Side Blackout Tool + Escáner Offline) en benchmarking, argumentario y guion AESIA.*
