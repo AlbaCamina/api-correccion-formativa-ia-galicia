@@ -6,12 +6,16 @@ los modelos ORM de SQLAlchemy y los esquemas Pydantic v2 correspondientes.
 Hito [v0.2-005] y ADR [D-002], [D-023], [D-024], [D-026].
 """
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 from sqlalchemy import Column, Integer, String, JSON, ForeignKey, DateTime, Float, Boolean
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field, ConfigDict
 from .database import Base
+
+
+def utcnow():
+    return datetime.now(timezone.utc)
 from .evaluation import EvaluacionIA
 
 
@@ -41,8 +45,8 @@ class Submission(Base):
     # Estados del ciclo de vida de la corrección
     estado = Column(String(50), default="PENDING", nullable=False)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
-    updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
+    updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
 
     # Relaciones
     profesor = relationship("Profesor")
@@ -71,7 +75,7 @@ class Evaluacion(Base):
     # Firma oficial del docente (HitL) que valida el resultado
     aprobado_por_profesor = Column(Boolean, default=False, nullable=False)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
 
     # Relaciones
     submission = relationship("Submission", back_populates="evaluaciones")
@@ -94,7 +98,7 @@ class ChangeLog(Base):
     datos_anteriores = Column(JSON, nullable=True)
     datos_nuevos = Column(JSON, nullable=True)
     
-    timestamp = Column(DateTime, default=datetime.utcnow, nullable=False)
+    timestamp = Column(DateTime, default=utcnow, nullable=False)
 
     # Relaciones
     submission = relationship("Submission", back_populates="changelog")
