@@ -10,11 +10,15 @@ JUSTIFICACIÓN ARQUITECTÓNICA Y UMBRAL DE REFACTORIZACIÓN (Scaling Trigger):
 - Umbral de Escalabilidad: Si en futuras fases el dominio supera las 8-10 tablas/entidades en BBDD,
   se procederá a desacoplar este módulo en `models/orm/` y `models/schemas/` para evitar acoplamientos.
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional
 from sqlalchemy import Column, Integer, String, DateTime
 from pydantic import BaseModel, EmailStr, Field, ConfigDict
 from .database import Base
+
+
+def utcnow():
+    return datetime.now(timezone.utc)
 
 
 # =====================================================================
@@ -31,7 +35,7 @@ class Profesor(Base):
     email = Column(String(255), unique=True, index=True, nullable=False)
     nombre = Column(String(150), nullable=False)
     hashed_password = Column(String(255), nullable=False)
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
 
 
 # =====================================================================

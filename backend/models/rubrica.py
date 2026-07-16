@@ -4,12 +4,16 @@ Cumple con la Regla 2 (Modularidad Plana) aglutinando en un solo archivo
 el modelo ORM de SQLAlchemy y los esquemas Pydantic v2.
 Hito [v0.2-004] y ADR [D-027] / [D-030].
 """
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List, Optional
 from sqlalchemy import Column, Integer, String, JSON, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field, ConfigDict
 from .database import Base
+
+
+def utcnow():
+    return datetime.now(timezone.utc)
 
 
 # =====================================================================
@@ -47,7 +51,7 @@ class RubricaDocente(Base):
     # Campo JSON que contendrá la lista validada de CriterioRubrica
     criterios = Column(JSON, nullable=False)
     
-    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    created_at = Column(DateTime, default=utcnow, nullable=False)
 
     # Relación de conveniencia
     profesor = relationship("Profesor")
