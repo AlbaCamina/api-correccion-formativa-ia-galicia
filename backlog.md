@@ -277,6 +277,7 @@
 - [x] SQLAlchemy configurado con connection pool (`backend/models/database.py`)
 - [x] Alembic configurado para migraciones (`alembic.ini` + `alembic/env.py`)
 - [x] Primera migración vacía ejecutada correctamente (`initial empty revision`)
+- [ ] *Nota de Deuda/Sincronización:* Generar y aplicar las revisiones de migración de Alembic para sincronizar el historial formal de migraciones con las columnas del esquema actual en BBDD (`estado_feed_forward` y `audit_metadata`) → ver `[v0.2-008]`.
 
 
 **Etiquetas:** `v0.2` `database` `infra`
@@ -346,9 +347,9 @@
 **para** mantener el anonimato del estudiante en la nube mediante seudonimización y que la profesora pueda cruzar después ese identificador con su lista local de clase sin exponer datos personales (cumplimiento RGPD).
 
 **Criterios de aceptación:**
-- [x] Tabla `submissions` con campos: `id`, `profesor_id`, `marco_id` (nullable), `rubrica_id`, `alumno_id` (nullable, anonimizado), `adaptaciones_alumno` (JSONB, nullable) [D-023], `estado` (PENDING/ANALYZING/REVIEW/GRADED), `created_at`, `updated_at`
+- [x] Tabla `submissions` con campos: `id`, `profesor_id`, `marco_id` (nullable), `rubrica_id`, `alumno_id` (nullable, anonimizado), `adaptaciones_alumno` (JSONB, nullable) [D-023], `estado` (PENDING/ANALYZING/REVIEW/GRADED), `estado_feed_forward` (PENDIENTE/REALIZADO_ALUMNO/VERIFICADO_EN_PRUEBA_SIGUIENTE) [D-026], `created_at`, `updated_at`
 - [x] Tabla `evaluaciones` con campos: `id`, `submission_id`, `resultado_ia` (JSONB), `nota_final`, `aprobado_por_profesor`, `created_at`
-- [x] Tabla `changelog` con campos: `id`, `submission_id`, `accion`, `actor`, `datos_anteriores` (JSONB), `datos_nuevos` (JSONB), `timestamp`
+- [x] Tabla `changelog` con campos: `id`, `submission_id`, `accion`, `actor`, `datos_anteriores` (JSONB), `datos_nuevos` (JSONB), `audit_metadata` (JSONB, nullable) [D-002], `timestamp`
 
 **Etiquetas:** `v0.2` `database`
 
@@ -384,6 +385,20 @@
 - [x] Protección de privacidad (LOPDGDD art.7): la IA jamás infiere o diagnostica NEAE; solo ejecuta la instrucción recibida y solo el profesor asignado puede acceder a dicha configuración
 
 **Etiquetas:** `v0.2` `backend` `ia` `compliance`
+
+---
+
+### [v0.2-008] Deuda Técnica: Sincronización de Migraciones Alembic y Cobertura HTTP 403 en Feed Forward
+
+**Como** desarrolladora y auditora técnica,  
+**quiero** saldar la deuda técnica de sincronización y testing identificada durante la implementación del seguimiento formativo (`PR #7`)  
+**para** mantener el historial de migraciones alineado con el esquema y verificar el rechazo por permisos en los nuevos endpoints.
+
+**Criterios de aceptación:**
+- [ ] **Sincronización Alembic:** Crear la revisión de migración (`alembic revision --autogenerate -m "add estado_feed_forward and audit_metadata"`) como deuda de sincronización del historial formal con el esquema actual de SQLAlchemy (no representa un fallo funcional del backend, sino una alineación de versionado de BBDD).
+- [ ] **Test HTTP 403 (Permisos de propiedad):** Añadir un fixture con un segundo profesor (`PROFESOR_ID_2`) en `test_evaluation_router.py` y verificar que si intenta llamar a `PATCH /api/v1/submissions/{id}/feed-forward/realizado` o `/verificado` sobre una entrega que no le pertenece, el backend rechaza con `403 Forbidden`.
+
+**Etiquetas:** `v0.2` `tech-debt` `tests` `database`
 
 ---
 
@@ -627,6 +642,21 @@
 
 ---
 
+### [v0.5-006] Evolución de Interfaz: Actor Alumno en `feed-forward/realizado` (`Student PWA`)
+
+**Como** estudiante del centro educativo,  
+**quiero** poder marcar directamente desde mi portal o PWA de alumno que he completado mi Siguiente Paso Accionable  
+**para** participar en mi propia evaluación continua sin requerir que el docente actúe manualmente como proxy en su panel.
+
+**Criterios de aceptación:**
+- [ ] El endpoint `PATCH /api/v1/submissions/{id}/feed-forward/realizado` amplía sus dependencias de seguridad para admitir tanto token JWT del rol `Profesor` propietario como del rol `Alumno` (`alumno_id` vinculado a la entrega).
+- [ ] Si la acción la ejecuta el propio estudiante, `ChangeLog` registra un actor específico (ej. `actor = "ALUMNO_ID_<hash>"` o `"ALUMNO"`), manteniendo la trazabilidad probatoria y separada del docente.
+- [ ] El semáforo formativo en el panel PWA de la profesora se actualiza visualmente en cuanto el estudiante completa su checklist personal.
+
+**Etiquetas:** `v0.5` `frontend` `backend` `pwa`
+
+---
+
 ## 🏆 Versión 1.0 — MVP Completo y Desplegado
 
 **Objetivo:** El producto está desplegado en una URL pública, documentado y listo para ser mostrado en portfolio y al contacto de la AESIA.
@@ -745,5 +775,5 @@
 ---
 
 *Backlog generado el 07/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 15/07/2026 — Sincronizados [D-034] en [v0.0-001] y [v0.5-002]; añadido [Roadmap-002] Escáner Offline de PII.*  
-*Total de historias: 30 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 2*
+*Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] (`estado_feed_forward`, `audit_metadata`); añadidas tareas [v0.2-008] (Deuda Alembic + 403) y [v0.5-006] (Actor Alumno).*  
+*Total de historias: 32 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 2*

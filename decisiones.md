@@ -88,9 +88,14 @@ Un sistema que asigna notas automáticamente a menores de edad sin intervención
 - Human-in-the-Loop (IA propone, profesor decide) — más compleja, pero legalmente defensible
 - Solo análisis cualitativo sin nota — limitaría el valor del producto
 
-**Decisión:** Human-in-the-Loop. La IA actúa exclusivamente como copiloto: propone un borrador de corrección. El profesor tiene siempre la última palabra para aprobar, ajustar o rechazar.
+**Decisión:** Human-in-the-Loop. La IA actúa exclusivamente como copiloto: propone un borrador de corrección o sugerencias de verificación formativa. El profesor tiene siempre la última palabra para aprobar, ajustar o rechazar.
 
-**Consecuencias:** El estado de `Submission` incluye el paso `REVIEW` antes de `GRADED`. El ChangeLog registra quién tomó la decisión final. Esta decisión es el escudo legal central del producto.
+**Consecuencias:** 
+1. El estado general de `Submission` incluye el paso `REVIEW` antes de `GRADED`.
+2. La tabla de auditoría inmutable `ChangeLog` separa estrictamente dos planos para el cumplimiento probatorio:
+   - **Diff de Negocio (`datos_anteriores` / `datos_nuevos`):** Contiene exclusivamente los estados reales antes y después de la acción (ej. transiciones de `estado` o `estado_feed_forward`).
+   - **Contexto de Auditoría (`audit_metadata`):** JSON que captura información auxiliar de trazabilidad (`ia_propuso_verificacion`, `evaluation_id`, versión del prompt, etc.).
+3. **Invariante legal de autoría:** El `actor` persistido en `ChangeLog` en transiciones críticas o de firma es **siempre un humano** (`PROFESOR_ID_X`). La IA no actúa nunca como actora ejecutora en transiciones formativas firmadas; su participación queda registrada únicamente en `audit_metadata` como señal de influencia o sugerencia. Esta decisión es el escudo legal central del producto bajo el AI Act y RGPD.
 
 ---
 
@@ -546,6 +551,7 @@ Nuestras elecciones pedagógicas están respaldadas por las tres máximas del mo
 **Decisión:** El contrato JSON que debe devolver el LLM (`v0.1-000` en adelante) incorpora obligatoriamente:
 1. **Calificación competencial cualitativa (`calificacion_cualitativa`):** Grado oficial según decretos gallegos (*Insuficiente [IN], Suficiente [SU], Bien [BI], Notable [NT], Sobresaliente [SB]*), además de la `nota` numérica (0-10) y el desglose por competencias (`competencias_criterios`), avalado por el modelo finlandés de evaluación auténtica.
 2. **Siguiente Paso Accionable (`siguiente_paso_accionable` / *Feed Forward*):** Adoptando el estándar del Reino Unido (modelo Hattie), la IA debe devolver siempre una directriz clara, concreta y realizable hoy por el alumno para corregir su principal área de mejora, eliminando el feedback abstracto.
+   * *Señal auxiliar de verificación (`feed_forward_verification_suggestion`):* En evaluaciones posteriores del mismo alumno, el contrato Pydantic puede emitir un booleano (`True/False`) recomendando al docente si el alumno ha incorporado con éxito el paso accionable anterior. Esta señal es únicamente informativa para el panel PWA y **no altera ningún estado en BBDD automáticamente**.
 3. **Índice de Confianza IA (`confidence_score`):** Un valor float entre `0.0` y `1.0` que indica la certeza técnica de la lectura OCR o interpretación del modelo. Si es `< 0.75`, el panel de la profesora muestra una alerta preventiva ("Caligrafía confusa o respuesta ambigua — requiere revisión manual prioritaria"), reforzando el *Human-in-the-Loop* bajo la AI Act.
 
 **Consecuencias:** El esquema JSON del smoke test (`smoke_test_llm.py` en `v0.1-000`) y de Pydantic en FastAPI incluirá estos tres campos. La PWA mostrará el *confidence score* en el panel dual de corrección y destacará el "Siguiente Paso Accionable" como tarjeta prioritaria para el docente y el alumno.
@@ -582,7 +588,7 @@ api-correccion-formativa-ia-galicia se posiciona como una herramienta técnicame
 ### [D-026] Seguimiento Formativo No Sumativo del Siguiente Paso Accionable (`estado_feed_forward`)
 
 **Fecha:** Julio 2026 (10/07/2026)  
-**Estado:** ✅ Adoptada
+**Estado:** ✅ Adoptada (`[v0.2-005]` / `feature/feed-forward-state-transitions`)
 
 **Contexto:**  
 En el modelo de corrección de api-correccion-formativa-ia-galicia (`[D-024]`), el motor LLM devuelve un "Siguiente Paso Accionable" (*Feed Forward*) con una directriz clara y concreta para que el estudiante la ejecute de inmediato (*"Reescribe el párrafo 3 incorporando dos conectores temporales"*). Surge el dilema sobre si el sistema y el docente deben evaluar o calificar numéricamente la entrega o devolución de dicho paso.
@@ -590,18 +596,27 @@ En el modelo de corrección de api-correccion-formativa-ia-galicia (`[D-024]`), 
 **Opciones consideradas:**
 - **Calificar numéricamente cada devolución de Feed Forward:** Rechazado categóricamente por generar una duplicación masiva de la carga burocrática del profesor (convertir cada corrección en una nueva mini-tarea evaluable que revisar al día siguiente), destruyendo la promesa de alivio docente del producto.
 - **Dejar el Feed Forward como recomendación informal sin registro:** Rechazado por generar falta de rendición de cuentas (*accountability*) en el alumno, convirtiendo el feedback en texto inerte.
-- **Registro de Checklist Formativo de Autoevaluación en Base de Datos (`estado_feed_forward` — *Sin Carga Sumativa*):** **Elegida por coherencia pedagógica y UX docente**.
+- **Registro de Checklist Formativo de Autoevaluación y Verificación Docente en Base de Datos (`estado_feed_forward` — *Sin Carga Sumativa*):** **Elegida por coherencia pedagógica, UX docente y blindaje HitL**.
 
 **Decisión:**  
-El cumplimiento del Siguiente Paso Accionable se modela en el esquema de la base de datos (dentro del `JSONB` de `submissions` o historial del alumno) mediante un marcador de estado **`estado_feed_forward`**, desglosado en tres valores:
-1. `PENDIENTE`: Asignado tras la corrección asistida.
-2. `REALIZADO_ALUMNO`: El estudiante (o el profesor en aula) marca con un clic `[x]` en su PWA que ha completado la acción de mejora en su estudio personal o cuaderno.
-3. `VERIFICADO_PRÓXIMA_PRUEBA`: En la evaluación del *siguiente* instrumento dentro de la misma Situación de Aprendizaje (`SdA`), el motor LLM verifica si la mejora previa fue incorporada, otorgando un refuerzo cualitativo positivo.
+El cumplimiento del Siguiente Paso Accionable se modela como una columna propia (`estado_feed_forward`) en la tabla `submissions`, independiente del ciclo de vida sumativo (`estado`), desglosada en tres valores exactos:
+1. `PENDIENTE`: Asignado por defecto por el sistema al inicializar o corregir la entrega.
+2. `REALIZADO_ALUMNO`: El estudiante (o el profesor como proxy en el aula) indica que ha completado la acción de mejora en su estudio personal o cuaderno.
+3. `VERIFICADO_EN_PRUEBA_SIGUIENTE`: En la evaluación del siguiente instrumento dentro de la misma Situación de Aprendizaje (`SdA`), se constata e interioriza que la mejora previa fue aplicada con éxito.
 
-El profesor **no tiene que corregir ni calificar sumativamente esta mini-tarea**. En su panel PWA visualiza un semáforo de qué estudiantes completan sus checks formativos, fomentando la autoevaluación y la evaluación continua (Decretos 156/157/2022 de Galicia) con cero inversión de tiempo extra.
+**Invariante Arquitectónica y Reglas de Transición:**
+> [!IMPORTANT]
+> **El LLM no persiste nunca `estado_feed_forward`; solo propone, el profesor confirma.** Aunque la IA emita la señal `feed_forward_verification_suggestion=True`, la actualización real en BBDD requiere una acción humana explícita mediante los endpoints transicionales.
+
+El backend prohíbe saltos no permitidos o reejecuciones, rechazando con HTTP `409 Conflict` cualquier transición fuera de este flujo estrictamente unidireccional:
+`PENDIENTE` ──(PATCH /realizado)──> `REALIZADO_ALUMNO` ──(PATCH /verificado)──> `VERIFICADO_EN_PRUEBA_SIGUIENTE`
+
+**Endpoints dedicados:**
+- `PATCH /api/v1/submissions/{id}/feed-forward/realizado`: Requiere autenticación docente (proxy del alumno). Cambia `PENDIENTE → REALIZADO_ALUMNO`.
+- `PATCH /api/v1/submissions/{id}/feed-forward/verificado`: Requiere autenticación docente. Cambia `REALIZADO_ALUMNO → VERIFICADO_EN_PRUEBA_SIGUIENTE`. Acepta un body opcional (`FeedForwardVerificadoRequest`) para inyectar en el log si la IA recomendó la verificación.
 
 **Consecuencias:**  
-El contrato de la base de datos y la interfaz de la PWA incorporan el campo y el check `estado_feed_forward`, consolidando la evaluación formativa sin incrementar la carga de corrección del docente.
+Todas las transiciones quedan registradas de forma atómica en `ChangeLog` asociando al docente como `actor` y aislando la influencia del LLM (`ia_propuso_verificacion`, `evaluation_id`) dentro del campo `audit_metadata` (`[D-002]`).
 
 ---
 
@@ -781,6 +796,38 @@ Se elimina al 100% el riesgo de fuga de datos en folios atípicos, demostrando a
 
 ---
 
+### D-035
+## Gobernanza de cambios sensibles y criterio de cierre de auditoría técnica
+
+**Estado:** ✅ Adoptada (`[v0.2-008]` / `AGENTS.md Regla 6`)  
+**Fecha:** Julio 2026 (16/07/2026)
+
+**Contexto:**  
+En un sistema de evaluación formativa asistido por IA, los cambios que afectan a estados de negocio, permisos, trazabilidad o al contrato HitL del modelo tienen impacto directo en cumplimiento y responsabilidad. Históricamente, es fácil que el código avance más rápido que los tests o la documentación, generando zonas de sombra: funcionalidades que “funcionan” pero no están trazadas ni defendibles en una revisión técnica.
+
+**Decisión:**  
+Se establece una política de gobernanza para **cambios sensibles**, definida como cualquier modificación sobre:
+
+1. Estados del ciclo de vida de negocio o del alumno (`Submissions.estado`, `estado_feed_forward`).
+2. Trazabilidad probatoria y registros inmutables (`ChangeLog`, `audit_metadata`).
+3. Autenticación, permisos de propiedad o roles (`auth`, respuestas `403 Forbidden`).
+4. Contratos estructurados de salida del LLM (`EvaluacionIA`) y su frontera con la firma humana (`HitL`).
+
+Un cambio de este tipo solo se considera **auditado y cerrado** cuando cumple, de forma simultánea, los siguientes cuatro pilares:
+
+1. **Diseño y gobernanza:** Existe una decisión arquitectónica justificada y registrada en `decisiones.md` (ADR) que describe contexto, opciones y consecuencias.
+2. **Implementación:** El código productivo refleja esa decisión de forma coherente, siguiendo los principios de modularidad plana y modelos tipados (`Pydantic` / `SQLAlchemy`).
+3. **Evidencia:** La suite de pruebas relevante (`pytest`) se ejecuta en verde en entorno limpio (`WSL`, contenedor Docker), demostrando el comportamiento esperado.
+4. **Sincronización documental:** `README.md` proporciona visibilidad técnica actualizada, `backlog.md` registra historias completadas y cualquier deuda técnica restante, y los cambios de ambos quedan vinculados al mismo Pull Request o sesión de trabajo.
+
+**Consecuencias:**  
+
+- Cualquier módulo que no cumpla los cuatro pilares se clasifica explícitamente como **“Estado: Parcial / Pendiente de auditoría”** y no se considera listo para revisión externa o defensa de portfolio.
+- Esta política se incorpora al comportamiento del asistente (`AGENTS.md`, Regla 6), de modo que tanto humanos como IA deben verificar el impacto multinivel antes de dar por finalizada una tarea sensible.
+- La trazabilidad entre decisiones (`decisiones.md`), implementación, pruebas y documentación se convierte en condición de salida estándar para cambios con impacto en estados, permisos, trazabilidad o HitL.
+
+---
+
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 15/07/2026 — añadidas D-027 a D-034 (Segunda Capa de Comprobación PII y Casos de Borde)*  
-*Total de decisiones registradas: 34*
+*Actualizado el 16/07/2026 — añadidas D-027 a D-034 (Comprobación PII) y D-035 (Gobernanza de Cambios Sensibles y Criterio de Cierre Técnico)*  
+*Total de decisiones registradas: 35*

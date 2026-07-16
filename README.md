@@ -294,6 +294,24 @@ El servidor guarda la entrega en PostgreSQL y devuelve la evaluación estructura
 
 ---
 
+## 🎯 Seguimiento Formativo y Auditoría (Feed Forward + HitL) (`[D-026]`)
+
+El backend gestiona el seguimiento formativo del **Siguiente Paso Accionable (`estado_feed_forward`)** de forma independiente a la calificación sumativa del examen (`[D-026]`). El ciclo de vida formativo avanza de manera estrictamente unidireccional: `PENDIENTE` → `REALIZADO_ALUMNO` → `VERIFICADO_EN_PRUEBA_SIGUIENTE`. Cualquier intento de salto no permitido devuelve `409 Conflict`.
+
+### Endpoints de Transición Formativa
+
+| Endpoint transicional | Método | Auth | Descripción |
+| :--- | :---: | :---: | :--- |
+| `/api/v1/submissions/{id}/feed-forward/realizado` | `PATCH` | ✅ JWT | Marca que el estudiante ha completado su acción de mejora (`REALIZADO_ALUMNO`). |
+| `/api/v1/submissions/{id}/feed-forward/verificado` | `PATCH` | ✅ JWT | Confirma que la mejora se ha comprobado en la siguiente evaluación (`VERIFICADO_EN_PRUEBA_SIGUIENTE`). |
+
+### Trazabilidad y Cumplimiento (`[D-002]`)
+
+1. **El motor LLM no persiste nunca el estado formativo:** Aunque la IA devuelva en su evaluación recomendaciones de verificación (`feed_forward_verification_suggestion`), la actualización en BBDD requiere confirmación humana explícita a través de los endpoints transicionables.
+2. **Auditoría estructurada en `ChangeLog`:** Cada transición persiste un registro atómico inmutable que separa el cambio de estado (`datos_anteriores` / `datos_nuevos`) del contexto de auditoría (`audit_metadata`, donde se traza si la IA recomendó el cambio y el ID de evaluación vinculada). El `actor` registrado en la base de datos es siempre el profesor autenticado (`PROFESOR_ID_X`).
+
+---
+
 
 ## 🧠 AI Development & Governance Methodology (`Phase Ninja`)
 

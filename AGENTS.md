@@ -22,6 +22,15 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
    * **Separación estricta de Revisión vs. Edición:** Ante cualquier orden o verbo que implique inspección, revisión, análisis, evaluación o reflexión (*"revisa"*, *"piensa"*, *"analiza"*, *"evalúa"*, *"comprueba"*), el Agente **TIENE PROHIBIDO** ejecutar herramientas de modificación de archivos en ese turno (`replace_file_content`, `multi_replace_file_content`, `write_to_file` o comandos que alteren el repositorio). El turno debe terminar obligatoriamente con la entrega del informe de diagnóstico o consulta.
    * **Cero ediciones sin orden explícita:** Aunque un documento (`decisiones.md`, `README.md`, `backlog.md`) o un archivo de código esté desactualizado tras una revisión, el Agente **NO PUEDE MODIFICARLO** hasta que el desarrollador emita una orden directa y explícita de implementación (*"modifica"*, *"aplica"*, *"haz los cambios"*, *"adelante"*).
    * **Prohibición de parches ad-hoc:** Si al implementar o testear surge una incompatibilidad técnica, un error de API no previsto o un caso de borde que requiera añadir lógica anidada compleja (ej. fallbacks multinivel, reintentos ad-hoc o excepciones anidadas), el Agente **TIENE PROHIBIDO** parchear el código sobre la marcha para "hacer que funcione". Debe pausar y presentar al menos dos opciones arquitectónicas contrastadas contra el principio YAGNI para tomar la decisión en equipo (*Human-in-the-Loop*).
+6. **Gobernanza de cambios sensibles y cierre de auditoría (`[D-035]`):**
+   * **Cuándo aplica:** Si la tarea afecta a estados de negocio (`Submission.estado`, `estado_feed_forward`), permisos/autenticación, trazabilidad (`ChangeLog` / `audit_metadata`) o al contrato HitL del LLM (`EvaluacionIA`), el agente debe tratarla como cambio sensible.
+   * **Impacto multinivel:** Ante un cambio sensible, el agente evalúa el impacto en los cinco artefactos clave: código, tests, `decisiones.md`, `backlog.md` y `README.md`.
+   * **Criterio de cierre (4 pilares):** Una funcionalidad sensible solo se considera cerrada cuando se cumplen simultáneamente:
+     1. **Diseño:** Decisión o directriz arquitectónica clara registrada en `decisiones.md` (ADR).
+     2. **Implementación:** Código actualizado, coherente con la decisión, en modelos/routers/servicios.
+     3. **Evidencia:** Pruebas automatizadas (`pytest`) en verde en entorno limpio.
+     4. **Documentación:** `README.md` y `backlog.md` sincronizados y cualquier deuda técnica residual explícita.
+   * **Trazabilidad humana:** El agente nunca atribuye a la IA acciones persistidas de cambio de estado en BBDD cuando el flujo normativo exige autorización docente (`HitL`). La IA puede proponer y aportar contexto en `audit_metadata`; el `actor` que firma cambios formativos es siempre humano (profesor o alumno, según el caso).
 
 ---
 
