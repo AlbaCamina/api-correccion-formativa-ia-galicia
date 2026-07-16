@@ -101,7 +101,8 @@ class ChangeLog(Base):
     # Capturas de estado para trazabilidad e inmutabilidad
     datos_anteriores = Column(JSON, nullable=True)
     datos_nuevos = Column(JSON, nullable=True)
-    
+    audit_metadata = Column(JSON, nullable=True)  # Contexto auxiliar de auditoría (señal IA, evaluation_id, etc.)
+
     timestamp = Column(DateTime, default=utcnow, nullable=False)
 
     # Relaciones
@@ -161,4 +162,11 @@ class ChangeLogResponse(BaseModel):
     actor: str = Field(..., description="Usuario o sistema que la realizó.")
     datos_anteriores: Optional[Dict[str, Any]] = Field(..., description="Estado anterior.")
     datos_nuevos: Optional[Dict[str, Any]] = Field(..., description="Estado nuevo.")
+    audit_metadata: Optional[Dict[str, Any]] = Field(None, description="Metadatos contextuales de auditoría (señal IA, evaluation_id, etc.).")
     timestamp: datetime = Field(..., description="Marca de tiempo del log.")
+
+
+class FeedForwardVerificadoRequest(BaseModel):
+    """Cuerpo opcional del endpoint de confirmación de verificación de Feed Forward."""
+    ia_propuso_verificacion: bool = Field(False, description="True si el LLM emitió una señal de verificación en la evaluación asociada.")
+    evaluation_id: Optional[int] = Field(None, description="ID de la evaluación que originó la señal del LLM.")
