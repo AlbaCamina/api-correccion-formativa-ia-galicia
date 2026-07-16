@@ -138,6 +138,7 @@ class TestEvaluationRouter(unittest.TestCase):
 
         orig_provider = os.environ.get("LLM_PROVIDER")
         orig_openai_key = os.environ.get("OPENAI_API_KEY")
+        orig_groq_key = os.environ.get("GROQ_API_KEY")
 
         try:
             os.environ["LLM_PROVIDER"] = "openai"
@@ -163,6 +164,33 @@ class TestEvaluationRouter(unittest.TestCase):
                 os.environ["OPENAI_API_KEY"] = orig_openai_key
             else:
                 os.environ.pop("OPENAI_API_KEY", None)
+            if orig_groq_key:
+                os.environ["GROQ_API_KEY"] = orig_groq_key
+            else:
+                os.environ.pop("GROQ_API_KEY", None)
+
+    def test_startup_validation_default_secret_key(self):
+        """Valida que startup_validation aborta si SECRET_KEY contiene el valor por defecto inseguro."""
+        import asyncio
+        from backend.main import startup_validation
+
+        orig_secret = os.environ.get("SECRET_KEY")
+        orig_provider = os.environ.get("LLM_PROVIDER")
+
+        try:
+            os.environ["LLM_PROVIDER"] = "mock"
+            os.environ["SECRET_KEY"] = "super-secret-key-galicia-2026-hitl-ninja"
+            with self.assertRaises(RuntimeError):
+                asyncio.run(startup_validation())
+        finally:
+            if orig_secret:
+                os.environ["SECRET_KEY"] = orig_secret
+            else:
+                os.environ.pop("SECRET_KEY", None)
+            if orig_provider:
+                os.environ["LLM_PROVIDER"] = orig_provider
+            else:
+                os.environ.pop("LLM_PROVIDER", None)
 
 
 if __name__ == "__main__":
