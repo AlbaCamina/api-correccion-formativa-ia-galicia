@@ -496,12 +496,14 @@ Modelo evaluativo obligatorio en Galicia para ESO y Bachillerato centrado en el 
 Estándar pedagógico anglosajón (modelo Hattie & Timperley en GCSE/A-Levels del Reino Unido) que soluciona el problema de la "IA cierta pero inútil". Exige que cada corrección formativa proporcione una acción única, concreta e inmediata que el alumno puede hacer hoy mismo para avanzar (`[D-024]`). Para no sobrecargar al docente con dobles correcciones, su cumplimiento se modela como un checklist formativo y de autoevaluación en base de datos (`estado_feed_forward: PENDIENTE | REALIZADO | VERIFICADO`) sin calificación sumativa (`[D-026]`).
 
 **Fuente de Verdad por Plano (`Single Source of Truth by Plane`)**  
-Principio de gobernanza arquitectónica y documental (`[D-035]`) según el cual, para evitar desfases o duplicidades contradictorias en proyectos complejos con asistencia de IA, cada documento o artefacto del repositorio actúa como la **única fuente de verdad autorizada para una dimensión concreta (o plano)** del sistema:
-- `decisiones.md` (Plano de Gobernanza Arquitectónica): Decisiones, alternativas y normas del proyecto (`ADRs`).
-- `AGENTS.md` (Plano Conductual y Operativo de IA): Reglas, límites y flujos mecánicos de trabajo para el asistente AI.
-- `backlog.md` (Plano de Gestión y Deuda Técnica): Historias completadas, roadmap y deuda pendiente.
-- `README.md` (Plano de Visibilidad Pública y Portfolio): Descripción, arquitectura y cómo ejecutar en local.
-- `models/` y `routers/` (Plano de Ejecución de Negocio): Código de producción formal en FastAPI/SQLAlchemy.
+Principio de gobernanza (`[D-035]`) según el cual cada tipo de información técnica o de gestión reside en un único archivo maestro para evitar duplicidades, desfases o contradicciones entre código y documentación.
+
+**Los 5 archivos clave del proyecto:**
+- `decisiones.md` → Fuente de verdad para las decisiones arquitectónicas (`ADRs`).
+- `AGENTS.md` → Fuente de verdad para el comportamiento operativo y reglas del asistente de IA.
+- `README.md` → Fuente de verdad para la visibilidad técnica, arquitectura y endpoints del backend.
+- `backlog.md` → Fuente de verdad para la planificación, historias de usuario y deuda técnica.
+- `AUDITORIA.md` → Fuente de verdad para el estado de auditoría interna y el cumplimiento por pilares.
 
 **Backlog**  
 Lista priorizada de todo el trabajo pendiente del proyecto, organizado en historias de usuario. En este proyecto: `backlog.md`.
