@@ -50,6 +50,15 @@ class TestEvaluationRouter(unittest.TestCase):
             ]
         )
         self.db.add(self.rubrica)
+
+        self.submission = Submission(
+            id="test-submission-uuid-001",
+            profesor_id=1,
+            rubrica_id=1,
+            estado="REVIEW",
+            estado_feed_forward="PENDIENTE",
+        )
+        self.db.add(self.submission)
         self.db.commit()
 
         # Sobrescribir dependencias en FastAPI
@@ -191,6 +200,76 @@ class TestEvaluationRouter(unittest.TestCase):
                 os.environ["LLM_PROVIDER"] = orig_provider
             else:
                 os.environ.pop("LLM_PROVIDER", None)
+
+    # ==========================================
+    # TESTS DE ENDPOINTS FEED FORWARD (D-026)
+    # ==========================================
+
+    def test_feed_forward_pendiente_a_realizado(self):
+        """Transición válida: PENDIENTE -> REALIZADO_ALUMNO devuelve 200 y actualiza el estado."""
+        response = self.client.patch("/api/v1/submissions/test-submission-uuid-001/feed-forward/realizado")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["estado_feed_forward"], "REALIZADO_ALUMNO")
+
+    def test_feed_forward_realizado_a_verificado(self):
+        """Transición válida: REALIZADO_ALUMNO -> VERIFICADO_EN_PRUEBA_SIGUIENTE devuelve 200."""
+        self.client.patch("/api/v1/submissions/test-submission-uuid-001/feed-forward/realizado")
+        response = self.client.patch(
+            "/api/v1/submissions/test-submission-uuid-001/feed-forward/verificado",
+            json={"ia_propuso_verificacion": True, "evaluation_id": 1},
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["estado_feed_forward"], "VERIFICADO_EN_PRUEBA_SIGUIENTE")
+
+    def test_feed_forward_salto_invalido_pendiente_a_verificado(self):
+        """Transición inválida: PENDIENTE -> VERIFICADO_EN_PRUEBA_SIGUIENTE devuelve 409."""
+        response = self.client.patch("/api/v1/submissions/test-submission-uuid-001/feed-forward/verificado")
+        self.assertEqual(response.status_code, 409)
+
+    def test_feed_forward_404_submission_inexistente(self):
+        """Devuelve 404 si la submission no existe."""
+        response = self.client.patch("/api/v1/submissions/no-existe/feed-forward/realizado")
+        self.assertEqual(response.status_code, 404)
+
+    def test_feed_forward_changelog_persistido(self):
+        """Verifica que la transición persiste una entrada en ChangeLog con actor y datos correctos."""
+        self.client.patch("/api/v1/submissions/test-submission-uuid-001/feed-forward/realizado")
+
+        log = (
+            self.db.query(ChangeLog)
+            .filter(
+                ChangeLog.submission_id == "test-submission-uuid-001",
+                ChangeLog.accion == "FEED_FORWARD_REALIZADO",
+            )
+            .first()
+        )
+        self.assertIsNotNone(log)
+        self.assertEqual(log.actor, "PROFESOR_ID_1")
+        self.assertEqual(log.datos_anteriores["estado_feed_forward"], "PENDIENTE")
+        self.assertEqual(log.datos_nuevos["estado_feed_forward"], "REALIZADO_ALUMNO")
+        self.assertIsNone(log.audit_metadata)
+
+    def test_feed_forward_verificado_metadata_ia(self):
+        """Verifica que audit_metadata registra la señal de IA sin hacerla actora de la transición."""
+        self.client.patch("/api/v1/submissions/test-submission-uuid-001/feed-forward/realizado")
+        self.client.patch(
+            "/api/v1/submissions/test-submission-uuid-001/feed-forward/verificado",
+            json={"ia_propuso_verificacion": True, "evaluation_id": 99},
+        )
+
+        log = (
+            self.db.query(ChangeLog)
+            .filter(
+                ChangeLog.submission_id == "test-submission-uuid-001",
+                ChangeLog.accion == "FEED_FORWARD_VERIFICADO",
+            )
+            .first()
+        )
+        self.assertIsNotNone(log)
+        self.assertEqual(log.actor, "PROFESOR_ID_1")
+        self.assertTrue(log.audit_metadata["ia_propuso_verificacion"])
+        self.assertEqual(log.audit_metadata["evaluation_id"], 99)
+
 
 
 if __name__ == "__main__":
