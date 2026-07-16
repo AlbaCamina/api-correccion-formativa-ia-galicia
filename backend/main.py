@@ -1,6 +1,7 @@
 import os
 import logging
 from fastapi import FastAPI, Request, HTTPException
+from contextlib import asynccontextmanager
 from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.exceptions import RequestValidationError
@@ -18,39 +19,6 @@ logger = logging.getLogger("backend.main")
 # Cargar variables de entorno desde el archivo .env (v0.1-006)
 load_dotenv()
 
-app = FastAPI(
-    title="API de Corrección Formativa con IA - Galicia",
-    description="Backend oficial para el sistema de corrección formativa adaptada al Decreto 157/2022 de la Xunta de Galicia.",
-    version="0.3-001",
-)
-
-# Registro de enrutadores
-app.include_router(evaluation_router)
-app.include_router(auth_router)
-app.include_router(marco_router)
-app.include_router(rubrica_router)
-app.include_router(submission_router)
-
-# Asegurar existencia del directorio y servir archivos de /uploads (simulando S3)
-os.makedirs("uploads", exist_ok=True)
-app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
-
-
-
-# Configuración de CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-    ],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-@app.on_event("startup")
 async def startup_validation():
     """
     Valida en el arranque que las variables de entorno requeridas según el proveedor estén presentes.
@@ -88,6 +56,48 @@ async def startup_validation():
         raise RuntimeError(error_msg)
 
     logger.info("¡Validación de variables de entorno exitosa! El servidor está listo.")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await startup_validation()
+    yield
+
+
+app = FastAPI(
+    title="API de Corrección Formativa con IA - Galicia",
+    description="Backend oficial para el sistema de corrección formativa adaptada al Decreto 157/2022 de la Xunta de Galicia.",
+    version="0.3-001",
+    lifespan=lifespan,
+)
+
+# Registro de enrutadores
+app.include_router(evaluation_router)
+app.include_router(auth_router)
+app.include_router(marco_router)
+app.include_router(rubrica_router)
+app.include_router(submission_router)
+
+# Asegurar existencia del directorio y servir archivos de /uploads (simulando S3)
+os.makedirs("uploads", exist_ok=True)
+app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
+
+
+
+# Configuración de CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
 
 # ==========================================
 # GESTIÓN DE EXCEPCIONES Y FORMATO DE ERRORES (v0.1-005)
