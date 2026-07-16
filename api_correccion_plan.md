@@ -2,7 +2,11 @@
 **Proyecto:** API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)  
 **Perfil:** Programadora Junior Full-Stack — Alba Camiña García  
 **Fecha de inicio:** Julio 2026  
-**Estado:** Fase 0 — Diseño y preparación
+**Estado:** Versión 0.2 Avanzada — Cierre técnico, gobernanza y preparación de demo AESIA
+
+> [!NOTE]
+> **SÍNTESIS DEL MOMENTO ACTUAL (Julio 2026):**  
+> El núcleo de la v0.2 está implementado y auditado (`main`). El foco inmediato es saldar el bloque **v0.2-008** (`Alembic` + seguridad propiedad `HTTP 403`), completar el circuito HitL de aprobación docente (**v0.2-009**) y dotar de endpoints de lectura para la demo técnica en la AESIA (**v0.2-010**) antes de iniciar la arquitectura multimodal pre-nube de la v0.3.
 
 ---
 
@@ -423,7 +427,9 @@ api-correccion/                              ← workspace único de VS Code
 | ✅ | Bloque 4-8 | Marco legal, modelo de datos, contrato JSON, servicios y versiones | 📋 Diseñado (`decisiones.md` y `backlog.md`) |
 | ✅ | Bloque 9 | Entorno de desarrollo configurado (WSL + OpenCode + Gemini + Groq) | 🛠️ Completado |
 | ✅ | **v0.1** | **Motor Síncrono y Contrato JSON Validados (`origin/main`)** | 🖥️ Completado |
-| 🚀 | **v0.2** | **Capa de Datos:** PostgreSQL + SQLAlchemy (`marcos_evaluacion` y `rubricas_docente` Modo Dual [D-027]) | 📋 **En curso / Siguiente paso** |
+| ✅ | **v0.2-Núcleo** | **Capa de Datos & Auth:** PostgreSQL + ORM, JWT de profesores, `marcos_evaluacion`, `rubricas_docente` (`COMBINADO`/`AUDITORIA` [D-027]), `Feed-Forward` ([D-026]) y `ChangeLog` | 🖥️ **Completado y Auditado** (`main`) |
+| 🚀 | **v0.2-008** | **Cierre Técnico & Auditoría:** Deuda de migraciones Alembic y cobertura de seguridad propiedad HTTP 403 en `Feed-Forward` | 📋 **En curso / Siguiente Sprint** |
+| ⭐ | **v0.2-Demo HitL** | **Flujo Principal & Consulta AESIA (`[v0.2-009]` y `[v0.2-010]`):** Endpoint HitL aprobación docente (`PATCH /approve`) y `[v0.2-010] Endpoints GET de Consulta y Trazabilidad` (también para demo técnica en Swagger ante AESIA) | ⏳ **Pendiente (Pre-Reunión AESIA)** |
 | ⭐ | **Bloque 3** | **Reunión con contacto AESIA (A Coruña):** Validación de pipeline multimodal, privacidad pre-nube y networking TIC | 🤝 **Al completar v0.2 (Puente a v0.3)** |
 | — | **v0.3** | **Multimodalidad y OCR:** Subida de fotos de exámenes y procesado visual con LLM Vision | ⏳ Pendiente de v0.2 y reunión AESIA |
 | — | **v0.4** | **Asincronía y Colas:** Celery + Redis para concurrencia masiva de correcciones | ⏳ Pendiente de v0.3 |
@@ -463,4 +469,5 @@ api-correccion/                              ← workspace único de VS Code
 *Documento generado el 07/07/2026 — Antigravity para Alba Camiña García*  
 *Actualizado el 08/07/2026 — BLOQUE 9 reescrito con entorno real desplegado*  
 *Actualizado el 09/07/2026 — sincronizadas reglas de trabajo (9, 10, 11), modelo multi-folio archivos_urls, compresión en cliente [D-020] y retención en Cold Storage [D-021]*  
-*Actualizado el 15/07/2026 — armonizada Defensa Multinivel de PII (`[D-022] + [D-034]`: Buffer RAM + Client-Side Blackout Tool + Escáner Offline) en benchmarking, argumentario y guion AESIA.*
+*Actualizado el 15/07/2026 — armonizada Defensa Multinivel de PII (`[D-022] + [D-034]`: Buffer RAM + Client-Side Blackout Tool + Escáner Offline) en benchmarking, argumentario y guion AESIA.*  
+*Actualizado el 16/07/2026 — alineado con la Versión 0.2 Avanzada, dividiendo la fase de datos en Núcleo terminado, cierre técnico [v0.2-008] y preparación de demo pre-AESIA con aprobación HitL [v0.2-009] y endpoints de consulta [v0.2-010].*

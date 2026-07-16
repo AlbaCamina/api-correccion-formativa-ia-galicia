@@ -402,6 +402,38 @@
 
 ---
 
+### [v0.2-009] Endpoint HitL de Aprobación Docente (REVIEW ➔ GRADED)
+
+**Como** profesor responsable de la evaluación,  
+**quiero** validar y aprobar formalmente el borrador de corrección propuesto por la IA  
+**para** convertirlo en una calificación final firme (`GRADED`), garantizando la soberanía humana (`[D-002]`, `AI Act`).
+
+**Criterios de aceptación:**
+- [ ] `PATCH /api/v1/evaluaciones/{id}/approve` (o `/submissions/{id}/approve`) verifica que el profesor autenticado es el propietario (`HTTP 403 Forbidden` en caso contrario).
+- [ ] Transiciona el estado de la entrega de `REVIEW` a `GRADED`.
+- [ ] Registra en `ChangeLog` la acción `EVALUACION_APROBADA` con el `actor = PROFESOR_ID_{id}` (nunca la IA ni el sistema).
+- [ ] Al completarse, actualiza la fila correspondiente del flujo de evaluación en `AUDITORIA.md` a **Auditado**.
+
+**Etiquetas:** `v0.2` `hitl` `endpoints` `ai-act`
+
+---
+
+### [v0.2-010] Endpoints GET de Consulta y Trazabilidad
+
+**Como** desarrolladora y ponente técnica en la demostración ante la AESIA,  
+**quiero** disponer de endpoints de lectura limpios para listar entregas y consultar el detalle evaluativo  
+**para** poder navegar por el flujo completo en vivo en la interfaz de Swagger UI (`/docs`) y verificar la trazabilidad sin consultar la base de datos a mano.
+
+**Criterios de aceptación:**
+- [ ] `GET /api/v1/submissions` devuelve el listado de entregas pertenecientes al profesor autenticado (`current_user`).
+- [ ] `GET /api/v1/evaluaciones/{submission_id}` devuelve el JSON evaluativo estructurado (`EvaluacionIA`) y sus metadatos.
+- [ ] Pruebas unitarias correspondientes en verde en `test_evaluation_router.py`.
+- [ ] Al completarse, refuerza el pilar de evidencia y visibilidad en `AUDITORIA.md`.
+
+**Etiquetas:** `v0.2` `endpoints` `swagger` `aesia-demo`
+
+---
+
 ## 📸 Versión 0.3 — Subida de Imágenes, Anonimización y OCR [GitHub Issue #3 (Open)]
 
 **Objetivo:** El profesor puede subir una foto o PDF del examen manuscrito. El sistema garantiza la privacidad recortando el nombre localmente con `Pillow` pre-nube, gestiona de forma resiliente el almacenamiento y procesa la corrección con un motor multimodal (Groq Vision / OpenAI).
@@ -775,5 +807,5 @@
 ---
 
 *Backlog generado el 07/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] (`estado_feed_forward`, `audit_metadata`); añadidas tareas [v0.2-008] (Deuda Alembic + 403) y [v0.5-006] (Actor Alumno).*  
-*Total de historias: 32 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 2*
+*Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] e incorporadas historias de cierre v0.2 y demo HitL pre-AESIA (`[v0.2-008]`, `[v0.2-009]`, `[v0.2-010]`).*  
+*Total de historias: 34 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 2*
