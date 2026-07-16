@@ -46,6 +46,8 @@ class Submission(Base):
     
     # Estados del ciclo de vida de la corrección
     estado = Column(String(50), default="PENDING", nullable=False)
+    # Estado del seguimiento formativo del Siguiente Paso Accionable (ADR D-026)
+    estado_feed_forward = Column(String(50), default="PENDIENTE", nullable=False)
     
     created_at = Column(DateTime, default=utcnow, nullable=False)
     updated_at = Column(DateTime, default=utcnow, onupdate=utcnow, nullable=False)
@@ -129,6 +131,10 @@ class SubmissionResponse(BaseModel):
     alumno_id: Optional[str] = Field(..., description="Identificador anónimo del alumno.")
     adaptaciones_alumno: Optional[Dict[str, Any]] = Field(..., description="Adaptaciones asociadas.")
     estado: str = Field(..., description="Estado del ciclo de vida (PENDING/ANALYZING/REVIEW/GRADED).")
+    estado_feed_forward: str = Field(
+        ...,
+        description="Estado del seguimiento del Siguiente Paso Accionable (PENDIENTE/REALIZADO_ALUMNO/VERIFICADO_EN_PRUEBA_SIGUIENTE)."
+    )
     created_at: datetime = Field(..., description="Fecha de recepción.")
     updated_at: datetime = Field(..., description="Fecha de última actualización.")
 
