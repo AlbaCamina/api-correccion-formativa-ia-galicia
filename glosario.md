@@ -28,6 +28,9 @@ Proceso de encontrar y corregir errores en el código. Literalmente "quitar los 
 **Deploy / Despliegue**  
 Publicar el código en un servidor accesible desde internet. Antes solo funciona en tu máquina local; tras el deploy, cualquiera puede usarlo.
 
+**Deprecado / Deprecation (`Deprecated`)**  
+Estado o cualidad de un método, función o tecnología que sigue funcionando temporalmente por motivos de compatibilidad con código antiguo, pero cuyo uso oficial ha sido desaconsejado o declarado obsoleto por sus creadores (generalmente porque existe una alternativa superior, más segura o moderna, o porque será eliminado definitivamente en una futura versión). En este proyecto: el reemplazo de `datetime.utcnow()` (deprecado en Python 3.12+ por no incluir zona horaria explícita) por `datetime.now(timezone.utc)` y callables `utcnow()` para evitar advertencias (`DeprecationWarning`) de SQLAlchemy/Pytest y garantizar timestamps precisos en UTC sin riesgo de ruptura en futuras actualizaciones del lenguaje.
+
 **Endpoint**  
 Una URL concreta de la API a la que se puede hacer una petición HTTP con un verbo específico. Cada endpoint tiene una responsabilidad única y bien definida. Los verbos más usados en este proyecto son:
 - `POST` — crea o procesa algo nuevo (subir examen, registrar profesor, evaluar)
