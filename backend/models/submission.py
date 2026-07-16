@@ -8,15 +8,17 @@ Hito [v0.2-005] y ADR [D-002], [D-023], [D-024], [D-026].
 import uuid
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
+
 from sqlalchemy import Column, Integer, String, JSON, ForeignKey, DateTime, Float, Boolean
 from sqlalchemy.orm import relationship
 from pydantic import BaseModel, Field, ConfigDict
+
 from .database import Base
+from .evaluation import EvaluacionIA
 
 
 def utcnow():
     return datetime.now(timezone.utc)
-from .evaluation import EvaluacionIA
 
 
 # =====================================================================
