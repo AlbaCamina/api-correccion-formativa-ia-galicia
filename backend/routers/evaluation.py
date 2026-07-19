@@ -20,6 +20,7 @@ class EvaluationRequest(BaseModel):
     student_answer: str = Field(..., description="Texto de la respuesta dada por el estudiante o transcripción de la prueba.")
     rubrica_id: int = Field(..., description="ID de la rúbrica del docente para evaluar.")
     marco_id: Optional[int] = Field(None, description="ID del marco normativo oficial (dejar null para Rúbrica Pura).")
+    etapa: Literal["ESO", "BACH"] = Field(..., description="Etapa educativa obligatoria. Si hay marco, se cruza para validación; si no, actúa como ancla normativa.")
     modo_evaluacion: Optional[Literal["COMBINADO", "AUDITORIA_CURRICULAR"]] = Field("COMBINADO", description="Estrategia de interacción con el marco legal.")
     question: Optional[str] = Field(None, description="Pregunta, reto o enunciado opcional del examen.")
     alumno_id: Optional[str] = Field(None, max_length=100, description="Identificador seudonimizado del alumno para control de RGPD.")
@@ -67,6 +68,11 @@ async def evaluate_submission(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="El marco de evaluación legislativo especificado no existe o no está activo."
             )
+        if marco.etapa != request.etapa:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail=f"La etapa declarada '{request.etapa}' no coincide con la etapa del marco normativo '{marco.etapa}'."
+            )
 
     # 3. Crear el registro de la entrega en estado ANALYZING
     submission = Submission(
@@ -82,10 +88,17 @@ async def evaluate_submission(
     db.refresh(submission)
 
     # 4. Construir la rúbrica detallada para el prompt del LLM
-    rubric_str = "\n".join([
-        f"- Criterio {c['id']} ({c['nombre']}): {c['descripcion']} (Peso: {c['peso']}%)"
-        for c in rubrica.criterios
-    ])
+    criterios_format = []
+    for c in rubrica.criterios:
+        codigo = c.get('criterio_codigo')
+        codigo_str = f" [{codigo}]" if codigo else ""
+        comps = c.get('competencias_clave')
+        comps_str = f" (Competencias: {', '.join(comps)})" if comps else ""
+        peso = c.get('peso')
+        peso_str = f" (Peso: {peso}%)" if peso is not None else ""
+        criterios_format.append(f"- Criterio {c.get('id', '')}{codigo_str} ({c.get('nombre', '')}): {c.get('descripcion', '')}{peso_str}{comps_str}")
+    
+    rubric_str = "\n".join(criterios_format)
 
     adaptaciones_str = ""
     if request.adaptaciones_alumno:
@@ -135,7 +148,8 @@ async def evaluate_submission(
         resultado = await evaluate_answer(
             student_answer=request.student_answer,
             rubric=rubric_prompt,
-            question=request.question or ""
+            question=request.question or "",
+            etapa=request.etapa
         )
     except Exception as e:
         # Marcar la entrega como fallida en base de datos si el LLM falla
