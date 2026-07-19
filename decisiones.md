@@ -54,6 +54,12 @@
 | [D-037](#d-037) | Estandarización del Historial Git (`Conventional Commits` y Trazabilidad ADR) | Jul 2026 | ✅ Adoptada |
 | [D-038](#d-038) | Mitigación de Pérdida de Contexto en Prompts Densos (`Prompt Anchoring` & `XML Tags`) | Jul 2026 | ✅ Adoptada |
 | [D-039](#d-039) | Desacoplamiento de Calificación Numérica y Cualitativa en Pruebas Evaluables | Jul 2026 | ✅ Adoptada |
+| [D-040](#d-040) | Distinción normativa LEY vs. CONFIGURACIÓN DE CENTRO como principio rector de calificación | Jul 2026 | ✅ Adoptada |
+| [D-041](#d-041) | Soporte multi-etapa: campo `etapa` (ESO/BACH) en `marcos_evaluacion` | Jul 2026 | ✅ Adoptada |
+| [D-042](#d-042) | Corrección de abreviatura cualitativa oficial: "BE" (Bien), nunca "BI" — corrige D-039 | Jul 2026 | ✅ Adoptada |
+| [D-043](#d-043) | Nota de prueba por media ponderada; la IA no suma, el backend recalcula — corrige D-039 | Jul 2026 | ✅ Adoptada |
+| [D-044](#d-044) | Trazabilidad obligatoria criterio de evaluación → competencia clave | Jul 2026 | ✅ Adoptada |
+| [D-045](#d-045) | Semántica HitL de la nota: `calificacion_numerica` es orientativa con decimales; el redondeo a entero de boletín lo hace el docente | Jul 2026 | ✅ Adoptada |
 
 ---
 
@@ -888,12 +894,14 @@ Se reducen drásticamente las alucinaciones de formato y el motor de corrección
 **Estado:** ✅ Adoptada (`[v0.2]`)  
 **Fecha:** Julio 2026 (18/07/2026)
 
+**Aviso de Supersesión:** Corregida por D-042 (la escala correcta es IN, SU, BE, NT, SB) y D-043 (media ponderada determinista en backend, la IA no suma).
+
 **Contexto:**  
-La normativa LOMLOE (ej. Decreto 157/2022 de Galicia) establece una evaluación competencial y cualitativa (IN, SU, BI, NT, SB) que representa el nivel de logro del alumno al final del ciclo o curso de forma global e interdisciplinar. Sin embargo, las materias y sus instrumentos de evaluación diarios (exámenes, pruebas, murales) siguen requiriendo obligatoriamente una calificación cuantitativa/numérica (0-10) en la praxis docente y administrativa. El contrato JSON inicial (`[D-024]`) limitaba el retorno de la IA únicamente a la calificación competencial.
+La normativa LOMLOE (ej. Decreto 157/2022 de Galicia) establece una evaluación competencial y cualitativa (IN, SU, BE, NT, SB) que representa el nivel de logro del alumno al final del ciclo o curso de forma global e interdisciplinar. Sin embargo, las materias y sus instrumentos de evaluación diarios (exámenes, pruebas, murales) siguen requiriendo obligatoriamente una calificación cuantitativa/numérica (0-10) en la praxis docente y administrativa. El contrato JSON inicial (`[D-024]`) limitaba el retorno de la IA únicamente a la calificación competencial.
 
 **Decisión:**  
 Se actualiza el contrato `EvaluacionIA` (y el System Prompt) para exigir a la IA que calcule y devuelva **ambos valores desacoplados**:
-1. `calificacion_numerica`: Puntuación exacta (float 0.0 - 10.0) de la prueba evaluable, derivada directamente de la suma ponderada de la rúbrica.
+1. `calificacion_numerica`: Puntuación exacta (float 0.0 - 10.0) de la prueba evaluable, derivada directamente de la media ponderada determinista en backend (la IA no suma).
 2. `calificacion_cualitativa`: Mapeo cualitativo oficial para alimentar el perfil competencial a final de curso.
 
 **Consecuencias:**  
@@ -901,6 +909,76 @@ El sistema es ahora jurídicamente perfecto y responde a la realidad del profeso
 
 ---
 
+---
+
+### D-040 — Distinción LEY vs. CONFIGURACIÓN DE CENTRO
+
+**Contexto.** Al auditar el motor de calificación contra la normativa gallega (Decreto 156/2022 y su Orde do 26/05/2023 para Educación Secundaria Obligatoria — ESO; Decreto 157/2022 y su Orde do 26/05/2023 para Bachillerato), se detectó que el sistema trataba como obligaciones legales varios elementos que la normativa NO regula.
+
+**Decisión.** El agente y el motor distinguen explícitamente dos categorías de reglas:
+- **Obligatorio por ley** (no configurable): escalas de calificación (ESO 1-10 entero; Bachillerato 0-10 entero, sin decimales); correspondencia cualitativa oficial solo en ESO (IN=1-4, SU=5, BE=6, NT=7-8, SB=9-10); los criterios de evaluación como referente único de calificación; competencias clave expresadas en términos cualitativos.
+- **Configuración de centro/departamento** (la ley no lo fija): puntuación y decimales por criterio, niveles de logro 1-4, pesos de los criterios, fórmula de media (aritmética o ponderada) y regla de redondeo.
+
+**Consecuencia.** El agente nunca presenta una decisión de departamento como mandato legal. Los avisos de configuración se reportan en `teacherSummary`.
+
+**Fuente.** Orde do 26/05/2023 (DOG 13/06/2023), Arts. 21.3, 22.2, 27.1, 27.4 (ESO); Arts. 17.1, 24.3, 29 (Bachillerato).
+
+---
+
+### D-041 — Soporte multi-etapa: campo `etapa` en `marcos_evaluacion`
+
+**Contexto.** El producto sirve tanto ESO como Bachillerato, pero la regla de calificación cualitativa oficial solo existe en ESO. El modelo `MarcoEvaluacion` solo tenía `asignatura` y `curso` como texto libre, obligando al modelo de lenguaje a inferir la etapa.
+
+**Decisión.** Se añade el campo `etapa: Literal["ESO","BACH"]` a `marcos_evaluacion` (y a los esquemas Pydantic asociados). En ESO la calificación oficial fuerte es la cualitativa; en Bachillerato es la numérica (0-10) y la cualitativa se marca como `"NA"` (no aplicable / orientativa).
+
+**Consecuencia.** Migración Alembic (herramienta de migración de base de datos) con valor por defecto `"BACH"` por compatibilidad con el estado actual (Filosofía de Bachillerato); revisar manualmente los marcos de ESO al cargarlos.
+
+---
+
+### D-042 — Abreviatura cualitativa oficial "BE", nunca "BI" (corrige D-039)
+
+**Contexto.** El esquema `EvaluacionIA`, la documentación y la propia **D-039** usaban `"BI"` para "Bien". La abreviatura oficial en la normativa es **"BE"** (Art. 27.1, Decreto 156/2022). El `Literal` de Pydantic rechazaba la salida correcta.
+
+**Decisión.** Se sustituye `"BI"` por `"BE"` en el esquema, el prompt y toda la documentación (plan, backlog, glosario). Se añade a la D-039 una nota "Corregida por D-042: la escala correcta es IN, SU, **BE**, NT, SB".
+
+**Consecuencia.** Bug corregido: la validación ya no rechaza calificaciones "Bien" correctas.
+
+---
+
+### D-043 — Nota de prueba por media ponderada; la IA no suma, el backend recalcula (corrige D-039)
+
+**Contexto.** La D-039 y la descripción de `calificacion_numerica` indicaban que la nota se derivaba "de la **suma** ponderada" y que **la IA la calcula**. Sumar criterios con distintos `maxScore` produce resultados incoherentes, y delegar la aritmética en el modelo de lenguaje es una fuente de errores no auditable.
+
+**Decisión.**
+1. La nota de prueba se calcula como **media ponderada** de los criterios, normalizando cada uno a base 10 (`score/maxScore*10`) y aplicando su `peso` (%). La suma de pesos debe ser 100 % (validado en `RubricaCreate`).
+2. **La IA NO suma ni calcula la nota.** El contrato `EvaluacionIA` exige que el modelo devuelva únicamente, por criterio: `score`, `maxScore` y `peso`.
+3. El **backend recalcula** `calificacion_numerica` de forma determinista mediante un `@model_validator(mode="after")` que actúa como **mutador** (sobrescribe el valor), **nunca como bloqueante**: no lanza 422 si la IA envía un valor incoherente, simplemente lo corrige.
+4. El frontend solo **muestra** el valor recalculado; no lo calcula.
+
+**Consecuencia.** Se sustituye el "suma ponderada" de la D-039 por "media ponderada determinista en backend". La aritmética queda fuera del alcance del modelo de lenguaje, es auditable y reproducible.
+
+---
+
+### D-044 — Trazabilidad criterio → competencia clave
+
+**Contexto.** El `RubricItem` no vinculaba cada criterio a su código oficial ni a las competencias clave. Sin esa cadena, el backend no puede agregar el grado de competencias del trimestre, que es el núcleo de la evaluación LOMLOE (Ley Orgánica de Modificación de la LOE).
+
+**Decisión.** `RubricItem` y `CriterioRubrica` incorporan `criterio_codigo`/`criterio_codigo_oficial` y `competencias_clave` (lista de: CCL, CP, STEM, CD, CPSAA, CC, CE, CCEC).
+
+**Consecuencia.** El backend puede reconstruir la evaluación de competencias a partir de los criterios evaluados en cada prueba.
+
+---
+
+### D-045 — Semántica HitL de la nota
+
+**Contexto.** `calificacion_numerica` (con decimales) podía confundirse con la nota oficial de boletín (entero).
+
+**Decisión.** `calificacion_numerica` es una **orientación** con decimales que el agente NO redondea. El docente decide la nota definitiva y aplica el redondeo a entero al aprobar (Human-in-the-Loop), guardándola en `nota_final`. El agente evalúa una sola evidencia; la agregación a nota de materia y competencias del trimestre la hace el backend.
+
+**Consecuencia.** Refuerza el escudo legal HitL (D-002) y separa el rol del asistente del rol decisor del docente.
+
+---
+
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 18/07/2026 — añadidas D-037, D-038 y D-039 (Estandarización Git, Defensa Context Overflow, Calificación Numérica)*  
-*Total de decisiones registradas: 39*
+*Actualizado el 19/07/2026 — añadidas D-040 a D-045 (Auditoría Normativa)*  
+*Total de decisiones registradas: 45*

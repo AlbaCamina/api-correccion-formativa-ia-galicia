@@ -515,11 +515,23 @@ Acuerdo contractual con el proveedor de IA por el que los datos enviados al mode
 **ADR** (Architecture Decision Records — Registro de Decisiones de Arquitectura)  
 Documento donde cada decisión técnica importante queda registrada con su contexto, las alternativas consideradas y el motivo de la elección. En este proyecto: `decisiones.md`.
 
+**Competencia clave**  
+Capacidad o destreza fundamental (ej. CCL, STEM) que se evalúa a lo largo del curso en todas las asignaturas. Según la LOMLOE se expresan en términos cualitativos y definen el Perfil de salida del alumno.
+
+**Criterio de evaluación**  
+Referente único y oficial de calificación según la LOMLOE. Evalúa el desempeño específico del alumno en una prueba o materia y es la base ineludible sobre la que se construye cualquier rúbrica o ponderación (`[D-040]`).
+
+**Descriptor operativo**  
+Concreción de la competencia clave y punto de unión o anclaje normativo con los criterios de evaluación de cada materia específica.
+
+**Distinción LEY vs. CONFIGURACIÓN DE CENTRO**  
+Principio rector de calificación (`[D-040]`) que exige separar estrictamente las obligaciones legales impuestas por los Decretos (ej. escalas 1-10 o referentes criteriales) de las decisiones pedagógicas internas de cada departamento escolar (ej. si se usan decimales, qué peso tiene cada criterio o si se hace media ponderada). Previene que el agente LLM invente reglas o presente configuraciones locales como mandatos autonómicos.
+
 **Comparative Judgement / Juicio Comparativo**  
 Metodología pedagógica innovadora (ej. *No More Marking* en Reino Unido) donde se evalúa el razonamiento cualitativo global en lugar de contar puntos mecánicos aislados (`[D-024]`).
 
 **Doble Circuito de Calificación (Materias vs. Competencias Clave)**  
-Modelo operativo dual vigente en los IES gallegos (Decretos 156/157/2022) y reflejado en XADE/api-correccion-formativa-ia-galicia: 1) **Circuito de Materias:** Las asignaturas se califican y cierran en los boletines trimestrales y ordinarios con **números enteros del 1 al 10** derivados de las notas cotidianas numéricas de las pruebas evaluables. 2) **Circuito de Competencias Clave:** Las 8 competencias oficiales (*CCL, STEM, CD...*) se califican al final del curso de forma cualitativa (*IN, SU, BI, NT, SB*) mediante el **cruce e intersección matricial inter-materias** de todos los criterios evaluados en las diferentes asignaturas del alumno.
+Modelo operativo dual vigente en los IES gallegos (Decretos 156/157/2022) y reflejado en XADE/api-correccion-formativa-ia-galicia: 1) **Circuito de Materias:** Las asignaturas se califican y cierran en los boletines trimestrales y ordinarios con **números enteros del 1 al 10** derivados de las notas cotidianas numéricas de las pruebas evaluables. 2) **Circuito de Competencias Clave:** Las 8 competencias oficiales (*CCL, STEM, CD...*) se califican al final del curso de forma cualitativa (*IN, SU, BE, NT, SB*) mediante el **cruce e intersección matricial inter-materias** de todos los criterios evaluados en las diferentes asignaturas del alumno.
 
 **Deuda Técnica (`Technical Debt` / Deuda Consciente)**  
 Coste estratégico de ingeniería que se asume al aplazar o simplificar deliberadamente una implementación en la fase actual para priorizar la entrega rápida y limpia de un hito, con el compromiso explícito de refactorizarla o completarla en una iteración posterior. En api-correccion-formativa-ia-galicia, un ejemplo es no persistir aún los binarios de subida en la tabla `Submission` durante `[v0.3-001]` porque dicha lógica se rediseñará integralmente al introducir el recorte de cabecera pre-nube con `Pillow` en `[v0.3-002]` (*YAGNI*).
@@ -527,8 +539,11 @@ Coste estratégico de ingeniería que se asume al aplazar o simplificar delibera
 **Equipotencialidad Criterial (`Decreto 156/157/2022`)**  
 Regla pedagógica general y por defecto por la que todos los Criterios de Evaluación (`criterio_id`) asociados a las competencias específicas de una materia tienen idéntico valor o peso en el cálculo de la nota final, salvo que el departamento establezca porcentajes diferenciados en su Programación Didáctica (`Capa 2`).
 
+**Etapa (ESO/BACH)**  
+Nivel educativo que determina legalmente la escala cualitativa aplicable (`[D-041]`). En ESO es el dato oficial fuerte (`IN, SU, BE, NT, SB`), mientras que en Bachillerato la calificación oficial es numérica entera y la cualitativa se reporta como "NA" (No Aplicable/Orientativa).
+
 **Evaluación Competencial Cualitativa (`Decretos 156/157/2022 Galicia`)**  
-Modelo evaluativo obligatorio en Galicia para ESO y Bachillerato centrado en el grado de adquisición de las competencias clave y específicas del currículo, expresado en grados cualitativos (*Insuficiente [IN], Suficiente [SU], Bien [BI], Notable [NT], Sobresaliente [SB]*) además o en lugar de la nota numérica simple (`[D-024]`).
+Modelo evaluativo obligatorio en Galicia para ESO y Bachillerato centrado en el grado de adquisición de las competencias clave y específicas del currículo, expresado en grados cualitativos (*Insuficiente [IN], Suficiente [SU], Bien [BE], Notable [NT], Sobresaliente [SB]*) además o en lugar de la nota numérica simple (`[D-024]`).
 
 **Feed Forward / Actionable Next Steps (Siguiente Paso Accionable y Seguimiento No Sumativo)**  
 Estándar pedagógico anglosajón (modelo Hattie & Timperley en GCSE/A-Levels del Reino Unido) que soluciona el problema de la "IA cierta pero inútil". Exige que cada corrección formativa proporcione una acción única, concreta e inmediata que el alumno puede hacer hoy mismo para avanzar (`[D-024]`). Para no sobrecargar al docente con dobles correcciones, su cumplimiento se modela como un checklist formativo y de autoevaluación en base de datos (`estado_feed_forward: PENDIENTE | REALIZADO | VERIFICADO`) sin calificación sumativa (`[D-026]`).
@@ -563,6 +578,15 @@ Unidad de seguimiento, trabajo o reporte en GitHub. En nuestra arquitectura y je
 
 **Milestone (Hito / Contenedor de Versión en GitHub)**  
 Punto de referencia y contenedor jerárquico superior en el roadmap del proyecto. En GitHub Projects y en api-correccion-formativa-ia-galicia equivale a una versión o entregable de software (`v0.1 Motor Síncrono`, `v0.2 Base de Datos`, `v0.2.5 Consolidación HitL`). Un Milestone agrupa las Issues correspondientes a esa versión y permanece abierto (`Open`) hasta que todas las tareas y auditorías de ese bloque se han completado.
+
+**Media ponderada**  
+Método de cálculo determinista implementado en el backend (`[D-043]`) donde la nota de la prueba es el resultado de normalizar cada criterio evaluado y multiplicarlo por su peso departamental, sumando un 100%. Garantiza que la aritmética quede fuera del alcance probabilístico del modelo de lenguaje.
+
+**Nivel de logro**  
+Escala de calidad (frecuentemente 1 a 4) empleada en la rúbrica de centro/departamento para categorizar el desempeño del alumno en cada criterio de evaluación. Es una decisión de configuración de centro, no una imposición del decreto.
+
+**Perfil de salida**  
+Grado final esperado de adquisición de las competencias clave que el alumno debe haber logrado al término de su etapa educativa básica para asegurar su desarrollo personal y social.
 
 **Separation of Concerns (Separación de Responsabilidades en Gobernanza `[D-035]`)**  
 Principio fundamental de ingeniería que dicta que cada aspecto, problema o capa de un sistema debe gestionarse en un módulo o actividad independiente. En el plano de gobernanza del proyecto, separa de manera estricta las actividades de **Inspección y Auditoría Técnica** (ej. contrastar código existente contra normativas y generar `AUDITORIA.md`) de las actividades de **Implementación y Programación de Código** (ej. escribir endpoints y migraciones). Al abrir y cerrar tareas (`Issues`) separadas para cada responsabilidad, se garantiza que la calidad y el blindaje legal no se diluyan en la rutina del picado de código.

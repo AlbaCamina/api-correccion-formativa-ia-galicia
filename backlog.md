@@ -363,7 +363,9 @@
 
 **Criterios de aceptación:**
 - [x] `POST /api/v1/evaluate` ahora acepta `marco_id` (opcional/nullable) y `rubrica_id`
-- [x] Si `marco_id` es null/None, evalúa en Modo Rúbrica Pura (ignora legislación). Si está presente, recupera el marco de la BBDD e inyecta en el prompt la estrategia elegida (Combinado vs. Auditoría).
+- [x] ⚠️ **BREAKING CHANGE (D-041):** `etapa` (`"ESO" | "BACH"`) pasa a ser un campo obligatorio en el payload. Peticiones sin etapa fallarán con `422`.
+- [x] Si el profesor declara una etapa que contradice al marco seleccionado, se rechaza con `400 Bad Request`.
+- [x] Si `marco_id` es null/None, evalúa en Modo Rúbrica Pura (ignora legislación) pero inyecta la `etapa` provista en la petición para evitar inferencias normativas por la IA.
 - [x] El resultado se guarda en `submissions` y `evaluaciones`
 - [x] El changelog registra la corrección con `actor = "IA"`
 
@@ -396,6 +398,7 @@
 
 **Criterios de aceptación:**
 - [ ] **Sincronización Alembic:** Crear la revisión de migración (`alembic revision --autogenerate -m "add estado_feed_forward and audit_metadata"`) como deuda de sincronización del historial formal con el esquema actual de SQLAlchemy (no representa un fallo funcional del backend, sino una alineación de versionado de BBDD).
+- [ ] **Migración Pendiente Extra (Deuda Técnica):** Aislar y ejecutar la migración específica para sincronizar las columnas `audit_metadata` (en `changelog`) y `estado_feed_forward` (en `submissions`) con la base de datos, ya que fueron añadidas a los modelos en commits anteriores pero no migradas.
 - [ ] **Test HTTP 403 (Permisos de propiedad):** Añadir un fixture con un segundo profesor (`PROFESOR_ID_2`) en `test_evaluation_router.py` y verificar que si intenta llamar a `PATCH /api/v1/submissions/{id}/feed-forward/realizado` o `/verificado` sobre una entrega que no le pertenece, el backend rechaza con `403 Forbidden`.
 
 **Etiquetas:** `v0.2` `tech-debt` `tests` `database`
