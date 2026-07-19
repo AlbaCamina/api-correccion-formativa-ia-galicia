@@ -23,6 +23,7 @@ class TestEvaluacionIA(unittest.TestCase):
                 },
                 "teacherSummary": "Excelente respuesta en comprensión conceptual."
             },
+            "calificacion_numerica": 8.0,
             "calificacion_cualitativa": "NT",
             "siguiente_paso_accionable": "Reescribe explicando por qué el filósofo debe gobernar la polis.",
             "confidence_score": 0.95

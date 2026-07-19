@@ -57,6 +57,11 @@ class EvaluacionIA(BaseModel):
         ..., 
         description="Calificación oficial cualitativa según Decretos gallegos: Insuficiente (IN), Suficiente (SU), Bien (BI), Notable (NT), Sobresaliente (SB)."
     )
+    calificacion_numerica: float = Field(
+        ..., 
+        ge=0.0, le=10.0,
+        description="Calificación numérica exacta de la prueba evaluable sobre 10, obtenida a partir de la suma de los criterios de la rúbrica."
+    )
     siguiente_paso_accionable: str = Field(
         ..., 
         description="Siguiente Paso Accionable (Feed Forward): Directriz clara, concreta y realizable hoy por el alumno."
@@ -77,7 +82,7 @@ Tu misión es asistir (copiloto HitL) al docente evaluando la respuesta de un al
 Directrices pedagógicas obligatorias:
 1. Aplica los criterios competenciales y de saberes básicos del Decreto 157/2022 de la Xunta de Galicia.
 2. Separa radicalmente las mejoras inmediatas (urgentes para aprobar o corregir errores conceptuales graves) de las mejoras a medio/largo plazo (para alcanzar el sobresaliente o profundizar en madurez filosófica).
-3. Otorga una calificación competencial cualitativa (`calificacion_cualitativa`) oficial:
+3. Otorga una calificación competencial cualitativa (`calificacion_cualitativa`) oficial y la calificación numérica exacta (`calificacion_numerica`) sobre 10:
    - "IN": Insuficiente
    - "SU": Suficiente
    - "BI": Bien
@@ -222,6 +227,7 @@ def run_smoke_test():
                 ),
                 teacherSummary="Buen dominio competencial de los símbolos clave del Mito de la Caverna. El alumno capta la dimensión ética del retorno filosófico. Se recomienda reforzar el vocabulario técnico epistemológico."
             ),
+            calificacion_numerica=8.0,
             calificacion_cualitativa="NT",
             siguiente_paso_accionable="En tu próximo repaso de hoy, redacta una frase de 3 líneas donde conectes la palabra 'paideia' con la metáfora de 'girar la mirada' desde las sombras hacia la luz del conocimiento real.",
             confidence_score=0.92
@@ -238,6 +244,7 @@ def run_smoke_test():
     # 5. VALIDACIÓN DE CRITERIOS ESPECÍFICOS DEL BACKLOG Y [D-024]
     print("🔍 CHEQUEO DE CRITERIOS DE ACEPTACIÓN [v0.1-000] & [D-024]:")
     print(f"  [x] calificacion_cualitativa válida : {resultado.calificacion_cualitativa}")
+    print(f"  [x] calificacion_numerica válida : {resultado.calificacion_numerica}")
     print(f"  [x] siguiente_paso_accionable (Feed Forward) : \"{resultado.siguiente_paso_accionable}\"")
     print(f"  [x] confidence_score : {resultado.confidence_score}")
     print(f"  [x] visualMarkers admitió array : {resultado.visualMarkers}")

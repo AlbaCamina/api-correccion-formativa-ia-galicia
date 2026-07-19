@@ -103,6 +103,7 @@ class TestEvaluationRouter(unittest.TestCase):
         resultado = data["resultado_ia"]
         self.assertIn("transcription", resultado)
         self.assertEqual(resultado["calificacion_cualitativa"], "NT")
+        self.assertEqual(resultado["calificacion_numerica"], 8.0)
         self.assertEqual(len(resultado["visualMarkers"]), 1)
         self.assertEqual(resultado["visualMarkers"][0]["type"], "error_excluido")
         self.assertIn("siguiente_paso_accionable", resultado)
