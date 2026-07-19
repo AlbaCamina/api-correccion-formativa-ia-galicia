@@ -49,6 +49,11 @@
 | [D-032](#d-032) | Trazabilidad Bidireccional Git-Web (`Bidirectional Traceability`) y Gobernanza de Milestones | Jul 2026 | ✅ Adoptada |
 | [D-033](#d-033) | Gestión de Vigencia Legislativa Curricular en el Modelo de Datos (`Metadatos Estáticos de Validación YAGNI`) | Jul 2026 | ✅ Adoptada |
 | [D-034](#d-034) | Segunda Capa de Comprobación y Redacción PII ante Casos de Borde Fotográficos (`Client-Side Blackout Tool` + Freno Pre-Nube) | Jul 2026 | ✅ Adoptada |
+| [D-035](#d-035) | Gobernanza de cambios sensibles y criterio de cierre de auditoría técnica (`AGENTS.md Regla 6`) | Jul 2026 | ✅ Adoptada |
+| [D-036](#d-036) | Simetría Lingüística en Entornos Co-oficiales (`Espejo Lingüístico Bilingüe`) | Jul 2026 | ✅ Adoptada |
+| [D-037](#d-037) | Estandarización del Historial Git (`Conventional Commits` y Trazabilidad ADR) | Jul 2026 | ✅ Adoptada |
+| [D-038](#d-038) | Mitigación de Pérdida de Contexto en Prompts Densos (`Prompt Anchoring` & `XML Tags`) | Jul 2026 | ✅ Adoptada |
+| [D-039](#d-039) | Desacoplamiento de Calificación Numérica y Cualitativa en Pruebas Evaluables | Jul 2026 | ✅ Adoptada |
 
 ---
 
@@ -828,6 +833,74 @@ Un cambio de este tipo solo se considera **auditado y cerrado** cuando cumple, d
 
 ---
 
+### [D-036] Simetría Lingüística en Entornos Co-oficiales (`Espejo Lingüístico Bilingüe`)
+
+**Estado:** ✅ Adoptada (`[v0.2]` / `prompt_builder.py Regla 7`)  
+**Fecha:** Julio 2026 (17/07/2026)
+
+**Contexto:**  
+Galicia opera bajo un sistema de co-oficialidad lingüística (gallego/castellano) en el que el alumnado tiene el derecho y la libertad de realizar sus pruebas evaluables en cualquiera de los dos idiomas o según la vehicularidad fijada por el proyecto lingüístico del centro. Dado que el `SYSTEM_PROMPT` base del motor LLM se redacta en castellano, existe el riesgo del comportamiento por defecto de la IA de responder en castellano (`reasoning`, `teacherSummary`, `siguiente_paso_accionable`) ante una entrega o rúbrica redactada en gallego, rompiendo la coherencia pedagógica y la inmersión normativa de la materia.
+
+**Decisión:**  
+Se adopta la **Regla de Simetría Lingüística (*Espejo Lingüístico*)** inyectada de forma imperativa en el `SYSTEM_PROMPT` (Directriz 7): el motor LLM tiene orden estricta de detectar el idioma vehicular de la respuesta del estudiante y de la rúbrica, y de formular el 100% del feedback cualitativo y accionable en ese mismo idioma (gallego normativo o castellano), sin mezclar lenguas ni requerir traducción o configuración manual adicional en cada corrección.
+
+**Consecuencias:**  
+1. **Inclusión lingüística nativa:** El alumno que responde en gallego recibe su `Siguiente Paso Accionable` y razonamiento en gallego normativo impecable, respetando el Decreto 157/2022 de la Xunta de Galicia.
+2. **Cero fricción docente:** La profesora no necesita seleccionar un toggle de "Idioma: Gallego" o "Idioma: Castellano" en la PWA; el motor actúa como espejo dinámico automático en cada llamada.
+
+---
+
+### [D-037] Estandarización del Historial Git (`Conventional Commits` y Trazabilidad ADR)
+
+**Estado:** ✅ Adoptada (`[v0.2]` / `AGENTS.md Regla 7`)  
+**Fecha:** Julio 2026 (18/07/2026)
+
+**Contexto:**  
+En un proyecto orientado a construir un portfolio de ingeniería de alto nivel y preparatorio para reuniones técnicas y auditorías de código, el historial de commits es tan importante como el código en sí. Un historial desordenado o mensajes opacos restan credibilidad a la arquitectura diseñada. Existe el riesgo de que al evolucionar rápidamente, los mensajes de commit pierdan su conexión con las tareas del backlog y las decisiones de arquitectura (ADRs), rompiendo la trazabilidad probatoria del proyecto.
+
+**Decisión:**  
+Se adopta el uso riguroso y obligatorio del estándar **Conventional Commits** (`feat:`, `fix:`, `docs:`, `test:`, `style:`) acompañado siempre de un **scope** descriptivo entre paréntesis (ej. `feat(submissions):`). Adicionalmente, se decreta que todo mensaje de commit (o PR) **debe incluir la referencia cruzada** al ID de la tarea del backlog (ej. `[v0.2-009]`) o al registro arquitectónico que lo motiva (ej. `[D-035]`).
+
+**Consecuencias:**  
+1. **Portfolio auto-explicativo:** El repositorio de GitHub se convierte en un artefacto que demuestra madurez en ingeniería de software (*Governance*), facilitando su lectura por parte de empresas tecnológicas, consultoras o mentores (AESIA).
+2. **Trazabilidad bidireccional real:** Cualquier evaluador técnico puede navegar desde una línea de código específica, ver el commit que la introdujo, leer el mensaje y saltar directamente al documento `decisiones.md` para entender el razonamiento de negocio que justificó ese cambio.
+
+---
+
+### [D-038] Mitigación de Pérdida de Contexto en Prompts Densos (`Prompt Anchoring` & `XML Tags`)
+
+**Estado:** ✅ Adoptada (`[v0.2]` / `AGENTS.md Regla 8`)  
+**Fecha:** Julio 2026 (18/07/2026)
+
+**Contexto:**  
+Al procesar rúbricas extensas, normativas largas (`marcos_evaluacion`) y folios transcritos masivos, la IA corre el riesgo de sufrir *Lost in the Middle* o *Context Overflow*, olvidando las reglas pedagógicas iniciales inyectadas en nuestro `SYSTEM_PROMPT` (como la Regla de simetría lingüística o la obligación de estructurar el JSON).
+
+**Decisión:**  
+Se adopta como arquitectura defensiva el uso estructurado de delimitadores semánticos (XML Tags) para separar los inputs del dominio (ej. `<rubrica>`, `<respuesta_alumno>`) en la fase de inyección de prompt (`prompt_builder.py`). Además, se aplica sistemáticamente **Prompt Anchoring**, repitiendo imperativamente la instrucción final de retorno JSON y la orden de usar el idioma vehicular del alumno justo en la última línea del user prompt. En el ámbito del ciclo de desarrollo, se adopta la política de **Context Reset** para las sesiones con agentes de IA.
+
+**Consecuencias:**  
+Se reducen drásticamente las alucinaciones de formato y el motor de corrección mantiene el foco cognitivo en la equidad y en el *Siguiente Paso Accionable*, blindando el comportamiento de la IA en producción independientemente de lo masiva que sea la entrada de contexto. Demuestra un conocimiento avanzado de las vulnerabilidades actuales en la arquitectura de los modelos fundacionales (Transformers).
+
+---
+
+### [D-039] Desacoplamiento de Calificación Numérica y Cualitativa en Pruebas Evaluables
+
+**Estado:** ✅ Adoptada (`[v0.2]`)  
+**Fecha:** Julio 2026 (18/07/2026)
+
+**Contexto:**  
+La normativa LOMLOE (ej. Decreto 157/2022 de Galicia) establece una evaluación competencial y cualitativa (IN, SU, BI, NT, SB) que representa el nivel de logro del alumno al final del ciclo o curso de forma global e interdisciplinar. Sin embargo, las materias y sus instrumentos de evaluación diarios (exámenes, pruebas, murales) siguen requiriendo obligatoriamente una calificación cuantitativa/numérica (0-10) en la praxis docente y administrativa. El contrato JSON inicial (`[D-024]`) limitaba el retorno de la IA únicamente a la calificación competencial.
+
+**Decisión:**  
+Se actualiza el contrato `EvaluacionIA` (y el System Prompt) para exigir a la IA que calcule y devuelva **ambos valores desacoplados**:
+1. `calificacion_numerica`: Puntuación exacta (float 0.0 - 10.0) de la prueba evaluable, derivada directamente de la suma ponderada de la rúbrica.
+2. `calificacion_cualitativa`: Mapeo cualitativo oficial para alimentar el perfil competencial a final de curso.
+
+**Consecuencias:**  
+El sistema es ahora jurídicamente perfecto y responde a la realidad del profesorado en el aula, manteniendo el espíritu competencial de la ley sin perder la precisión numérica de las tareas evaluables. Se han modificado los esquemas Pydantic para cumplir este requerimiento, registrado como cambio sensible (HitL) según Regla 6.
+
+---
+
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 16/07/2026 — añadidas D-027 a D-034 (Comprobación PII) y D-035 (Gobernanza de Cambios Sensibles y Criterio de Cierre Técnico)*  
-*Total de decisiones registradas: 35*
+*Actualizado el 18/07/2026 — añadidas D-037, D-038 y D-039 (Estandarización Git, Defensa Context Overflow, Calificación Numérica)*  
+*Total de decisiones registradas: 39*

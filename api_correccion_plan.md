@@ -44,6 +44,22 @@ El éxito de adopción de **api-correccion-formativa-ia-galicia** por parte de d
 4. **Privacidad blindada al nivel del *Datenschutz* alemán (`[D-022] + [D-034]`):** El profesorado y el centro pueden estar tranquilos: ninguna imagen con el nombre y apellidos del alumno llega a internet ni a los servidores de la nube o las empresas de IA. El recorte en memoria RAM (`[D-022]`), la herramienta visual de redacción o tampón en la PWA del docente (`[D-034]`) y la seudonimización pre-nube garantizan un cumplimiento impecable del RGPD y de la LOPDGDD.
 5. **Omni-canal y 100% Multimodal:** Un único motor para todo el aula. Corrige con el mismo rigor y en la misma interfaz los exámenes de papel fotografiados, los murales o cartulinas infográficas colgados en la pared y las entregas digitales o presentaciones en *Canva* o *Google Slides*.
 
+### 💰 Viabilidad Económica y FinOps (Análisis de Coste Multimodal por Examen)
+Uno de los mayores escepticismos ante la adopción masiva de modelos de IA Multimodal en centros escolares es el presunto coste de inferencia en la nube al procesar fotografías de exámenes diarios. Sin embargo, en **api-correccion-formativa-ia-galicia** el coste por examen es prácticamente nulo o extremadamente reducido gracias a dos decisiones arquitectónicas clave:
+- **Optimización de resolución en cliente (`[D-020]`):** La PWA redimensiona y comprime la foto del examen en el procesador del dispositivo docente a ~2048px (`Web Worker / Canvas`) antes de enviarla. Esto estabiliza el peso del archivo y limita el consumo a un promedio de **~850 tokens visuales** (+ ~1.000 tokens de prompt y rúbrica = **~1.850 tokens de input totales**).
+- **Inferencia Pydantic sin redundancias (`[D-024]`):** La salida estructurada (`EvaluacionIA`) acota la respuesta del modelo a ~600 tokens útiles de output.
+
+**Desglose financiero real por examen y por aula (30 alumnos):**
+
+| Motor Multimodal (`LLM_PROVIDER`) | Coste Input (~1.850 tokens) | Coste Output (~600 tokens) | **Coste TOTAL por Examen** | **Coste por Clase de 30 Alumnos** |
+|---|---|---|---|---|
+| **`Groq LPU (Llama 3.2 90B/11B Vision)`** | **0,00 €** *(Tier gratuito/Portfolio)* | **0,00 €** *(Tier gratuito/Portfolio)* | **0,00 €** *(Gratis en desarrollo `[D-028]`)* | **0,00 €** |
+| **`GPT-4o-mini`** *(Opción ultra-eficiente cloud)* | $0,00027 | $0,00036 | **~$0,00063 (~0,06 céntimos de €)** | **~$0,019 (menos de 2 céntimos de €)** |
+| **`GPT-4o` / `Claude 3.5 Sonnet`** *(Potencia máxima)* | $0,0046 | $0,0060 | **~$0,0106 (~1 céntimo de €)** | **~$0,31 (~31 céntimos de €)** |
+
+> [!TIP]
+> **Conclusión FinOps para modelo B2B/B2C:** Incluso operando con modelos comerciales cloud como `GPT-4o-mini`, la corrección completa y detallada de un lote de 30 exámenes manuscritos le cuesta a un colegio **menos de 2 céntimos de euro en total**. Este margen operativo ultrabajo permite ofrecer tarifas de suscripción accesibles a centros docentes obteniendo rentabilidad superior y sostenibilidad a largo plazo.
+
 ---
 
 
@@ -457,6 +473,10 @@ api-correccion/                              ← workspace único de VS Code
 - React Native sobre el código React de la PWA
 - App Store + Google Play
 - Notificaciones push, escáner optimizado, modo offline parcial
+
+### 🔌 Integración Directa con Plataformas y LMS (Post-MVP / v2.x)
+- **Google Classroom / Moodle OAuth:** Conexión directa mediante API para importar automáticamente las entregas y tareas digitales de los alumnos sin necesidad de que el docente exporte o capture el PDF/imagen manualmente.
+- **Sincronización de calificaciones HitL con XADE:** Exportación automatizada y formateada del acta y de las calificaciones competenciales (`IN, SU, BI, NT, SB`) validadas por el docente para agilizar la carga oficial de notas en la plataforma autonómica galega (cumpliendo las restricciones del Esquema Nacional de Seguridad).
 
 ### 💳 Sistema de Monetización y Pagos (Stripe)
 - Integración de pasarela de pago para modelo B2C (suscripción mensual de profesores)

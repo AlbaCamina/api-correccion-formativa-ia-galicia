@@ -281,6 +281,7 @@ El servidor guarda la entrega en PostgreSQL y devuelve la evaluación estructura
       },
       "teacherSummary": "Excelente base conceptual adaptada al perfil NEAE del alumno."
     },
+    "calificacion_numerica": 8.0,
     "calificacion_cualitativa": "NT",
     "siguiente_paso_accionable": "Explica en un párrafo por qué el prisionero liberado debe regresar con sus compañeros en la oscuridad.",
     "confidence_score": 0.95,

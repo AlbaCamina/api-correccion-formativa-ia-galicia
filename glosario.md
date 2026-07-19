@@ -45,18 +45,27 @@ Una URL concreta de la API a la que se puede hacer una petición HTTP con un ver
 
 **Endpoints reales de api-correccion-formativa-ia-galicia (por versión):**
 
-| Versión | Endpoint | Verbo | Función |
-|---|---|---|---|
-| v0.1 | `/api/v1/evaluate` | `POST` | Corrección síncrona con texto plano |
-| v0.2 | `/api/v1/auth/register` | `POST` | Registro de profesora |
-| v0.2 | `/api/v1/auth/login` | `POST` | Login → devuelve JWT |
-| v0.2 | `/api/v1/rubricas` | `POST/GET` | Crear y listar rúbricas |
-| v0.2 | `/api/v1/evaluate` | `POST` | Corrección con BBDD + marco normativo |
-| v0.3 | `/api/v1/submissions/upload` | `POST` | Subida de imagen/PDF del examen |
-| v0.3 | `/api/v1/evaluaciones/{id}/approve` | `PATCH` | Aprobación HitL docente (`REVIEW → GRADED`) |
-| v0.4 | `/api/v1/submissions` | `GET` | Lista paginada de entregas del docente |
-| v0.4 | `/api/v1/submissions/{id}/events` | `GET` (SSE) | Stream de estado en tiempo real |
-| v1.0 | `/api/v1/submissions/{id}/changelog` | `GET` | Historial inmutable de auditoría AI Act |
+| Versión | Endpoint | Verbo | Función | Estado |
+|---|---|---|---|---|
+| v0.1 | `/api/v1/evaluate` | `POST` | Corrección síncrona con texto plano | ✅ Implementado |
+| v0.2 | `/api/v1/auth/register` | `POST` | Registro de profesora | ✅ Implementado |
+| v0.2 | `/api/v1/auth/login` | `POST` | Login → devuelve JWT | ✅ Implementado |
+| v0.2 | `/api/v1/auth/login-json` | `POST` | Login en formato JSON puro (alternativo a form-data) | ✅ Implementado |
+| v0.2 | `/api/v1/auth/me` | `GET` | Perfil de la profesora autenticada | ✅ Implementado |
+| v0.2 | `/api/v1/rubricas` | `POST` | Crear una rúbrica | ✅ Implementado |
+| v0.2 | `/api/v1/rubricas` | `GET` | Listar todas las rúbricas de la profesora | ✅ Implementado |
+| v0.2 | `/api/v1/rubricas/{id}` | `GET` | Consultar una rúbrica concreta | ✅ Implementado |
+| v0.2 | `/api/v1/rubricas/{id}` | `PUT` | Editar una rúbrica completa | ✅ Implementado |
+| v0.2 | `/api/v1/rubricas/{id}` | `DELETE` | Eliminar una rúbrica | ✅ Implementado |
+| v0.2 | `/api/v1/evaluate` | `POST` | Corrección con BBDD + marco normativo | ✅ Implementado |
+| v0.2 | `/api/v1/marcos` | `GET` | Listar marcos normativos disponibles | ✅ Implementado |
+| v0.3 | `/api/v1/submissions/upload` | `POST` | Subida de imagen/PDF del examen | ✅ Implementado |
+| v0.3 | `/api/v1/submissions/{id}/feed-forward/realizado` | `PATCH` | Alumno marca el feed-forward como realizado | ✅ Implementado |
+| v0.3 | `/api/v1/submissions/{id}/feed-forward/verificado` | `PATCH` | Profesora verifica el feed-forward del alumno | ✅ Implementado |
+| v0.3 | `/api/v1/evaluaciones/{id}/approve` | `PATCH` | Aprobación HitL docente (`REVIEW → GRADED`) | 🔜 Roadmap |
+| v0.4 | `/api/v1/submissions` | `GET` | Lista paginada de entregas del docente | 🔜 Roadmap |
+| v0.4 | `/api/v1/submissions/{id}/events` | `GET` (SSE) | Stream de estado en tiempo real | 🔜 Roadmap |
+| v1.0 | `/api/v1/submissions/{id}/changelog` | `GET` | Historial inmutable de auditoría AI Act | 🔜 Roadmap |
 
 **Frontend**  
 La parte del sistema que ve el usuario: botones, pantallas, formularios. En este proyecto: React + Vite (se implementa en v0.5).
@@ -96,14 +105,18 @@ Librerías y frameworks clave de api-correccion-formativa-ia-galicia:
 | `pyjwt` | Librería | Genera y verifica tokens Bearer JWT de autenticación |
 | `pillow` | Librería | Recorta la cabecera del examen (nombre del alumno) en memoria pre-nube |
 | `python-dotenv` | Librería | Carga variables de entorno del archivo `.env` |
-| `pytesseract` | Librería | *(Roadmap v0.8)* OCR offline para el escáner de PII pre-nube (`[D-034]`) |
-| `react` | Framework | Construye la interfaz de usuario de la PWA del docente |
+| `pytesseract` | Librería | *(c0.8)* OCR offline para el escáner de PII pre-nube (`[D-034]`) |
+| `react` | Librería | Construye la interfaz de usuario de la PWA del docente |
 
 **Nativo / Integración Nativa (`Native / Built-in`)**  
-Capacidad o funcionalidad que viene incorporada de fábrica en el núcleo de una herramienta o tecnología, sin necesidad de instalar librerías de terceros, añadir capas intermedias o usar parches artesanales. En nuestra arquitectura priorizamos soluciones nativas para mantener un código limpio, rápido y con mínimas dependencias (`YAGNI`): por ejemplo, la validación gramatical nativa de `Structured Outputs` con `.parse()` en OpenAI, la generación de documentación Swagger en `/docs` nativa de FastAPI, y la gestión del pool de conexiones nativo en SQLAlchemy.
+Capacidad o funcionalidad que viene incorporada de fábrica en el núcleo de una herramienta o tecnología, sin necesidad de instalar librerías de terceros, añadir capas intermedias o usar parches artesanales. En nuestra arquitectura priorizamos soluciones nativas para mantener un código limpio, rápido y con mínimas dependencias (`YAGNI`): por ejemplo, la generación de documentación Swagger en `/docs` nativa de FastAPI, y la gestión del pool de conexiones nativo en SQLAlchemy. En cuanto a la validación del contrato `EvaluacionIA`, la solución nativa varía según el proveedor: con OpenAI se usa `Structured Outputs` con `.parse()` (el modelo garantiza el JSON antes de enviarlo); con Groq o Claude se usa `response_format={"type": "json_object"}` + `model_validate_json()` de Pydantic en el cliente.
 
 **Parseo / Parsear (`Parsing` / `.parse()`)**  
-Proceso informático de analizar, desgranar y convertir una cadena de datos en bruto (como un texto plano o una respuesta JSON por red) en una estructura de datos tipada, navegable y comprensible para el lenguaje de programación (como un objeto o instancia Pydantic en Python). En nuestro backend, cuando el modelo de IA responde con un string, el método `.parse()` o `model_validate_json` *parsea* ese texto, verificando rigurosamente campo por campo y tipo por tipo que el contrato `EvaluacionIA` se cumpla al 100% antes de procesar la nota en base de datos.
+Proceso informático de analizar, desgranar y convertir una cadena de datos en bruto (como un texto plano o una respuesta JSON por red) en una estructura de datos tipada, navegable y comprensible para el lenguaje de programación (como un objeto o instancia Pydantic en Python). En api-correccion-formativa-ia-galicia el mecanismo concreto depende del proveedor configurado en `LLM_PROVIDER`:
+- **`openai`:** `client.beta.chat.completions.parse()` — el modelo garantiza JSON válido antes de enviarlo; `.parsed` devuelve ya una instancia `EvaluacionIA`.
+- **`groq` (y futuro `claude`):** `client.chat.completions.create()` con `response_format={"type": "json_object"}` — el modelo devuelve un string JSON que `EvaluacionIA.model_validate_json()` valida en el cliente.
+
+El **contrato `EvaluacionIA` y la validación Pydantic son siempre necesarios** con cualquier proveedor — solo cambia *quién* garantiza el formato: la API de OpenAI en el primer caso, Pydantic en el cliente en el segundo.
 
 **PEP 8 (`Python Enhancement Proposal 8`)**  
 Guía de estilo oficial para la escritura de código en el lenguaje Python. Define normas ampliamente aceptadas de legibilidad, organización y formato, como la agrupación de importaciones en bloques (librería estándar, paquetes de terceros y módulos locales separados por líneas en blanco), el uso de dos líneas en blanco antes de funciones y clases de nivel superior, la indentación de 4 espacios y convenciones de nombres como `snake_case` para funciones/variables y `PascalCase` para clases y modelos. En este proyecto, la aplicación sistemática de PEP 8 refuerza la modularidad plana y el tipado estricto, manteniendo un backend claro, mantenible y alineado con los estándares profesionales de la comunidad Python. En particular, se ha reforzado la agrupación correcta de importaciones y el espaciado vertical en archivos como `submission.py`.
@@ -114,6 +127,9 @@ Secuencia ordenada y automatizada de pasos donde la salida (*output*) de un proc
 **Scaffolding** (Andamiaje o Estructura Inicial de Código)  
 Generación automática o manual del esqueleto básico de un proyecto antes de empezar a escribir la lógica interna de negocio. Consiste en crear la jerarquía de carpetas principales, archivos de configuración (como `package.json`, `.env.example`, `main.py` o `docker-compose.yml`) y plantillas estructurales vacías. Proporciona los cimientos ordenados sobre los que evoluciona el código.
 
+**Servidor**  
+Ordenador (o proceso en un ordenador) que está siempre encendido y escuchando peticiones de otros programas. Cuando una profesora pulsa «Corregir» en la PWA, su navegador envía una petición HTTP al servidor, que la procesa y devuelve la respuesta. En este proyecto el servidor es el proceso Uvicorn que ejecuta FastAPI dentro de WSL — en local corre en `http://127.0.0.1:8000` y en producción se desplegará en Railway. El servidor no hace nada hasta que recibe una petición; cuando la recibe, la atiende y vuelve a esperar.
+
 **Stateless vs. Stateful** (Sin Estado vs. con Estado / Transaccional)  
 Un sistema es **Stateless** cuando el servidor no conserva memoria ni registro de las peticiones previas (como nuestra API v0.1: evaluaba un texto y olvidaba al usuario instantáneamente). Un sistema es **Stateful o Transaccional** cuando mantiene un estado coherente y persistente en el tiempo (como nuestra API v0.2: autentica al docente con JWT, verifica la propiedad de la rúbrica en base de datos, almacena la entrega en la tabla `Submission` y audita cada acción en un `ChangeLog` inmutable).
 
@@ -123,7 +139,7 @@ Reescribir código para que sea más limpio o eficiente sin cambiar lo que hace.
 **README**  
 Archivo de texto en la raíz del repositorio que explica qué es el proyecto, cómo instalarlo y cómo usarlo. Es lo primero que ve cualquier persona que visita el repositorio en GitHub.
 
-**REST / Arquitectura REST (`RESTful`)**  
+**REST** (Representational State Transfer — Transferencia de Estado Representacional) **/ Arquitectura REST (`RESTful`)**  
 Estilo arquitectónico que define cómo deben comunicarse los sistemas en internet mediante HTTP. No es un protocolo ni una librería — es un conjunto de principios de diseño que, si se cumplen, la API se denomina "RESTful". Los principios clave que aplica api-correccion-formativa-ia-galicia son:
 - **Cliente-Servidor:** React (PWA) y FastAPI son independientes y se comunican solo por HTTP.
 - **Sin estado (`Stateless`):** Cada petición lleva toda la información necesaria en la cabecera JWT — el servidor no recuerda sesiones entre peticiones.
@@ -135,7 +151,13 @@ Estilo arquitectónico que define cómo deben comunicarse los sistemas en intern
 El conjunto de tecnologías que usa un proyecto. En api-correccion-formativa-ia-galicia: Python + FastAPI + PostgreSQL + React + Vite + Redis + Celery.
 
 **Swagger / OpenAPI**  
-Estándar para describir y documentar APIs REST. FastAPI lo integra nativamente: al arrancar el servidor, genera automáticamente una interfaz web interactiva en la ruta `/docs` que permite probar todos los endpoints desde el navegador sin escribir código ni instalar herramientas.
+Dos conceptos relacionados pero distintos que trabajan juntos:
+- **OpenAPI** es el **estándar** — un documento JSON/YAML generado automáticamente que describe toda la API: qué endpoints existen, qué datos aceptan y qué devuelven. FastAPI lo genera solo leyendo los decoradores `@router.post(...)` y los modelos Pydantic, sin que tengas que escribir nada extra.
+- **Swagger UI** es la **interfaz visual** — una página web interactiva que lee ese documento OpenAPI y lo convierte en formularios usables.
+
+**Cómo funciona en la práctica:** con el servidor arrancado, abres `http://127.0.0.1:8000/docs` en el navegador y ves todos los endpoints listados. Para cada uno puedes hacer clic, rellenar los campos del formulario y pulsar **"Execute"** para enviar una petición real y ver la respuesta del servidor al instante — sin escribir ningún comando ni abrir herramientas externas como Postman.
+
+**Ejemplo con api-correccion-formativa-ia-galicia:** abres `/docs`, haces clic en `POST /api/v1/auth/login`, introduces un email y contraseña, pulsas Execute y ves el JWT devuelto en pantalla. Luego puedes copiar ese token y usarlo en el botón **"Authorize"** (candado arriba a la derecha) para probar los endpoints protegidos.
 
 ---
 
@@ -229,14 +251,26 @@ Modelo de lenguaje de la empresa Anthropic. Alternativa a GPT-4o. Se considera e
 **Confidence Score** (Índice de Confianza IA)  
 Medida numérica devuelta por el modelo (`0.0` a `1.0`) que indica la certeza o fiabilidad de la interpretación y lectura de un examen. En api-correccion-formativa-ia-galicia (`[D-024]`), si la confianza es `< 0.75` (caligrafía confusa, borrones), el sistema emite una alerta visual para que la profesora revise con especial atención prioritaria.
 
+**Context Overflow (Saturación de contexto) y "Lost in the Middle" (Perdido en el medio)**  
+Fenómeno y limitación arquitectónica de las redes neuronales actuales (Transformers). Ocurre cuando la *Ventana de contexto* se llena con miles de tokens de información. El mecanismo de atención de la IA (*Attention Mechanism*) tiende a priorizar la información que está al principio y al final, "olvidando" temporalmente lo del medio. Para mitigar esto, se utilizan tres estrategias principales:
+
+1. **Prompt Anchoring (Anclaje de Prompt):** Repetir las reglas críticas justo al final del prompt.
+2. **XML Tagging (Delimitadores Semánticos):** Envolver bloques de contexto entre etiquetas XML.
+3. **Context Reset (Limpieza de Sesión):** Cerrar el chat cuando la memoria se llena e iniciar uno nuevo con un resumen.
+
 **Contrato JSON (`[D-024]` / `EvaluacionIA`)**  
 Acuerdo estricto de estructura y tipado definido con Pydantic v2 que transforma a los motores de Inteligencia Artificial (por naturaleza generadores probabilísticos de texto libre) en componentes deterministas de software. Al exigir la validación estricta (`Structured Outputs` / `.parse()`), se prohíbe al LLM emitir saludos, texto libre o formatos alucinados, garantizando que el backend reciba invariablemente campos tipados (calificaciones, marcadores x-y, desglose de rúbricas y `confidence_score`) listos para persistirse en PostgreSQL y mostrarse en la PWA del profesor.
 
-**Generador Asistido de Rúbricas (Copiloto Pre-Corrección)**  
-Funcionalidad de asistencia de api-correccion-formativa-ia-galicia (`Capa 4` relacional) por la que el docente solo necesita subir o describir el enunciado de una prueba o tarea evaluable. El motor LLM cruza automáticamente la normativa general (`Capa 1`), la programación del departamento (`Capa 2`) y el acuerdo transversal del centro (`Capa 3`) para generar una propuesta de rúbrica en 4 niveles de logro (*Insuficiente, Suficiente/Bien, Notable y Sobresaliente*). El profesor la valida con un clic en su PWA, reduciendo un 90% del tiempo burocrático de diseño de baremos.
+**FinOps (Análisis Práctico de Coste Multimodal)**  
+Evaluación financiera del consumo de tokens. Evaluar una foto de un examen manuscrito comprimida a 2048px en la PWA (`[D-020]`) consume una media de **~1.850 tokens de entrada** (~850 visuales + ~1.000 de rúbrica/prompt) y genera **~600 tokens de salida estructurada JSON Pydantic (`[D-024]`)**. En términos financieros reales:
+- En fase de desarrollo con **Groq LPU (`[D-028]`)**, el coste por examen es de **0,00 €**.
+- En producción usando **`GPT-4o-mini`**, corregir los exámenes diarios de un grupo de 30 alumnos cuesta **menos de 2 céntimos de euro (`~$0,019 USD / 0,018 €`)**. Esto prueba que el sistema es extremadamente rentable y sostenible.
 
-**GPT-4o** / **GPT-4o Vision**  
-Modelo de lenguaje de OpenAI. La variante Vision acepta imágenes además de texto, lo que permite enviarle la foto del examen para que lo lea y evalúe.
+**Generador Asistido de Rúbricas (Copiloto Pre-Corrección)**  
+Funcionalidad de asistencia de api-correccion-formativa-ia-galicia (`Capa 4` relacional) por la que el docente solo necesita subir o describir el enunciado de una prueba o tarea evaluable. El motor LLM cruza automáticamente la normativa general (`Capa 1`), la programación del departamento (`Capa 2`) y el acuerdo transversal del centro (`Capa 3`) para generar una propuesta de rúbrica en 4 niveles de logro (*Insuficiente, Suficiente/Bien, Notable y Sobresaliente*). El profesor la valida con un clic en su PWA, reduciendo un 90% del tiempo burocrático de diseño de baremos. La rúbrica genera una nota numérica estricta para la tarea/examen (0-10), vinculando internamente cada criterio cuantitativo con las competencias clave que se evaluarán de forma cualitativa a final de curso.
+
+**GPT-4o**  
+Modelo de lenguaje de OpenAI. A diferencia del antiguo GPT-4 (donde existía una variante separada llamada GPT-4V o GPT-4 Vision para procesar imágenes), **GPT-4o es multimodal de fábrica**: acepta texto, imagen y audio en el mismo modelo sin necesidad de especificar ninguna variante. Esto permite enviarle directamente la foto del examen para que lo lea y evalúe contra la rúbrica.
 
 **Jerarquía Normativa en 5 Capas Relacionales (`JSONB`)**  
 Modelo arquitectónico multinivel de api-correccion-formativa-ia-galicia que desacopla y combina sin ambigüedad la legislación pública (`Capa 1: Decreto Xunta`), la programación anual del departamento (`Capa 2: Saberes y Criterios`), las normas comunes del colegio (`Capa 3: PEC/CCP`), la rúbrica de la prueba asistida (`Capa 4: El Profesor`) y las adaptaciones individuales de equidad (`Capa 5: NEAE/NEE en JSONB`).
@@ -248,13 +282,10 @@ Modelo de inteligencia artificial entrenado con enormes cantidades de texto. Es 
 Parámetro arquitectónico de interacción pedagógica (`[D-027]`, `modo_evaluacion`) que resuelve la tensión entre los criterios oficiales de la Xunta y las rúbricas ad-hoc de los docentes sin sobreingeniería en el backend. En modo `COMBINADO`, la IA fusiona los saberes de la ley con la rúbrica de la profesora para calificar entregas diarias con agilidad. En modo `AUDITORIA_CURRICULAR`, la IA corrige la tarea y adicionalmente orienta al docente contrastando su rúbrica contra los Decretos 156/157/2022, advirtiendo en `teacherSummary` de posibles omisiones competenciales.
 
 **Multimodal / Omni-canal**  
-Un modelo de IA que procesa texto, imagen y estructuras combinadas de forma simultánea (ej. GPT-4o o Claude 3.5 Sonnet). En api-correccion-formativa-ia-galicia esto permite evaluar **cualquier tipo de prueba evaluable**: no solo fotos de exámenes manuscritos, sino murales de cartulina de aula, redacciones en campos de texto online (`Form Text`) y PDFs o capturas de presentaciones hechas a ordenador (como *Canva* o *Google Slides*).
+Un modelo de IA que procesa texto, imagen y estructuras combinadas de forma simultánea (ej. GPT-4o o Claude 3.5 Sonnet). En api-correccion-formativa-ia-galicia esto permite evaluar **cualquier tipo de prueba evaluable**: no solo fotos de exámenes manuscritos o murales de cartulina de aula, sino también pruebas o entregas realizadas a ordenador (*Canva*, *Google Slides*, redacciones en Word/Docs, hojas de cálculo o cuestionarios online). En el alcance del MVP, el docente exporta o captura estas pruebas en formato digital (PDF o PNG) y las sube al sistema para que la IA las evalúe visualmente igual que un examen en papel. La importación automática y directa mediante conexión por API con plataformas externas (Google Classroom o Moodle) queda contemplada como mejora para futuras versiones post-MVP.
 
 **OCR** (Optical Character Recognition — Reconocimiento Óptico de Caracteres)  
 Tecnología integrada en la IA multimodal que extrae y convierte la caligrafía manuscrita de la foto del examen o el texto gráfico de un mural/cartulina en datos legibles para evaluarlos contra la rúbrica.
-
-**Prueba evaluable (Instrumento de evaluación)**  
-Cualquier evidencia de aprendizaje del alumno sometida a corrección formativa. En api-correccion-formativa-ia-galicia abarca los 3 formatos del aula moderna: papel manuscrito (foto), creación plástica/visual (foto de mural o cartulina) y entregas digitales (redacciones online o exportaciones PDF/PNG de presentaciones de Canva).
 
 **Prompt**  
 El texto de instrucciones que se envía al modelo de IA. Se divide en dos partes con roles distintos:
@@ -263,6 +294,12 @@ El texto de instrucciones que se envía al modelo de IA. Se divide en dos partes
 - **`user prompt` (la tarea concreta):** Contiene los datos variables de cada corrección: la respuesta del alumno, la rúbrica de la profesora, el marco normativo y las adaptaciones NEAE. Cambia en cada petición.
 
 El `prompt_builder.py` construye dinámicamente el `user prompt` combinando estos datos. El `system prompt` permanece constante en todas las correcciones.
+
+**Prueba evaluable (Instrumento de evaluación)**  
+Cualquier evidencia de aprendizaje del alumno sometida a corrección formativa. En api-correccion-formativa-ia-galicia abarca los 3 formatos del aula moderna: papel manuscrito (foto), creación plástica/visual (foto de mural o cartulina) y entregas digitales (redacciones online o exportaciones PDF/PNG de presentaciones de Canva).
+
+**Simetría Lingüística (Bilingüismo co-oficial / Espejo lingüístico)**  
+Directriz imperativa de diseño pedagógico (`[D-036]`, `Regla 7` en `SYSTEM_PROMPT`) en sistemas educativos de comunidades con lengua co-oficial (como Galicia). Ordena al motor LLM detectar de forma automática el idioma vehicular (gallego normativo o castellano) en el que esté redactada la respuesta o prueba evaluable del alumno, y formular el 100% de los campos cualitativos de retorno (`reasoning`, `teacherSummary` y `siguiente_paso_accionable`) exactamente en ese mismo idioma. Evita que la IA responda por defecto en castellano ante entregas en gallego, sin exigir que la profesora seleccione interruptores manuales en la interfaz.
 
 **Structured Outputs** (Salidas Estructuradas)  
 Mecanismo que fuerza al modelo de IA a devolver siempre un JSON con un esquema fijo, en lugar de responder en texto libre. Explicado en detalle en `sesion_02_storage_y_structured_outputs.md`.
@@ -276,9 +313,10 @@ La unidad mínima de texto que procesa un modelo de lenguaje. Aproximadamente `1
 | `GPT-4o` | ~$2,50 / M tokens | ~$10 / M tokens | 128.000 tokens |
 | `Claude Sonnet` | ~$3 / M tokens | ~$15 / M tokens | 200.000 tokens |
 
-**Ventana de contexto (`context window`):** el límite de tokens que el modelo puede leer de una vez (prompt + respuesta juntos). Si un examen escaneado con mucho texto supera ese límite, el modelo trunca o falla — por eso en `[D-020]` se comprime la imagen en la PWA antes de enviarla.
-
 **En este proyecto:** Groq es el motor primario (`[D-028]`) precisamente porque su cota gratuita permite desarrollar y demostrar el sistema sin coste, con inferencia ultrarrápida.
+
+**Ventana de Contexto (`Context Window`)**  
+El límite máximo de tokens que el modelo puede leer de una vez (prompt + respuesta juntos). Si un examen escaneado con mucho texto supera ese límite, el modelo falla — por eso en `[D-020]` se comprime la imagen en la PWA antes de enviarla.
 
 ---
 
@@ -364,7 +402,7 @@ Herramienta que compila y sirve el código React durante el desarrollo. Es muy r
 ## 7. Control de versiones y repositorio
 
 **Branch / Rama**  
-Una línea de desarrollo paralela en Git. Permite trabajar en una funcionalidad nueva sin afectar al código principal. En este proyecto: `v0.1-sync-engine`, `v0.2-database`, etc.
+Una línea de desarrollo paralela en Git. Permite trabajar en una funcionalidad nueva o hacer pruebas sin romper el código principal. En este proyecto utilizamos ramas temporales (ej. `feature/nueva-funcion`) que, una vez terminadas y validadas, se fusionan (`merge`) con la rama `main` y se eliminan para mantener el repositorio limpio.
 
 **Commit**  
 Un punto de guardado en el historial de Git. Cada commit tiene un mensaje que describe qué cambió. Ejemplo: `feat: add evaluate endpoint`.
@@ -409,7 +447,7 @@ El proyecto completo gestionado por Git, incluyendo todos los archivos y su hist
 ## 8. Herramientas de desarrollo con IA
 
 **AGENTS.md**  
-Archivo de texto en la raíz del proyecto que OpenCode lee automáticamente al arrancar. Contiene el contexto del proyecto (arquitectura, convenciones, reglas) para que el agente trabaje con información actualizada sin tener que explicárselo cada vez.
+Archivo de texto en la raíz del proyecto que los agentes de IA (como Antigravity, OpenCode o Cursor) leen automáticamente al arrancar para inyectarlo en su `System Prompt`. Contiene el contexto del proyecto (arquitectura, convenciones, reglas) para que el agente trabaje con información actualizada sin tener que explicárselo cada vez.
 
 **Antigravity**  
 El agente de IA integrado en VS Code (este). Se usa para arquitectura, decisiones de diseño, revisiones críticas y documentación. Consume cuota de Claude Sonnet.
@@ -505,17 +543,29 @@ Principio de gobernanza (`[D-035]`) según el cual cada tipo de información té
 - `backlog.md` → Fuente de verdad para la planificación, historias de usuario y deuda técnica.
 - `AUDITORIA.md` → Fuente de verdad para el estado de auditoría interna y el cumplimiento por pilares.
 
+**Audit Trail (Trazabilidad e Historial de Auditoría en GitHub)**  
+Registro temporal, inmutable y verificable de todas las actividades de ingeniería, inspección técnica y decisiones tomadas a lo largo de un proyecto. En api-correccion-formativa-ia-galicia se manifiesta tanto en el código (`ChangeLog` en BBDD para cumplir con el *AI Act*) como en la gestión institucional del repositorio (`[D-035]`): cerrar una Issue formal de auditoría hoy (`[QA/Audit] Verificación Transversal v0.0 a v0.2.7 y Matriz AUDITORIA.md`) deja una huella probatoria en la pestaña `Closed` de GitHub ante mentores y evaluadores de que el equipo revisó y validó el sistema antes de iniciar el código de un nuevo hito.
+
 **Backlog**  
 Lista priorizada de todo el trabajo pendiente del proyecto, organizado en historias de usuario. En este proyecto: `backlog.md`.
 
 **Criterios de aceptación**  
 Lista de condiciones concretas y verificables que deben cumplirse para considerar una historia de usuario terminada. Sin criterios claros, no hay forma de saber cuándo algo está "listo".
 
+**Epic Issue (Épica como Issue / Modelo de Épica)**  
+Metodología de organización ágil y de repositorio donde cada gran bloque funcional o iteración de versión (`Versión 0.1`, `Milestone v0.2.5`, `Versión 0.3`) se abre en GitHub como una única gran **Issue madre** que contiene en su cuerpo el checklist de todas sus historias de usuario (`- [ ]`). Este modelo simplifica radicalmente la gestión para equipos ágiles HitL, evitando la dispersión en decenas de micro-issues y mostrando el progreso del hito de forma centralizada.
+
 **Historia de usuario**  
 Forma de describir una funcionalidad desde el punto de vista del usuario final. Formato: "Como [rol], quiero [acción], para [beneficio]". Es la unidad de trabajo del backlog.
 
-**Milestone**  
-Punto de referencia en el roadmap del proyecto. En este proyecto equivale a una versión (v0.1, v0.2...). Cada milestone agrupa las historias de usuario de esa versión.
+**Issue (Tarea / Incidencia en GitHub)**  
+Unidad de seguimiento, trabajo o reporte en GitHub. En nuestra arquitectura y jerarquía, una Issue representa una **tarea ejecutada por el equipo**: puede ser una tarea de desarrollo de software (`#8 [Milestone v0.2.5] Migraciones y HitL`), una tarea de inspección y gobernanza (`#9 [Auditoría de Gobernanza] Matriz AUDITORIA.md`) o un reporte de bug. Las Issues operan dentro de los Milestones y se marcan con casillas interactivas (`- [x]`) hasta cerrarse (`Closed`).
+
+**Milestone (Hito / Contenedor de Versión en GitHub)**  
+Punto de referencia y contenedor jerárquico superior en el roadmap del proyecto. En GitHub Projects y en api-correccion-formativa-ia-galicia equivale a una versión o entregable de software (`v0.1 Motor Síncrono`, `v0.2 Base de Datos`, `v0.2.5 Consolidación HitL`). Un Milestone agrupa las Issues correspondientes a esa versión y permanece abierto (`Open`) hasta que todas las tareas y auditorías de ese bloque se han completado.
+
+**Separation of Concerns (Separación de Responsabilidades en Gobernanza `[D-035]`)**  
+Principio fundamental de ingeniería que dicta que cada aspecto, problema o capa de un sistema debe gestionarse en un módulo o actividad independiente. En el plano de gobernanza del proyecto, separa de manera estricta las actividades de **Inspección y Auditoría Técnica** (ej. contrastar código existente contra normativas y generar `AUDITORIA.md`) de las actividades de **Implementación y Programación de Código** (ej. escribir endpoints y migraciones). Al abrir y cerrar tareas (`Issues`) separadas para cada responsabilidad, se garantiza que la calidad y el blindaje legal no se diluyan en la rutina del picado de código.
 
 **Modo Copiloto / Trabajo en Terminal (HitL Técnico)**  
 Metodología de desarrollo en parejas por la que la Inteligencia Artificial asume el rol de arquitecta y generadora de andamiaje de código (`Punto 2: Qué hicieron los agentes`), mientras que la desarrolladora humana ejerce el liderazgo operativo ejecutando en su propia terminal (WSL/Warp) todos los comandos de validación, levantamiento de base de datos (`docker compose`), migraciones (`alembic upgrade head`) y commits (`Punto 3: Cómo validé yo`). Esto preserva la memoria muscular técnica, el control soberano del entorno y la autoría intelectual superior del portfolio (`[D-029]`).

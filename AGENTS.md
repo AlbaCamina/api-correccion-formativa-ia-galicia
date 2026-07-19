@@ -31,6 +31,13 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
      3. **Evidencia:** Pruebas automatizadas (`pytest`) en verde en entorno limpio.
      4. **Documentación:** `README.md` y `backlog.md` sincronizados y cualquier deuda técnica residual explícita.
    * **Trazabilidad humana:** El agente nunca atribuye a la IA acciones persistidas de cambio de estado en BBDD cuando el flujo normativo exige autorización docente (`HitL`). La IA puede proponer y aportar contexto en `audit_metadata`; el `actor` que firma cambios formativos es siempre humano (profesor o alumno, según el caso).
+7. **Estandarización de Commits y Trazabilidad:**
+   * Todos los commits deben seguir estrictamente el formato *Conventional Commits* (`feat:`, `fix:`, `docs:`, `style:`, `test:`) incluyendo el contexto de la modificación entre paréntesis (scope).
+   * Es **obligatorio** incluir en el mensaje del commit la referencia cruzada al registro arquitectónico (ej. `[D-035]`) o a la tarea del backlog (ej. `[v0.2-009]`) que motiva el cambio, garantizando la trazabilidad probatoria del portfolio.
+8. **Defensa contra Context Overflow y Lost in the Middle:**
+   * El agente debe estructurar grandes bloques de texto usando delimitadores `<xml>` para facilitar la atención del modelo.
+   * Al construir prompts en el backend (`prompt_builder.py`), el agente aplicará **Prompt Anchoring**, repitiendo las reglas inquebrantables (como el retorno estricto de JSON o la Simetría Lingüística del alumno) estrictamente al final del prompt.
+   * En sesiones de desarrollo prolongadas, si el orquestador humano exige un *"Context Reset"*, el agente generará un resumen de cierre para iniciar una sesión nueva en limpio.
 
 ---
 
