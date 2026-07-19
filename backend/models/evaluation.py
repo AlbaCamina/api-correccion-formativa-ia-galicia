@@ -36,6 +36,11 @@ class EvaluacionIA(BaseModel):
         ..., 
         description="Calificación oficial cualitativa según Decretos gallegos: Insuficiente (IN), Suficiente (SU), Bien (BI), Notable (NT), Sobresaliente (SB)."
     )
+    calificacion_numerica: float = Field(
+        ..., 
+        ge=0.0, le=10.0,
+        description="Calificación numérica exacta de la prueba evaluable sobre 10, obtenida a partir de la suma de los criterios de la rúbrica."
+    )
     siguiente_paso_accionable: str = Field(
         ..., 
         description="Siguiente Paso Accionable (Feed Forward): Directriz clara, concreta y realizable hoy por el alumno."
