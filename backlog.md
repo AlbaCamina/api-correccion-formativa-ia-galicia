@@ -812,3 +812,6 @@
 *Backlog generado el 07/07/2026 — Antigravity para Alba Camiña García*  
 *Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] e incorporadas historias de cierre v0.2 y demo HitL pre-AESIA (`[v0.2-008]`, `[v0.2-009]`, `[v0.2-010]`).*  
 *Total de historias: 34 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 2*
+- **Tests sin validaci�n de migraciones (v0.3-002)**: Los tests unitarios utilizan SQLite en memoria llamando a `metadata.create_all()` en lugar de aplicar revisiones Alembic, por lo que no validan si las migraciones coinciden con los modelos reales. Esta es una limitaci�n t�cnica conocida que obliga a validar las nuevas columnas (como `estado_feed_forward`) manualmente contra Postgres.
+
+- **Advertencia de Dependencias (v0.5)**: Los tests arrojan un `StarletteDeprecationWarning: Using 'httpx' with 'starlette.testclient' is deprecated; install 'httpx2' instead.` que debe resolverse actualizando la dependencia del cliente HTTP de pruebas.
