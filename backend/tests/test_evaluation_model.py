@@ -45,7 +45,7 @@ class TestEvaluacionIA(unittest.TestCase):
     def test_invalid_calificacion_cualitativa(self):
         """Valida que un valor fuera de la Literal permitida lanza ValidationError (422)."""
         invalid_data = self.valid_data.copy()
-        invalid_data["calificacion_cualitativa"] = "APROBADO"  # Inválido, debe ser IN, SU, BI, NT, SB
+        invalid_data["calificacion_cualitativa"] = "APROBADO"  # Inválido, debe ser IN, SU, BE, NT, SB, NA
         with self.assertRaises(ValidationError):
             EvaluacionIA(**invalid_data)
 
