@@ -4,10 +4,10 @@
 [![Python 3.14+](https://img.shields.io/badge/Python-3.14%2B-blue?style=flat&logo=python)](https://www.python.org/)
 [![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16--Alpine-316192?style=flat&logo=postgresql)](https://www.postgresql.org/)
 [![Groq](https://img.shields.io/badge/LLM-Groq%20%2F%20OpenAI-orange?style=flat)](https://groq.com/)
-[![Decreto 157/2022](https://img.shields.io/badge/Normativa-Decreto%20157%2F2022%20Galicia-lightblue?style=flat)](#)
+[![Decretos 156/2022 e 157/2022](https://img.shields.io/badge/Normativa-Decretos%20156%2F2022%20e%20157%2F2022%20Galicia-lightblue?style=flat)](#)
 [![Version](https://img.shields.io/badge/Version-v0.3--001-brightgreen?style=flat)](#)
 
-API de Corrección Formativa con IA diseñada para asistir al profesorado de **Filosofía de Bachillerato** en la Comunidad Autónoma de Galicia. Estructurada bajo el marco pedagógico oficial de la **LOMLOE**, el **Decreto 157/2022 (Xunta de Galicia)**, y las directrices de privacidad de la Unión Europea (**RGPD / AI Act / ENS**).
+API de Corrección Formativa con IA diseñada para asistir al profesorado de **Filosofía de Bachillerato** en la Comunidad Autónoma de Galicia. Estructurada bajo el marco pedagógico oficial de la **LOMLOE**, los **Decretos 156/2022 y 157/2022 (Xunta de Galicia)** (garantizando el blindaje estricto de la etapa educativa ESO/BACH), y las directrices de privacidad de la Unión Europea (**RGPD / AI Act / ENS**).
 
 ---
 
@@ -175,6 +175,7 @@ Respuesta de ejemplo:
     "nombre": "Filosofía de Bachillerato — Galicia",
     "asignatura": "Filosofía",
     "curso": "1º Bachillerato",
+    "etapa": "BACH",
     "estado_activo": true,
     "fuente_legislativa_url": "https://www.xunta.gal/dog/Publicados/2022/20220804/AnuncioG0655-280722-0001_es.html",
     "ultima_verificacion_manual": "2026-07-10"
@@ -219,6 +220,8 @@ Endpoint protegido por **Token Bearer JWT transaccional** conectado a base de da
 
 ### Ejemplo de Petición (Request)
 
+> ⚠️ **BREAKING CHANGE (D-041):** El campo `etapa` ("ESO" | "BACH") es obligatorio en el payload. Sin él la API devuelve `422 Unprocessable Entity`, y si su valor contradice la etapa del marco normativo seleccionado devuelve `400 Bad Request`.
+
 Requiere cabecera de autenticación `Authorization: Bearer <token>` transaccional:
 
 ```bash
@@ -229,6 +232,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/evaluate \
     "student_answer": "El prisionero sale de la caverna y ve el sol o la luz...",
     "rubrica_id": 1,
     "marco_id": 1,
+    "etapa": "BACH",
     "modo_evaluacion": "COMBINADO",
     "question": "¿Qué simboliza la salida del prisionero de la caverna?",
     "alumno_id": "A-14",
@@ -242,7 +246,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/evaluate \
 
 ### Ejemplo de Respuesta (Response: `EvaluacionResponse`)
 
-El servidor guarda la entrega en PostgreSQL y devuelve la evaluación estructurada con marcadores visuales neutros (`type: "error_excluido"`) y registro de ortografía excluida por adaptación:
+El servidor guarda la entrega en PostgreSQL y devuelve la evaluación estructurada con marcadores visuales neutros (`type: "error_excluido"`) y registro de ortografía excluida por adaptación. *Nota: En el ejemplo la calificación cualitativa es "NA" (Bachillerato). En ESO la escala oficial es IN, SU, BE, NT, SB (D-042: BE, no BI).*
 
 ```json
 {
@@ -282,7 +286,7 @@ El servidor guarda la entrega en PostgreSQL y devuelve la evaluación estructura
       "teacherSummary": "Excelente base conceptual adaptada al perfil NEAE del alumno."
     },
     "calificacion_numerica": 8.0,
-    "calificacion_cualitativa": "NT",
+    "calificacion_cualitativa": "NA",
     "siguiente_paso_accionable": "Explica en un párrafo por qué el prisionero liberado debe regresar con sus compañeros en la oscuridad.",
     "confidence_score": 0.95,
     "ortografia_detectada": true,
