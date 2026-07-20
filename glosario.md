@@ -19,6 +19,9 @@ La parte del sistema que no ve el usuario. Procesa los datos, llama a la IA, gua
 **Boilerplate**  
 Código repetitivo y estructural que hay que escribir en casi todo proyecto aunque no hace nada específico del negocio (imports, configuración inicial, estructura de carpetas). Los agentes de IA lo generan bien.
 
+**Breaking Change**  
+Cambio que rompe la compatibilidad hacia atrás. Ejemplo arquitectónico (`[D-041]`): hacer obligatorio el campo `etapa` en `EvaluationRequest`, de manera que los clientes antiguos que no lo envíen recibirán un error `422 Unprocessable Entity`.
+
 **CORS** (Cross-Origin Resource Sharing — Intercambio de Recursos de Origen Cruzado)  
 Mecanismo de seguridad de los navegadores web que restringe las peticiones HTTP realizadas desde un dominio o puerto (ej. `http://localhost:5173` en Vite) hacia otro diferente (`http://127.0.0.1:8000` en FastAPI). Por especificación oficial, cuando se permite el envío de credenciales o tokens Bearer (`allow_credentials=True`), está prohibido usar un comodín (`allow_origins=["*"]`) por riesgo de seguridad; se exige declarar explícitamente los orígenes confiables.
 
@@ -67,6 +70,12 @@ Una URL concreta de la API a la que se puede hacer una petición HTTP con un ver
 | v0.4 | `/api/v1/submissions/{id}/events` | `GET` (SSE) | Stream de estado en tiempo real | 🔜 Roadmap |
 | v1.0 | `/api/v1/submissions/{id}/changelog` | `GET` | Historial inmutable de auditoría AI Act | 🔜 Roadmap |
 
+**Fallo silencioso (Silent Failure)**  
+Un error en el sistema que no interrumpe la ejecución ni muestra un mensaje de error visible, pero que corrompe el estado o produce resultados incorrectos. Ejemplo en código: si la API no validara correctamente una respuesta nula y la IA asignase un "NA" sin avisar.
+
+**Fallback**  
+Plan B o mecanismo de respaldo automático cuando el sistema principal falla. Ejemplo de decisión arquitectónica: el uso de `json_object` como fallback en caso de que falle la API de `Structured Outputs` con el proveedor principal (Groq).
+
 **Frontend**  
 La parte del sistema que ve el usuario: botones, pantallas, formularios. En este proyecto: React + Vite (se implementa en v0.5).
 
@@ -107,6 +116,9 @@ Librerías y frameworks clave de api-correccion-formativa-ia-galicia:
 | `python-dotenv` | Librería | Carga variables de entorno del archivo `.env` |
 | `pytesseract` | Librería | *(c0.8)* OCR offline para el escáner de PII pre-nube (`[D-034]`) |
 | `react` | Librería | Construye la interfaz de usuario de la PWA del docente |
+
+**Mojibake**  
+Texto ilegible o corrupto resultante de decodificar datos de texto utilizando una codificación de caracteres incorrecta (como interpretar UTF-8 como ISO-8859-1). Ejemplo: caracteres extraños en `backlog.md` antes de forzar explícitamente el `encoding="utf-8"` en el script de reparación.
 
 **Nativo / Integración Nativa (`Native / Built-in`)**  
 Capacidad o funcionalidad que viene incorporada de fábrica en el núcleo de una herramienta o tecnología, sin necesidad de instalar librerías de terceros, añadir capas intermedias o usar parches artesanales. En nuestra arquitectura priorizamos soluciones nativas para mantener un código limpio, rápido y con mínimas dependencias (`YAGNI`): por ejemplo, la generación de documentación Swagger en `/docs` nativa de FastAPI, y la gestión del pool de conexiones nativo en SQLAlchemy. En cuanto a la validación del contrato `EvaluacionIA`, la solución nativa varía según el proveedor: con OpenAI se usa `Structured Outputs` con `.parse()` (el modelo garantiza el JSON antes de enviarlo); con Groq o Claude se usa `response_format={"type": "json_object"}` + `model_validate_json()` de Pydantic en el cliente.
@@ -182,11 +194,29 @@ async def evaluate(                # ← función asíncrona (no bloquea el serv
 
 Ventajas clave sobre Django o Flask: tipado nativo con Pydantic, async/await nativo, y generación automática de Swagger UI en `/docs` sin configuración adicional.
 
+**Clase (Class)**  
+Plantilla para crear objetos en programación orientada a objetos que define propiedades (atributos) y comportamientos (métodos). Ejemplo de código: `class EvaluacionIA(BaseModel):` en Pydantic define la estructura de validación.
+
+**Diccionario (Dictionary)**  
+Estructura de datos en Python que guarda pares de clave-valor (`{ "etapa": "BACH" }`). Aunque es útil para mockear datos, el tipado estricto (`Regla 3 de AGENTS.md`) dicta preferir modelos Pydantic antes que diccionarios genéricos para evitar fallos de integridad.
+
 **Event Loop & Corrutina (`async / await`)**  
 El **Event Loop** (Bucle de Eventos de `asyncio`) es el motor que permite al servidor Uvicorn gestionar cientos de peticiones concurrentes en un solo hilo de procesador. Una **Corrutina** (`async def`) cede el control al bucle cuando encuentra una operación de entrada/salida precedida por `await` (como una llamada HTTP a Groq o consulta a base de datos), permitiendo que el servidor atienda a otros profesores mientras la red responde (`I/O-Bound`). Si se usa código síncrono bloqueante como `time.sleep()`, todo el bucle se paraliza.
 
 **Inyección de Dependencias** (`Dependency Injection` — `Depends()`)  
 Patrón de diseño central en FastAPI por el cual una función o endpoint no instancia ni busca directamente sus recursos externos (como una conexión a base de datos `get_db` o la validación de un usuario `get_current_profesor`), sino que el framework se los suministra automáticamente en la firma de la función. Este desacoplamiento permite inyectar dependencias simuladas o transaccionales en memoria (`sqlite:///:memory:`) durante los tests (`dependency_overrides`) sin modificar el código de producción.
+
+**Linter**  
+Herramienta de análisis de código estático que marca errores de sintaxis, estilo o malas prácticas antes de la ejecución. Ejemplo: detectar incumplimientos del PEP 8 o importaciones no usadas en `main.py` antes de commitear.
+
+**Mock**  
+Objeto o función falsa que simula el comportamiento de un componente real (frecuentemente externo) para su uso en pruebas aisladas (*Unit Tests*). Ejemplo arquitectónico: en `test_evaluation_router.py`, el `llm_client.py` actúa en modo MOCK devolviendo una respuesta prefijada (`{"calificacion_cualitativa": "NA"}`) sin gastar cuota de API real en los tests.
+
+**Modelo (Model)**  
+Representación de una entidad de negocio en el código. En el proyecto existen dos tipos: Modelos de BBDD con SQLAlchemy (`models/evaluation.py` para persistir en PostgreSQL) y Modelos de validación con Pydantic (`EvaluationRequest` para asegurar el tipado de los datos entrantes).
+
+**Objeto (Object)**  
+Una instancia concreta creada a partir de una clase. Ejemplo: `submission = Submission(id="123")` es un objeto que representa la entrega específica de un alumno en memoria, antes de ser enviada con `db.add(submission)`.
 
 **Pydantic**  
 Librería de Python que valida datos automáticamente. Defines cómo debe ser un objeto (campos, tipos) y Pydantic rechaza cualquier dato que no encaje. En este proyecto actúa como guardián del JSON que devuelve la IA.
@@ -224,7 +254,7 @@ Las cuatro operaciones básicas sobre cualquier dato. Decir "CRUD completo" sign
 Tipo de campo especial de PostgreSQL que guarda JSON de forma comprimida y permite hacer búsquedas dentro del JSON. Se usa para la normativa educativa gallega (campo flexible que puede cambiar sin alterar la estructura de la tabla).
 
 **Migración**  
-Cambio controlado en la estructura de la base de datos (añadir una tabla, un campo, cambiar un tipo). Alembic las gestiona y guarda el historial.
+Cambio controlado en la estructura de la base de datos (añadir una tabla, un campo, cambiar un tipo). Alembic las gestiona y guarda el historial. Ejemplo arquitectónico: añadir la columna `estado_feed_forward` en la versión `[v0.2]`, lo cual requirió generar una nueva revisión de Alembic (`alembic upgrade head`) para evitar una pérdida total o destrucción de datos de las tablas existentes.
 
 **ORM** (Object-Relational Mapper — Traductor entre objetos y tablas)  
 Herramienta que permite trabajar con la base de datos usando objetos del lenguaje de programación en lugar de SQL puro. SQLAlchemy es el ORM de este proyecto.
@@ -442,6 +472,9 @@ Subir los commits locales al repositorio remoto en GitHub.
 **Repositorio**  
 El proyecto completo gestionado por Git, incluyendo todos los archivos y su historial de cambios.
 
+**Scope (Ámbito del commit)**  
+En la convención de `Conventional Commits` de este proyecto, es el texto entre paréntesis que indica qué parte del sistema se ha modificado, garantizando la trazabilidad. Ejemplo: `docs(audit)` indica una actualización en la documentación por auditoría; `test(api)` señala un cambio en los tests del backend.
+
 ---
 
 ## 8. Herramientas de desarrollo con IA
@@ -569,6 +602,9 @@ Lista de condiciones concretas y verificables que deben cumplirse para considera
 
 **Epic Issue (Épica como Issue / Modelo de Épica)**  
 Metodología de organización ágil y de repositorio donde cada gran bloque funcional o iteración de versión (`Versión 0.1`, `Milestone v0.2.5`, `Versión 0.3`) se abre en GitHub como una única gran **Issue madre** que contiene en su cuerpo el checklist de todas sus historias de usuario (`- [ ]`). Este modelo simplifica radicalmente la gestión para equipos ágiles HitL, evitando la dispersión en decenas de micro-issues y mostrando el progreso del hito de forma centralizada.
+
+**Gobernanza (Governance)**  
+Conjunto de normas, prácticas y convenciones que aseguran que el proyecto se desarrolle de manera estructurada, auditable y segura. Ejemplo en el proyecto: la decisión `[D-035]` y las reglas estrictas de `AGENTS.md` (como el "Stop & Consult") que blindan el repositorio aislando la revisión de la implementación y manteniendo actualizados los documentos maestros (`decisiones.md`, `backlog.md`).
 
 **Historia de usuario**  
 Forma de describir una funcionalidad desde el punto de vista del usuario final. Formato: "Como [rol], quiero [acción], para [beneficio]". Es la unidad de trabajo del backlog.
