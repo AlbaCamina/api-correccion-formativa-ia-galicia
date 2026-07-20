@@ -363,7 +363,9 @@
 
 **Criterios de aceptación:**
 - [x] `POST /api/v1/evaluate` ahora acepta `marco_id` (opcional/nullable) y `rubrica_id`
-- [x] Si `marco_id` es null/None, evalúa en Modo Rúbrica Pura (ignora legislación). Si está presente, recupera el marco de la BBDD e inyecta en el prompt la estrategia elegida (Combinado vs. Auditoría).
+- [x] ⚠️ **BREAKING CHANGE (D-041):** `etapa` (`"ESO" | "BACH"`) pasa a ser un campo obligatorio en el payload. Peticiones sin etapa fallarán con `422`.
+- [x] Si el profesor declara una etapa que contradice al marco seleccionado, se rechaza con `400 Bad Request`.
+- [x] Si `marco_id` es null/None, evalúa en Modo Rúbrica Pura (ignora legislación) pero inyecta la `etapa` provista en la petición para evitar inferencias normativas por la IA.
 - [x] El resultado se guarda en `submissions` y `evaluaciones`
 - [x] El changelog registra la corrección con `actor = "IA"`
 
@@ -396,6 +398,7 @@
 
 **Criterios de aceptación:**
 - [ ] **Sincronización Alembic:** Crear la revisión de migración (`alembic revision --autogenerate -m "add estado_feed_forward and audit_metadata"`) como deuda de sincronización del historial formal con el esquema actual de SQLAlchemy (no representa un fallo funcional del backend, sino una alineación de versionado de BBDD).
+- [ ] **Migración Pendiente Extra (Deuda Técnica):** Aislar y ejecutar la migración específica para sincronizar las columnas `audit_metadata` (en `changelog`) y `estado_feed_forward` (en `submissions`) con la base de datos, ya que fueron añadidas a los modelos en commits anteriores pero no migradas.
 - [ ] **Test HTTP 403 (Permisos de propiedad):** Añadir un fixture con un segundo profesor (`PROFESOR_ID_2`) en `test_evaluation_router.py` y verificar que si intenta llamar a `PATCH /api/v1/submissions/{id}/feed-forward/realizado` o `/verificado` sobre una entrega que no le pertenece, el backend rechaza con `403 Forbidden`.
 
 **Etiquetas:** `v0.2` `tech-debt` `tests` `database`
@@ -809,3 +812,6 @@
 *Backlog generado el 07/07/2026 — Antigravity para Alba Camiña García*  
 *Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] e incorporadas historias de cierre v0.2 y demo HitL pre-AESIA (`[v0.2-008]`, `[v0.2-009]`, `[v0.2-010]`).*  
 *Total de historias: 34 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 2*
+- **Tests sin validaci�n de migraciones (v0.3-002)**: Los tests unitarios utilizan SQLite en memoria llamando a `metadata.create_all()` en lugar de aplicar revisiones Alembic, por lo que no validan si las migraciones coinciden con los modelos reales. Esta es una limitaci�n t�cnica conocida que obliga a validar las nuevas columnas (como `estado_feed_forward`) manualmente contra Postgres.
+
+- **Advertencia de Dependencias (v0.5)**: Los tests arrojan un `StarletteDeprecationWarning: Using 'httpx' with 'starlette.testclient' is deprecated; install 'httpx2' instead.` que debe resolverse actualizando la dependencia del cliente HTTP de pruebas.

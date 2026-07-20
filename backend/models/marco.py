@@ -4,11 +4,13 @@ Implementa el modelo ORM de SQLAlchemy y los esquemas Pydantic v2 correspondient
 Soporta metadatos de vigencia legislativa en cumplimiento con el ADR [D-033] y Hito [v0.2-003].
 """
 from datetime import date
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, Literal
 from sqlalchemy import Column, Integer, String, Boolean, JSON, Date
 from pydantic import BaseModel, Field, ConfigDict
 from .database import Base
 
+# Etapa educativa: gobierna la escala y la oficialidad de la cualitativa.
+Etapa = Literal["ESO", "BACH"]
 
 # =====================================================================
 # 1. MODELO ORM DE SQLALCHEMY (TABLA 'marcos_evaluacion')
@@ -25,6 +27,7 @@ class MarcoEvaluacion(Base):
     nombre = Column(String(255), nullable=False)
     asignatura = Column(String(100), nullable=False)
     curso = Column(String(100), nullable=False)
+    etapa = Column(String(10), default="BACH", nullable=False)
     estado_activo = Column(Boolean, default=True, nullable=False)
     
     # Estructura JSONB que contiene competencias, saberes y criterios oficiales
@@ -43,6 +46,7 @@ class MarcoCreate(BaseModel):
     nombre: str = Field(..., min_length=3, max_length=255, description="Nombre del decreto o currículum oficial.")
     asignatura: str = Field(..., min_length=2, max_length=100, description="Asignatura o materia regulada.")
     curso: str = Field(..., min_length=2, max_length=100, description="Curso académico (ej. 1º Bacharelato).")
+    etapa: Etapa = Field(..., description="Etapa educativa: 'ESO' (cualitativa oficial 1-10) o 'BACH' (numérica 0-10).")
     estado_activo: bool = Field(default=True, description="Estado operativo del marco.")
     rubrica_completa: Dict[str, Any] = Field(..., description="Estructura curricular completa en formato JSON.")
     ultima_verificacion_manual: Optional[date] = Field(None, description="Fecha de la última revisión de vigencia legal.")
@@ -57,6 +61,7 @@ class MarcoResponse(BaseModel):
     nombre: str = Field(..., description="Nombre del decreto o currículum oficial.")
     asignatura: str = Field(..., description="Asignatura regulada.")
     curso: str = Field(..., description="Curso académico.")
+    etapa: Etapa = Field(..., description="Etapa educativa (ESO/BACH).")
     estado_activo: bool = Field(..., description="Indica si el marco de evaluación está activo.")
     rubrica_completa: Dict[str, Any] = Field(..., description="Estructura curricular en JSON.")
     ultima_verificacion_manual: Optional[date] = Field(None, description="Última verificación manual de vigencia legal.")

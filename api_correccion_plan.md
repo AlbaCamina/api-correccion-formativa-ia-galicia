@@ -268,19 +268,58 @@ B2B — Canal institucional / integración
 - `Evaluacion` — JSON completo de resultado IA
 - `ChangeLog` — Auditoría
 
-### JSON de salida (contrato con la IA)
+### JSON de salida (contrato con la IA) — actualizado (D-042, D-043, D-044, D-045)
+
+> [!NOTE]
+> Este contrato evalúa UNA sola evidencia (una prueba). La agregación a nota de materia y
+> competencias del trimestre la realiza el backend después, no el modelo de lenguaje.
+
 ```json
 {
-  "transcription": "...",
-  "rubricBreakdown": [{ "category": "...", "score": 6, "maxScore": 10, "reasoning": "..." }],
-  "visualMarkers": [{ "x": 120, "y": 450, "type": "GRAMMAR_ERROR", "comment": "..." }],
+  "transcription": "Texto transcrito de la respuesta del alumno (en v0.1 coincide con la entrada).",
+  "etapa": "BACH",
+  "rubricBreakdown": [
+    {
+      "criterio_codigo": "FILO-B2.3",
+      "competencias_clave": ["CCL", "CC"],
+      "category": "Argumentación filosófica",
+      "score": 7.5,
+      "maxScore": 10.0,
+      "peso": 40.0,
+      "nivel_logro": 3,
+      "reasoning": "Justificación pedagógica referida a la evidencia del alumno."
+    }
+  ],
+  "visualMarkers": [
+    {
+      "x": 0,
+      "y": 0,
+      "type": "MEJORA",
+      "comment": "En v0.1 (texto plano) las coordenadas son 0 y el array puede ir vacío []."
+    }
+  ],
   "qualitativeAnalysis": {
-    "strengths": ["..."],
-    "improvementNeeds": { "immediate": ["..."], "mediumLongTerm": ["..."] },
-    "teacherSummary": "..."
-  }
+    "strengths": ["Punto fuerte 1"],
+    "improvementNeeds": {
+      "immediate": ["Mejora urgente (para aprobar o corregir error grave)"],
+      "mediumLongTerm": ["Mejora de consolidación (hacia sobresaliente)"]
+    },
+    "teacherSummary": "Resumen para el cuaderno del profesor. Aquí se reportan avisos de configuración: pesos que no suman 100 %, criterios sin evaluar o brechas curriculares (modo AUDITORIA_CURRICULAR)."
+  },
+  "calificacion_cualitativa": "NA",
+  "calificacion_numerica": 7.5,
+  "siguiente_paso_accionable": "Feed Forward (Hattie): directriz concreta y realizable hoy. Debe decir QUÉ y CÓMO.",
+  "confidence_score": 0.9,
+  "ortografia_detectada": ["palabra_con_falta"],
+  "errores_excluidos_por_adaptacion": ["palabra_con_falta"]
 }
 ```
+
+**Notas de contrato (importantes):**
+- `type` de `visualMarkers` usa el vocabulario real: `"ERROR"`, `"MEJORA"`, `"CORRECTO"`, `"error_excluido"`. Ya NO se usa `"GRAMMAR_ERROR"` (obsoleto del contrato v0.1).
+- `calificacion_cualitativa` admite: `"IN"`, `"SU"`, `"BE"`, `"NT"`, `"SB"`, `"NA"`. En Bachillerato se usa `"NA"` (no es oficial); en ESO es el dato oficial fuerte. Nunca `"BI"` (D-042).
+- `calificacion_numerica` es ORIENTATIVA con decimales (media ponderada de criterios, D-043). El docente redondea al aprobar (D-045).
+- `criterio_codigo` + `competencias_clave` habilitan la trazabilidad hacia competencias (D-044).
 
 ---
 
@@ -476,7 +515,7 @@ api-correccion/                              ← workspace único de VS Code
 
 ### 🔌 Integración Directa con Plataformas y LMS (Post-MVP / v2.x)
 - **Google Classroom / Moodle OAuth:** Conexión directa mediante API para importar automáticamente las entregas y tareas digitales de los alumnos sin necesidad de que el docente exporte o capture el PDF/imagen manualmente.
-- **Sincronización de calificaciones HitL con XADE:** Exportación automatizada y formateada del acta y de las calificaciones competenciales (`IN, SU, BI, NT, SB`) validadas por el docente para agilizar la carga oficial de notas en la plataforma autonómica galega (cumpliendo las restricciones del Esquema Nacional de Seguridad).
+- **Sincronización de calificaciones HitL con XADE:** Exportación automatizada y formateada del acta y de las calificaciones competenciales (`IN, SU, BE, NT, SB`) validadas por el docente para agilizar la carga oficial de notas en la plataforma autonómica galega (cumpliendo las restricciones del Esquema Nacional de Seguridad).
 
 ### 💳 Sistema de Monetización y Pagos (Stripe)
 - Integración de pasarela de pago para modelo B2C (suscripción mensual de profesores)

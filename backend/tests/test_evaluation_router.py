@@ -59,6 +59,17 @@ class TestEvaluationRouter(unittest.TestCase):
             estado_feed_forward="PENDIENTE",
         )
         self.db.add(self.submission)
+
+        self.marco = MarcoEvaluacion(
+            id=1,
+            nombre="Decreto 156/2022",
+            asignatura="Filosofía",
+            curso="1 BACH",
+            etapa="BACH",
+            rubrica_completa={}
+        )
+        self.db.add(self.marco)
+        
         self.db.commit()
 
         # Sobrescribir dependencias en FastAPI
@@ -89,6 +100,7 @@ class TestEvaluationRouter(unittest.TestCase):
         payload = {
             "student_answer": "El prisionero sale a la luz exterior y ve el sol...",
             "rubrica_id": 1,
+            "etapa": "BACH",
             "question": "¿Qué simboliza la salida del prisionero?"
         }
         response = self.client.post("/api/v1/evaluate", json=payload)
@@ -102,7 +114,7 @@ class TestEvaluationRouter(unittest.TestCase):
 
         resultado = data["resultado_ia"]
         self.assertIn("transcription", resultado)
-        self.assertEqual(resultado["calificacion_cualitativa"], "NT")
+        self.assertEqual(resultado["calificacion_cualitativa"], "NA")
         self.assertEqual(resultado["calificacion_numerica"], 8.0)
         self.assertEqual(len(resultado["visualMarkers"]), 1)
         self.assertEqual(resultado["visualMarkers"][0]["type"], "error_excluido")
@@ -111,11 +123,12 @@ class TestEvaluationRouter(unittest.TestCase):
         self.assertEqual(resultado["confidence_score"], 0.92)
 
     def test_evaluate_endpoint_validation_error(self):
-        """Valida que enviar datos vacíos o sin rúbrica lanza error 400 o 422."""
+        """Valida que enviar datos vacíos o sin rúbrica lanza error 400 o 404."""
         # 1. student_answer vacío -> 400
         payload = {
             "student_answer": "",
-            "rubrica_id": 1
+            "rubrica_id": 1,
+            "etapa": "BACH"
         }
         response = self.client.post("/api/v1/evaluate", json=payload)
         self.assertEqual(response.status_code, 400)
@@ -124,7 +137,8 @@ class TestEvaluationRouter(unittest.TestCase):
         # 2. rubrica_id inexistente o de otro docente -> 404
         payload = {
             "student_answer": "Respuesta correcta",
-            "rubrica_id": 999
+            "rubrica_id": 999,
+            "etapa": "BACH"
         }
         response = self.client.post("/api/v1/evaluate", json=payload)
         self.assertEqual(response.status_code, 404)
@@ -140,6 +154,28 @@ class TestEvaluationRouter(unittest.TestCase):
         self.assertEqual(response.status_code, 422)
         data = response.json()
         self.assertIn("detail", data)
+
+    def test_evaluate_endpoint_missing_etapa_validation_error(self):
+        """Valida que omitir la etapa lanza error 422 (breaking change D-041)."""
+        payload = {
+            "student_answer": "Respuesta normal",
+            "rubrica_id": 1
+        }
+        response = self.client.post("/api/v1/evaluate", json=payload)
+        self.assertEqual(response.status_code, 422)
+        self.assertIn("etapa", str(response.json()["detail"]))
+
+    def test_evaluate_endpoint_cross_check_etapa_error(self):
+        """Valida que si hay marco_id y la etapa del request difiere de la del marco, lanza 400 (D-041)."""
+        payload = {
+            "student_answer": "Respuesta",
+            "rubrica_id": 1,
+            "etapa": "ESO",  # Incompatible: el marco 1 tiene etapa='BACH'
+            "marco_id": 1
+        }
+        response = self.client.post("/api/v1/evaluate", json=payload)
+        self.assertEqual(response.status_code, 400)
+        self.assertIn("La etapa declarada 'ESO' no coincide con la etapa del marco normativo 'BACH'", response.json()["detail"])
 
     def test_startup_validation_missing_key(self):
         """Valida que startup_validation aborta si falta la key correspondiente en la configuración."""

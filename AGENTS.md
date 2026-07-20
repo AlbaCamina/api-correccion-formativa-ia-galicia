@@ -70,3 +70,35 @@ api-correccion/
 ---
 
 *Cualquier código añadido debe respetar estas directrices para mantener la consistencia y mantenibilidad del portfolio.*
+
+---
+
+## 📚 Contexto Normativo de Calificación (LEER ANTES DE TOCAR EL MOTOR DE EVALUACIÓN)
+
+Esta API califica conforme a la normativa LOMLOE (Ley Orgánica de Modificación de la LOE) vigente en Galicia: Decreto 156/2022 y Orde do 26/05/2023 (Educación Secundaria Obligatoria — ESO); Decreto 157/2022 y Orde do 26/05/2023 (Bachillerato).
+
+### Regla de oro: LEY vs. CONFIGURACIÓN DE CENTRO (D-040)
+Nunca presentes una decisión de centro como si fuera obligación legal.
+
+**Obligatorio por ley (no configurable):**
+- Escala ESO: entero 1-10, sin decimales. Escala Bachillerato: entero 0-10, sin decimales.
+- Cualitativa oficial SOLO en ESO: `IN`=1-4, `SU`=5, `BE`=6, `NT`=7-8, `SB`=9-10. (Bien se abrevia **BE**, nunca BI — D-042).
+- Los **criterios de evaluación** son el referente único de calificación. Los **saberes básicos** son solo contenido de referencia.
+- Las **competencias clave** se expresan en términos cualitativos, no como media numérica oficial.
+
+**Configuración de centro/departamento (la ley NO lo fija):**
+- Decimales por criterio, niveles de logro 1-4, pesos de criterios, fórmula de media (aritmética/ponderada) y regla de redondeo.
+
+### Reglas de implementación fijadas
+- **Etapa explícita (D-041):** usar el campo `etapa` (`ESO`/`BACH`) de `marcos_evaluacion`. No inferir la etapa del texto de `curso`.
+- **Media ponderada (D-043):** la nota de prueba = media ponderada de criterios normalizados a base 10 (`score/maxScore*10`) por su `peso` (%). Los pesos suman 100 %.
+- **Trazabilidad (D-044):** cada criterio lleva `criterio_codigo` y `competencias_clave` (CCL, CP, STEM, CD, CPSAA, CC, CE, CCEC).
+- **Semántica HitL (D-045):** `calificacion_numerica` es orientativa con decimales; el agente NO redondea. El docente decide y redondea al aprobar (`nota_final`). El agente evalúa una sola evidencia; la agregación al trimestre la hace el backend.
+
+### Valores válidos del contrato `EvaluacionIA`
+- `calificacion_cualitativa`: `IN | SU | BE | NT | SB | NA` (usar `NA` en Bachillerato).
+- `visualMarkers.type`: `ERROR | MEJORA | CORRECTO | error_excluido` (nunca `GRAMMAR_ERROR`).
+- `etapa`: `ESO | BACH`.
+
+### Adaptaciones NEAE (Necesidades Específicas de Apoyo Educativo) — D-023
+Si hay adaptaciones (p. ej. `excluir_ortografia`), detectar las faltas, listarlas en `ortografia_detectada` y `errores_excluidos_por_adaptacion`, y NO penalizar por ellas.

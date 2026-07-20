@@ -26,7 +26,8 @@ class TestEvaluacionIA(unittest.TestCase):
             "calificacion_numerica": 8.0,
             "calificacion_cualitativa": "NT",
             "siguiente_paso_accionable": "Reescribe explicando por qué el filósofo debe gobernar la polis.",
-            "confidence_score": 0.95
+            "confidence_score": 0.95,
+            "etapa": "BACH"
         }
 
     def test_valid_evaluation(self):
@@ -42,10 +43,17 @@ class TestEvaluacionIA(unittest.TestCase):
         with self.assertRaises(ValidationError):
             EvaluacionIA(**invalid_data)
 
+    def test_missing_etapa_validation_error(self):
+        """Valida que omitir la etapa lanza ValidationError (422), probando el breaking change D-041."""
+        invalid_data = self.valid_data.copy()
+        del invalid_data["etapa"]
+        with self.assertRaises(ValidationError):
+            EvaluacionIA(**invalid_data)
+
     def test_invalid_calificacion_cualitativa(self):
         """Valida que un valor fuera de la Literal permitida lanza ValidationError (422)."""
         invalid_data = self.valid_data.copy()
-        invalid_data["calificacion_cualitativa"] = "APROBADO"  # Inválido, debe ser IN, SU, BI, NT, SB
+        invalid_data["calificacion_cualitativa"] = "APROBADO"  # Inválido, debe ser IN, SU, BE, NT, SB, NA
         with self.assertRaises(ValidationError):
             EvaluacionIA(**invalid_data)
 

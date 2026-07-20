@@ -32,7 +32,7 @@ def get_llm_client(provider: str) -> OpenAI:
     else:
         raise ValueError(f"Proveedor de LLM '{provider}' no soportado para llamadas reales.")
 
-async def evaluate_answer(student_answer: str, rubric: str, question: str = "") -> EvaluacionIA:
+async def evaluate_answer(student_answer: str, rubric: str, question: str = "", etapa: str = "") -> EvaluacionIA:
     """
     Llama al LLM (OpenAI o Groq) con el prompt estructurado para evaluar la respuesta del alumno.
     Tiene tolerancia a fallos con un reintento y fallback a json_object si falla el .parse() nativo.
@@ -45,18 +45,27 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "") 
         await asyncio.sleep(0.5)  # Simular latencia de red sin bloquear el event loop
         from backend.models.evaluation import RubricItem, QualitativeAnalysis, ImprovementNeeds, VisualMarker
         return EvaluacionIA(
+            etapa="BACH",
             transcription=student_answer,
             rubricBreakdown=[
                 RubricItem(
+                    criterio_codigo="FILO-B2.3",
+                    competencias_clave=["CCL", "CC"],
                     category="Precisión conceptual y simbolismo platónico",
                     score=4.2,
                     maxScore=5.0,
+                    peso=50.0,
+                    nivel_logro=4,
                     reasoning="Comprende el simbolismo de la luz y el Sol como Idea de Bien y el esfuerzo del aprendizaje, aunque simplifica la alegoría del prisionero."
                 ),
                 RubricItem(
+                    criterio_codigo="FILO-B2.4",
+                    competencias_clave=["CPSAA", "CE"],
                     category="Conexión con el concepto de paideia como conversión",
                     score=3.8,
                     maxScore=5.0,
+                    peso=50.0,
+                    nivel_logro=3,
                     reasoning="Menciona correctamente el deber moral y político del retorno del filósofo a la caverna, pero falta desarrollar el giro del alma (periagoge)."
                 )
             ],
@@ -84,7 +93,7 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "") 
                 teacherSummary="Buen dominio competencial de los símbolos clave del Mito de la Caverna. El alumno capta la dimensión ética del retorno filosófico. Se recomienda reforzar el vocabulario técnico epistemológico."
             ),
             calificacion_numerica=8.0,
-            calificacion_cualitativa="NT",
+            calificacion_cualitativa="NA",
             siguiente_paso_accionable="En tu próximo repaso de hoy, redacta una frase de 3 líneas donde conectes la palabra 'paideia' con la metáfora de 'girar la mirada' desde las sombras hacia la luz del conocimiento real.",
             confidence_score=0.92,
             ortografia_detectada=["esfuerço"],
@@ -92,7 +101,7 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "") 
         )
 
     client = get_llm_client(provider)
-    user_prompt = build_user_prompt(student_answer, rubric, question)
+    user_prompt = build_user_prompt(student_answer, rubric, question, etapa)
 
     max_attempts = 2
     last_exception = None
