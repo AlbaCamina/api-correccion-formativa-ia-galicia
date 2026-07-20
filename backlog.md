@@ -437,6 +437,21 @@
 
 ---
 
+### [v0.2-011] Seed de Normativa ESO (Decreto 156/2022)
+
+**Como** desarrolladora,  
+**quiero** disponer de un registro base (`seed`) en la BBDD con la normativa oficial de la ESO en Galicia  
+**para** poder testear el flujo completo multi-etapa y verificar que el endpoint rechaza contradicciones entre el marco y la etapa (`[D-041]`).
+
+**Criterios de aceptación:**
+- [ ] Archivo `seed_eso.py` o script equivalente que inyecte un marco de evaluación bajo el Decreto 156/2022 de Galicia.
+- [ ] Contiene saberes básicos y competencias clave expresadas con la escala cualitativa oficial de ESO (`IN, SU, BE, NT, SB`).
+- [ ] Validado en entorno local para confirmar que `GET /api/v1/marcos` lo expone correctamente junto al de Bachillerato.
+
+**Etiquetas:** `v0.2` `database` `seed`
+
+---
+
 ## 📸 Versión 0.3 — Subida de Imágenes, Anonimización y OCR [GitHub Issue #3 (Open)]
 
 **Objetivo:** El profesor puede subir una foto o PDF del examen manuscrito. El sistema garantiza la privacidad recortando el nombre localmente con `Pillow` pre-nube, gestiona de forma resiliente el almacenamiento y procesa la corrección con un motor multimodal (Groq Vision / OpenAI).
@@ -620,6 +635,7 @@
 - [ ] Seudonimización en cliente [`D-022`]: recorte automático de la cabecera superior (primeros 3 cm) sobre el Canvas
 - [ ] **`[D-034]` Herramienta de Tampón/Blackout Box:** vista previa pre-subida donde el docente puede arrastrar recuadros negros adicionales con el dedo o ratón sobre cualquier nombre desplazado al pie, lateral o centro del folio. Los píxeles se destruyen en el navegador antes del `fetch` a la nube
 - [ ] Vista previa y reordenación de folios antes de confirmar
+- [ ] **Selector obligatorio de `etapa` (ESO/BACH):** La interfaz bloquea el envío y exige seleccionar la etapa educativa, alineándose con el *Breaking Change* de backend (`[D-041]`) para prevenir errores HTTP 422.
 - [ ] Botón de envío que transmite el array y datos a `POST /api/v1/submissions`
 - [ ] Indicador de carga mientras el servidor encola la corrección asíncrona
 

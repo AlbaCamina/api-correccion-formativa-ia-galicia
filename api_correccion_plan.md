@@ -6,7 +6,7 @@
 
 > [!NOTE]
 > **SÍNTESIS DEL MOMENTO ACTUAL (Julio 2026):**  
-> El núcleo de la v0.2 está implementado y auditado (`main`). El foco inmediato es saldar el bloque **v0.2-008** (`Alembic` + seguridad propiedad `HTTP 403`), completar el circuito HitL de aprobación docente (**v0.2-009**) y dotar de endpoints de lectura para la demo técnica en la AESIA (**v0.2-010**) antes de iniciar la arquitectura multimodal pre-nube de la v0.3.
+> El núcleo de la v0.2 está implementado y auditado (incluyendo la auditoría normativa LOMLOE y el blindaje multi-etapa). El foco inmediato es cerrar la Issue #8 (Consolidación HitL): saldar el bloque **v0.2-008** (`Alembic` + seguridad propiedad `HTTP 403`), completar el circuito HitL de aprobación docente (**v0.2-009**), dotar de endpoints de lectura para trazabilidad (**v0.2-010**) y añadir el seed de normativa ESO (**v0.2-011**) antes de iniciar la arquitectura multimodal pre-nube de la v0.3.
 
 ---
 
