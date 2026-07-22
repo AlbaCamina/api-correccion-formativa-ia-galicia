@@ -397,9 +397,9 @@
 **para** mantener el historial de migraciones alineado con el esquema y verificar el rechazo por permisos en los nuevos endpoints.
 
 **Criterios de aceptación:**
-- [ ] **Sincronización Alembic:** Crear la revisión de migración (`alembic revision --autogenerate -m "add estado_feed_forward and audit_metadata"`) como deuda de sincronización del historial formal con el esquema actual de SQLAlchemy (no representa un fallo funcional del backend, sino una alineación de versionado de BBDD).
-- [ ] **Migración Pendiente Extra (Deuda Técnica):** Aislar y ejecutar la migración específica para sincronizar las columnas `audit_metadata` (en `changelog`) y `estado_feed_forward` (en `submissions`) con la base de datos, ya que fueron añadidas a los modelos en commits anteriores pero no migradas.
-- [ ] **Test HTTP 403 (Permisos de propiedad):** Añadir un fixture con un segundo profesor (`PROFESOR_ID_2`) en `test_evaluation_router.py` y verificar que si intenta llamar a `PATCH /api/v1/submissions/{id}/feed-forward/realizado` o `/verificado` sobre una entrega que no le pertenece, el backend rechaza con `403 Forbidden`.
+- [x] **Sincronización Alembic:** Crear la revisión de migración (`alembic revision --autogenerate -m "add estado_feed_forward and audit_metadata"`) como deuda de sincronización del historial formal con el esquema actual de SQLAlchemy (no representa un fallo funcional del backend, sino una alineación de versionado de BBDD).
+- [x] **Migración Pendiente Extra (Deuda Técnica):** Aislar y ejecutar la migración específica para sincronizar las columnas `audit_metadata` (en `changelog`) y `estado_feed_forward` (en `submissions`) con la base de datos, ya que fueron añadidas a los modelos en commits anteriores pero no migradas.
+- [x] **Test HTTP 403 (Permisos de propiedad):** Añadir un fixture con un segundo profesor (`PROFESOR_ID_2`) en `test_evaluation_router.py` y verificar que si intenta llamar a `PATCH /api/v1/submissions/{id}/feed-forward/realizado` o `/verificado` sobre una entrega que no le pertenece, el backend rechaza con `403 Forbidden`.
 
 **Etiquetas:** `v0.2` `tech-debt` `tests` `database`
 
@@ -412,10 +412,10 @@
 **para** convertirlo en una calificación final firme (`GRADED`), garantizando la soberanía humana (`[D-002]`, `AI Act`).
 
 **Criterios de aceptación:**
-- [ ] `PATCH /api/v1/evaluaciones/{id}/approve` (o `/submissions/{id}/approve`) verifica que el profesor autenticado es el propietario (`HTTP 403 Forbidden` en caso contrario).
-- [ ] Transiciona el estado de la entrega de `REVIEW` a `GRADED`.
-- [ ] Registra en `ChangeLog` la acción `EVALUACION_APROBADA` con el `actor = PROFESOR_ID_{id}` (nunca la IA ni el sistema).
-- [ ] Al completarse, actualiza la fila correspondiente del flujo de evaluación en `AUDITORIA.md` a **Auditado**.
+- [x] `PATCH /api/v1/evaluaciones/{id}/approve` (o `/submissions/{id}/approve`) verifica que el profesor autenticado es el propietario (`HTTP 403 Forbidden` en caso contrario).
+- [x] Transiciona el estado de la entrega de `REVIEW` a `GRADED`.
+- [x] Registra en `ChangeLog` la acción `EVALUACION_APROBADA` con el `actor = PROFESOR_ID_{id}` (nunca la IA ni el sistema).
+- [x] Al completarse, actualiza la fila correspondiente del flujo de evaluación en `AUDITORIA.md` a **Auditado**.
 
 **Etiquetas:** `v0.2` `hitl` `endpoints` `ai-act`
 
@@ -428,10 +428,10 @@
 **para** poder navegar por el flujo completo en vivo en la interfaz de Swagger UI (`/docs`) y verificar la trazabilidad sin consultar la base de datos a mano.
 
 **Criterios de aceptación:**
-- [ ] `GET /api/v1/submissions` devuelve el listado de entregas pertenecientes al profesor autenticado (`current_user`).
-- [ ] `GET /api/v1/evaluaciones/{submission_id}` devuelve el JSON evaluativo estructurado (`EvaluacionIA`) y sus metadatos.
-- [ ] Pruebas unitarias correspondientes en verde en `test_evaluation_router.py`.
-- [ ] Al completarse, refuerza el pilar de evidencia y visibilidad en `AUDITORIA.md`.
+- [x] `GET /api/v1/submissions` devuelve el listado de entregas pertenecientes al profesor autenticado (`current_user`).
+- [x] `GET /api/v1/evaluaciones/{submission_id}` devuelve el JSON evaluativo estructurado (`EvaluacionIA`) y sus metadatos.
+- [x] Pruebas unitarias correspondientes en verde en `test_evaluation_router.py`.
+- [x] Al completarse, refuerza el pilar de evidencia y visibilidad en `AUDITORIA.md`.
 
 **Etiquetas:** `v0.2` `endpoints` `swagger` `aesia-demo`
 
@@ -444,9 +444,9 @@
 **para** poder testear el flujo completo multi-etapa y verificar que el endpoint rechaza contradicciones entre el marco y la etapa (`[D-041]`).
 
 **Criterios de aceptación:**
-- [ ] Archivo `seed_eso.py` o script equivalente que inyecte un marco de evaluación bajo el Decreto 156/2022 de Galicia.
-- [ ] Contiene saberes básicos y competencias clave expresadas con la escala cualitativa oficial de ESO (`IN, SU, BE, NT, SB`).
-- [ ] Validado en entorno local para confirmar que `GET /api/v1/marcos` lo expone correctamente junto al de Bachillerato.
+- [x] Archivo `seed_eso.py` o script equivalente que inyecte un marco de evaluación bajo el Decreto 156/2022 de Galicia.
+- [x] Contiene saberes básicos y competencias clave expresadas con la escala cualitativa oficial de ESO (`IN, SU, BE, NT, SB`).
+- [x] Validado en entorno local para confirmar que `GET /api/v1/marcos` lo expone correctamente junto al de Bachillerato.
 
 **Etiquetas:** `v0.2` `database` `seed`
 
