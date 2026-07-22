@@ -6,6 +6,7 @@ Base normativa: Decreto 156/2022 (ESO) y Decreto 157/2022 (Bachillerato) - Xunta
 """
 from typing import List, Literal, Optional
 from pydantic import BaseModel, Field, model_validator
+from backend.models.marco import Etapa
 
 # Escala cualitativa OFICIAL (Art. 27.1, Decreto 156/2022 - ESO).
 # CORRECCIÓN CRÍTICA: "Bien" se abrevia "BE", NUNCA "BI".
@@ -70,7 +71,7 @@ class EvaluacionIA(BaseModel):
     qualitativeAnalysis: QualitativeAnalysis = Field(..., description="Análisis pedagógico cualitativo con fortalezas y mejoras.")
 
     # --- Etapa: determina si la cualitativa es oficial ---
-    etapa: Literal["ESO", "BACH"] = Field(
+    etapa: Etapa = Field(
         ...,
         description="Etapa educativa. En ESO la calificación oficial fuerte es la cualitativa; en BACH es la numérica y la cualitativa es solo orientativa (usar 'NA')."
     )

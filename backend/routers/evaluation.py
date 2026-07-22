@@ -5,7 +5,7 @@ from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from backend.models.database import get_db
 from backend.models.user import Profesor
-from backend.models.marco import MarcoEvaluacion
+from backend.models.marco import MarcoEvaluacion, Etapa
 from backend.models.rubrica import RubricaDocente
 from backend.models.submission import Submission, Evaluacion, ChangeLog, EvaluacionResponse
 from backend.services.auth_service import get_current_profesor
@@ -20,7 +20,7 @@ class EvaluationRequest(BaseModel):
     student_answer: str = Field(..., description="Texto de la respuesta dada por el estudiante o transcripción de la prueba.")
     rubrica_id: int = Field(..., description="ID de la rúbrica del docente para evaluar.")
     marco_id: Optional[int] = Field(None, description="ID del marco normativo oficial (dejar null para Rúbrica Pura).")
-    etapa: Literal["ESO", "BACH"] = Field(..., description="Etapa educativa obligatoria. Si hay marco, se cruza para validación; si no, actúa como ancla normativa.")
+    etapa: Etapa = Field(..., description="Etapa educativa obligatoria. Si hay marco, se cruza para validación; si no, actúa como ancla normativa.")
     modo_evaluacion: Optional[Literal["COMBINADO", "AUDITORIA_CURRICULAR"]] = Field("COMBINADO", description="Estrategia de interacción con el marco legal.")
     question: Optional[str] = Field(None, description="Pregunta, reto o enunciado opcional del examen.")
     alumno_id: Optional[str] = Field(None, max_length=100, description="Identificador seudonimizado del alumno para control de RGPD.")
@@ -68,10 +68,10 @@ async def evaluate_submission(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="El marco de evaluación legislativo especificado no existe o no está activo."
             )
-        if marco.etapa != request.etapa:
+        if marco.etapa != request.etapa.value:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"La etapa declarada '{request.etapa}' no coincide con la etapa del marco normativo '{marco.etapa}'."
+                detail=f"La etapa declarada '{request.etapa.value}' no coincide con la etapa del marco normativo '{marco.etapa}'."
             )
 
     # 3. Crear el registro de la entrega en estado ANALYZING

@@ -3,14 +3,17 @@ Módulo de modelos de datos y esquemas de validación para los Marcos de Evaluac
 Implementa el modelo ORM de SQLAlchemy y los esquemas Pydantic v2 correspondientes.
 Soporta metadatos de vigencia legislativa en cumplimiento con el ADR [D-033] y Hito [v0.2-003].
 """
+import enum
 from datetime import date
-from typing import Any, Dict, Optional, Literal
+from typing import Any, Dict, List, Optional
 from sqlalchemy import Column, Integer, String, Boolean, JSON, Date
 from pydantic import BaseModel, Field, ConfigDict
 from .database import Base
 
-# Etapa educativa: gobierna la escala y la oficialidad de la cualitativa.
-Etapa = Literal["ESO", "BACH"]
+class Etapa(str, enum.Enum):
+    """Etapa educativa: gobierna la escala de calificación y la oficialidad de la cualitativa (D-041, D-046)."""
+    ESO = "ESO"
+    BACH = "BACH"
 
 # =====================================================================
 # 1. MODELO ORM DE SQLALCHEMY (TABLA 'marcos_evaluacion')
@@ -27,7 +30,7 @@ class MarcoEvaluacion(Base):
     nombre = Column(String(255), nullable=False)
     asignatura = Column(String(100), nullable=False)
     curso = Column(String(100), nullable=False)
-    etapa = Column(String(10), default="BACH", nullable=False)
+    etapa = Column(String(10), nullable=False)
     estado_activo = Column(Boolean, default=True, nullable=False)
     
     # Estructura JSONB que contiene competencias, saberes y criterios oficiales
@@ -35,7 +38,7 @@ class MarcoEvaluacion(Base):
     
     # Metadatos de vigencia legislativa [D-033]
     ultima_verificacion_manual = Column(Date, nullable=True)
-    fuente_legislativa_url = Column(String(500), nullable=True)
+    normativa_fuentes = Column(JSON, nullable=True)
 
 
 # =====================================================================
@@ -49,8 +52,11 @@ class MarcoCreate(BaseModel):
     etapa: Etapa = Field(..., description="Etapa educativa: 'ESO' (cualitativa oficial 1-10) o 'BACH' (numérica 0-10).")
     estado_activo: bool = Field(default=True, description="Estado operativo del marco.")
     rubrica_completa: Dict[str, Any] = Field(..., description="Estructura curricular completa en formato JSON.")
-    ultima_verificacion_manual: Optional[date] = Field(None, description="Fecha de la última revisión de vigencia legal.")
-    fuente_legislativa_url: Optional[str] = Field(None, max_length=500, description="Enlace al BOE/DOG oficial.")
+    ultima_verificacion_manual: Optional[date] = Field(None, description="Fecha de la última revisión de vigencia legal (meta-auditoría, no normativa en sí).")
+    normativa_fuentes: Optional[List[Dict[str, Any]]] = Field(
+        None,
+        description="Lista de fuentes legislativas. Cada objeto: {tipo, numero, fecha, url, vigente_desde, vigente_hasta}."
+    )
 
 
 class MarcoResponse(BaseModel):
@@ -64,5 +70,5 @@ class MarcoResponse(BaseModel):
     etapa: Etapa = Field(..., description="Etapa educativa (ESO/BACH).")
     estado_activo: bool = Field(..., description="Indica si el marco de evaluación está activo.")
     rubrica_completa: Dict[str, Any] = Field(..., description="Estructura curricular en JSON.")
-    ultima_verificacion_manual: Optional[date] = Field(None, description="Última verificación manual de vigencia legal.")
-    fuente_legislativa_url: Optional[str] = Field(None, description="URL del BOE/DOG de la normativa.")
+    ultima_verificacion_manual: Optional[date] = Field(None, description="Última verificación manual de vigencia legal (meta-auditoría).")
+    normativa_fuentes: Optional[List[Dict[str, Any]]] = Field(None, description="Lista estructurada de fuentes legislativas.")
