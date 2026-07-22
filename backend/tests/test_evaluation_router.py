@@ -268,6 +268,33 @@ class TestEvaluationRouter(unittest.TestCase):
         response = self.client.patch("/api/v1/submissions/no-existe/feed-forward/realizado")
         self.assertEqual(response.status_code, 404)
 
+    def test_feed_forward_unauthorized(self):
+        """Devuelve 403 si un profesor distinto al dueño intenta modificar el feed-forward."""
+        profesor2 = Profesor(id=2, email="otradocente@edu.xunta.gal", nombre="María", hashed_password="hashed_mock")
+        self.db.add(profesor2)
+        self.db.commit()
+
+        # Sobrescribir localmente la dependencia
+        def override_get_current_profesor2():
+            return profesor2
+
+        app.dependency_overrides[get_current_profesor] = override_get_current_profesor2
+
+        try:
+            # Intentar marcar realizado
+            response1 = self.client.patch("/api/v1/submissions/test-submission-uuid-001/feed-forward/realizado")
+            self.assertEqual(response1.status_code, 403)
+
+            # Intentar verificar
+            response2 = self.client.patch(
+                "/api/v1/submissions/test-submission-uuid-001/feed-forward/verificado",
+                json={"ia_propuso_verificacion": True, "evaluation_id": 1}
+            )
+            self.assertEqual(response2.status_code, 403)
+        finally:
+            # Restaurar
+            app.dependency_overrides[get_current_profesor] = lambda: self.profesor
+
     def test_feed_forward_changelog_persistido(self):
         """Verifica que la transición persiste una entrada en ChangeLog con actor y datos correctos."""
         self.client.patch("/api/v1/submissions/test-submission-uuid-001/feed-forward/realizado")
@@ -307,6 +334,179 @@ class TestEvaluationRouter(unittest.TestCase):
         self.assertTrue(log.audit_metadata["ia_propuso_verificacion"])
         self.assertEqual(log.audit_metadata["evaluation_id"], 99)
 
+    def test_approve_submission_success(self):
+        """Aprobación exitosa: transiciona a GRADED, actualiza la evaluacion y crea el ChangeLog."""
+        evaluacion = Evaluacion(
+            submission_id="test-submission-uuid-001",
+            resultado_ia={"calificacion_numerica": 8.0},
+            aprobado_por_profesor=False
+        )
+        self.db.add(evaluacion)
+        self.db.commit()
+
+        payload = {"nota_final": 9.0}
+        response = self.client.patch("/api/v1/submissions/test-submission-uuid-001/approve", json=payload)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["estado"], "GRADED")
+
+        # Verificar base de datos
+        db_sub = self.db.query(Submission).filter(Submission.id == "test-submission-uuid-001").first()
+        self.assertEqual(db_sub.estado, "GRADED")
+
+        db_eval = self.db.query(Evaluacion).filter(Evaluacion.submission_id == "test-submission-uuid-001").first()
+        self.assertTrue(db_eval.aprobado_por_profesor)
+        self.assertEqual(db_eval.nota_final, 9.0)
+
+        db_log = (
+            self.db.query(ChangeLog)
+            .filter(
+                ChangeLog.submission_id == "test-submission-uuid-001",
+                ChangeLog.accion == "EVALUACION_APROBADA"
+            )
+            .first()
+        )
+        self.assertIsNotNone(db_log)
+        self.assertEqual(db_log.actor, "PROFESOR_ID_1")
+        self.assertEqual(db_log.audit_metadata["actor_id"], 1)
+        self.assertEqual(db_log.audit_metadata["actor_tipo"], "profesor")
+
+    def test_approve_submission_invalid_state(self):
+        """Intento de aprobación cuando el estado no es REVIEW devuelve 409."""
+        sub = self.db.query(Submission).filter(Submission.id == "test-submission-uuid-001").first()
+        sub.estado = "PENDING"
+        self.db.commit()
+
+        response = self.client.patch("/api/v1/submissions/test-submission-uuid-001/approve")
+        self.assertEqual(response.status_code, 409)
+
+    def test_approve_submission_unauthorized(self):
+        """Intento de aprobación por parte de un profesor no propietario devuelve 403."""
+        profesor2 = Profesor(id=2, email="otradocente@edu.xunta.gal", nombre="María", hashed_password="hashed_mock")
+        self.db.add(profesor2)
+        self.db.commit()
+
+        # Sobrescribir localmente la dependencia
+        def override_get_current_profesor2():
+            return profesor2
+
+        app.dependency_overrides[get_current_profesor] = override_get_current_profesor2
+
+        try:
+            response = self.client.patch("/api/v1/submissions/test-submission-uuid-001/approve")
+            self.assertEqual(response.status_code, 403)
+        finally:
+            # Restaurar
+            app.dependency_overrides[get_current_profesor] = lambda: self.profesor
+
+    def test_listar_submissions_owner_only(self):
+        """Devuelve solo las entregas del profesor autenticado."""
+        # Submission ajena (profesor 2)
+        sub_ajena = Submission(
+            id="test-submission-uuid-ajena",
+            profesor_id=2,
+            rubrica_id=1,
+            estado="REVIEW",
+        )
+        self.db.add(sub_ajena)
+        self.db.commit()
+
+        response = self.client.get("/api/v1/submissions")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        
+        # Debe contener solo la del profesor 1
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["id"], "test-submission-uuid-001")
+
+    def test_listar_submissions_filter_estado(self):
+        """Devuelve las entregas del profesor autenticado filtradas opcionalmente por estado."""
+        # Crear otra submission del profesor 1 pero en estado GRADED
+        sub_graded = Submission(
+            id="test-submission-uuid-graded",
+            profesor_id=1,
+            rubrica_id=1,
+            estado="GRADED",
+        )
+        self.db.add(sub_graded)
+        self.db.commit()
+
+        # 1. Filtrar por REVIEW
+        response = self.client.get("/api/v1/submissions?estado=REVIEW")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["id"], "test-submission-uuid-001")
+
+        # 2. Filtrar por GRADED
+        response = self.client.get("/api/v1/submissions?estado=GRADED")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(len(data), 1)
+        self.assertEqual(data[0]["id"], "test-submission-uuid-graded")
+
+    def test_obtener_evaluacion_success(self):
+        """Obtiene la evaluación de una entrega propia de forma exitosa."""
+        resultado_mock = {
+            "etapa": "BACH",
+            "transcription": "Test",
+            "rubricBreakdown": [
+                {
+                    "criterio_codigo": "FILO-B2.3",
+                    "competencias_clave": ["CCL", "CC"],
+                    "category": "Cat",
+                    "score": 8.0,
+                    "maxScore": 10.0,
+                    "peso": 100.0,
+                    "nivel_logro": 4,
+                    "reasoning": "Reason"
+                }
+            ],
+            "visualMarkers": [],
+            "qualitativeAnalysis": {
+                "strengths": ["Strength"],
+                "improvementNeeds": {
+                    "immediate": ["Immediate"],
+                    "mediumLongTerm": ["Medium"]
+                },
+                "teacherSummary": "Summary"
+            },
+            "calificacion_numerica": 8.0,
+            "calificacion_cualitativa": "NA",
+            "siguiente_paso_accionable": "Siguiente paso",
+            "confidence_score": 0.9
+        }
+        evaluacion = Evaluacion(
+            submission_id="test-submission-uuid-001",
+            resultado_ia=resultado_mock,
+            aprobado_por_profesor=False
+        )
+        self.db.add(evaluacion)
+        self.db.commit()
+
+        response = self.client.get("/api/v1/evaluaciones/test-submission-uuid-001")
+        self.assertEqual(response.status_code, 200)
+        data = response.json()
+        self.assertEqual(data["submission_id"], "test-submission-uuid-001")
+        self.assertFalse(data["aprobado_por_profesor"])
+
+    def test_obtener_evaluacion_unauthorized(self):
+        """Devuelve 403 si un profesor intenta acceder a la evaluación de una entrega ajena."""
+        profesor2 = Profesor(id=2, email="otradocente@edu.xunta.gal", nombre="María", hashed_password="hashed_mock")
+        self.db.add(profesor2)
+        self.db.commit()
+
+        # Sobrescribir localmente la dependencia
+        def override_get_current_profesor2():
+            return profesor2
+
+        app.dependency_overrides[get_current_profesor] = override_get_current_profesor2
+
+        try:
+            response = self.client.get("/api/v1/evaluaciones/test-submission-uuid-001")
+            self.assertEqual(response.status_code, 403)
+        finally:
+            # Restaurar
+            app.dependency_overrides[get_current_profesor] = lambda: self.profesor
 
 
 if __name__ == "__main__":

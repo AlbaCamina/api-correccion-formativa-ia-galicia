@@ -183,6 +183,37 @@ async def evaluate_submission(
     submission.estado = "REVIEW"
     db.commit()
     db.refresh(evaluacion)
-
     return evaluacion
+
+
+@router.get("/evaluaciones/{submission_id}", response_model=EvaluacionResponse)
+def obtener_evaluacion(
+    submission_id: str,
+    db: Session = Depends(get_db),
+    current_profesor: Profesor = Depends(get_current_profesor),
+):
+    """
+    Obtiene la última evaluación de la entrega especificada.
+    Valida que la entrega pertenezca al profesor autenticado.
+    """
+    submission = db.query(Submission).filter(Submission.id == submission_id).first()
+    if not submission:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Entrega no encontrada."
+        )
+    if submission.profesor_id != current_profesor.id:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="No tienes permiso para acceder a esta entrega."
+        )
+
+    evaluacion = db.query(Evaluacion).filter(Evaluacion.submission_id == submission_id).order_by(Evaluacion.id.desc()).first()
+    if not evaluacion:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Evaluación no encontrada para esta entrega."
+        )
+    return evaluacion
+
 

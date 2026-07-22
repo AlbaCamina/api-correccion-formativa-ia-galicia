@@ -3,12 +3,15 @@ import uuid
 from fastapi import APIRouter, Body, Depends, HTTPException, UploadFile, File, status
 from sqlalchemy.orm import Session
 
+from typing import Optional, List
+from pydantic import BaseModel, Field
 from backend.models.database import get_db
 from backend.models.submission import (
     ChangeLog,
     FeedForwardVerificadoRequest,
     Submission,
     SubmissionResponse,
+    Evaluacion,
 )
 from backend.models.user import Profesor
 from backend.services.auth_service import get_current_profesor
@@ -175,3 +178,79 @@ def confirmar_feed_forward_verificado(
     db.commit()
     db.refresh(sub)
     return sub
+
+
+class ApproveRequest(BaseModel):
+    nota_final: Optional[float] = Field(None, description="Nota final opcional asignada por el docente.")
+
+
+@router.patch("/{submission_id}/approve", response_model=SubmissionResponse)
+def aprobar_submission(
+    submission_id: str,
+    body: Optional[ApproveRequest] = None,
+    db: Session = Depends(get_db),
+    current_profesor: Profesor = Depends(get_current_profesor),
+):
+    """
+    Aprueba la evaluación de una entrega (Human-in-the-Loop).
+    Transiciona el estado de la entrega de REVIEW a GRADED.
+    Registra en ChangeLog la acción EVALUACION_APROBADA con el actor docente.
+    """
+    sub = db.query(Submission).filter(Submission.id == submission_id).first()
+    if not sub:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Entrega no encontrada.")
+    if sub.profesor_id != current_profesor.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="No tienes permiso sobre esta entrega.")
+
+    if sub.estado != "REVIEW":
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"La entrega debe estar en estado 'REVIEW' para ser aprobada. Estado actual: '{sub.estado}'.",
+        )
+
+    estado_anterior = sub.estado
+    sub.estado = "GRADED"
+
+    # Buscar la evaluación correspondiente para marcarla como aprobada
+    evaluacion = db.query(Evaluacion).filter(Evaluacion.submission_id == sub.id).order_by(Evaluacion.id.desc()).first()
+    if evaluacion:
+        evaluacion.aprobado_por_profesor = True
+        if body and body.nota_final is not None:
+            evaluacion.nota_final = body.nota_final
+        elif evaluacion.nota_final is None:
+            # Si no se provee nota_final e intentamos usar la de la IA
+            evaluacion.nota_final = evaluacion.resultado_ia.get("calificacion_numerica")
+
+    log = ChangeLog(
+        submission_id=sub.id,
+        accion="EVALUACION_APROBADA",
+        actor=f"PROFESOR_ID_{current_profesor.id}",
+        datos_anteriores={"estado": estado_anterior},
+        datos_nuevos={"estado": sub.estado},
+        audit_metadata={
+            "actor_id": current_profesor.id,
+            "actor_tipo": "profesor"
+        },
+    )
+    db.add(log)
+    db.commit()
+    db.refresh(sub)
+    return sub
+
+
+@router.get("", response_model=List[SubmissionResponse])
+def listar_submissions(
+    estado: Optional[str] = None,
+    db: Session = Depends(get_db),
+    current_profesor: Profesor = Depends(get_current_profesor),
+):
+    """
+    Lista las entregas que pertenecen al profesor autenticado.
+    Soporta filtro opcional por estado en base de datos.
+    """
+    query = db.query(Submission).filter(Submission.profesor_id == current_profesor.id)
+    if estado:
+        query = query.filter(Submission.estado == estado)
+    return query.all()
+
+
