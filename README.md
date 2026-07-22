@@ -81,7 +81,7 @@ El servidor estará accesible en `http://127.0.0.1:8000`. Puedes consultar la do
 ### 6. Ejecutar la Suite de Pruebas
 
 ```bash
-python3 -m unittest discover -s backend/tests/
+venv/bin/pytest backend/tests/ -v
 ```
 
 ---
@@ -177,8 +177,17 @@ Respuesta de ejemplo:
     "curso": "1º Bachillerato",
     "etapa": "BACH",
     "estado_activo": true,
-    "fuente_legislativa_url": "https://www.xunta.gal/dog/Publicados/2022/20220804/AnuncioG0655-280722-0001_es.html",
-    "ultima_verificacion_manual": "2026-07-10"
+    "normativa_fuentes": [
+      {
+        "tipo": "Decreto",
+        "numero": "157/2022",
+        "fecha": "2022-08-04",
+        "url": "https://www.xunta.gal/dog/Publicados/2022/20220804/AnuncioG0655-280722-0001_es.html",
+        "vigente_desde": "2022-09-01",
+        "vigente_hasta": null
+      }
+    ],
+    "ultima_verificacion_manual": "2026-07-14"
   }
 ]
 ```

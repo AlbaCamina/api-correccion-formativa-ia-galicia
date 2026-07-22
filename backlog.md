@@ -128,7 +128,7 @@
 - [ ] `qualitativeAnalysis` incluye: `strengths[]`, `improvementNeeds.immediate[]`, `improvementNeeds.mediumLongTerm[]`, `teacherSummary`
 - [ ] Probado con al menos 1 respuesta de alumno de ejemplo (buena, regular o mala)
 - [ ] El script imprime el JSON recibido con formato legible (`json.dumps(..., indent=2)`)
-- [ ] La respuesta incluye `calificacion_cualitativa` (valor IN/SU/BI/NT/SB), `siguiente_paso_accionable` (string no vacío) y `confidence_score` (float 0.0–1.0) según [D-024]
+- [ ] La respuesta incluye `calificacion_cualitativa` (valor IN/SU/**BE**/NT/SB), `siguiente_paso_accionable` (string no vacío) y `confidence_score` (float 0.0–1.0) según [D-024, D-042]
 - [ ] Si `confidence_score < 0.75`, el script imprime una advertencia ("⚠️ Revisión manual recomendada")
 
 **Etiquetas:** `v0.1` `backend`
@@ -308,7 +308,7 @@
 **para** que cambios legislativos solo requieran actualizar un registro (no el código), y para que el sistema pueda escalar a otras comunidades autónomas sin modificar la arquitectura.
 
 **Criterios de aceptación:**
-- [x] Tabla `marcos_evaluacion` con campos: `id`, `nombre`, `asignatura`, `curso`, `estado_activo`, `rubrica_completa` (JSONB) y metadatos de vigencia legislativa: `ultima_verificacion_manual` (DATE/nullable) y `fuente_legislativa_url` (VARCHAR/nullable) [D-033]
+- [x] Tabla `marcos_evaluacion` con campos: `id`, `nombre`, `asignatura`, `curso`, `estado_activo`, `rubrica_completa` (JSONB) y metadatos de vigencia legislativa: `ultima_verificacion_manual` (DATE/nullable) y `normativa_fuentes` (JSON list: `{tipo, numero, fecha, url, vigente_desde, vigente_hasta}`) [D-033, D-046 — Issue #12]
 - [x] Seed con al menos un marco de evaluación real de Bachillerato o ESO (Decreto autonómico de la Xunta de Galicia) incluyendo fecha de verificación actual
 - [x] `GET /api/v1/marcos` devuelve todos los marcos activos
 - [x] El endpoint de evaluación acepta `marco_id` para usar el marco correspondiente
