@@ -112,10 +112,20 @@ def seed_database():
             nombre="Decreto 157/2022 - Currículo de Filosofía en Galicia",
             asignatura="Filosofía",
             curso="1º Bachillerato",
+            etapa="BACH",
             estado_activo=True,
             rubrica_completa=rubrica_completa_galicia,
             ultima_verificacion_manual=date(2026, 7, 14),
-            fuente_legislativa_url="https://www.xunta.gal/dog/Publicados/2022/20220603/AnuncioG0656-260522-0001_gl.html"
+            normativa_fuentes=[
+                {
+                    "tipo": "decreto",
+                    "numero": "157/2022",
+                    "fecha": "2022-06-03",
+                    "url": "https://www.xunta.gal/dog/Publicados/2022/20220603/AnuncioG0656-260522-0001_gl.html",
+                    "vigente_desde": "2022-09-01",
+                    "vigente_hasta": None
+                }
+            ]
         )
         
         db.add(nuevo_marco)
