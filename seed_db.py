@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 sys.path.append(os.path.abspath(os.path.dirname(__file__)))
 
 from backend.models.database import SessionLocal, engine, Base
-from backend.models.marco import MarcoEvaluacion
+from backend.models.marco import MarcoEvaluacion, Etapa
 
 
 def seed_database():
@@ -112,7 +112,7 @@ def seed_database():
             nombre="Decreto 157/2022 - Currículo de Filosofía en Galicia",
             asignatura="Filosofía",
             curso="1º Bachillerato",
-            etapa="BACH",
+            etapa=Etapa.BACH,
             estado_activo=True,
             rubrica_completa=rubrica_completa_galicia,
             ultima_verificacion_manual=date(2026, 7, 14),

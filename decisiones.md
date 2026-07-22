@@ -60,6 +60,7 @@
 | [D-043](#d-043) | Nota de prueba por media ponderada; la IA no suma, el backend recalcula — corrige D-039 | Jul 2026 | ✅ Adoptada |
 | [D-044](#d-044) | Trazabilidad obligatoria criterio de evaluación → competencia clave | Jul 2026 | ✅ Adoptada |
 | [D-045](#d-045) | Semántica HitL de la nota: `calificacion_numerica` es orientativa con decimales; el redondeo a entero de boletín lo hace el docente | Jul 2026 | ✅ Adoptada |
+| [D-046](#d-046) | Etapa como `str` Enum de Python en lugar de tabla catálogo en BD | Jul 2026 | ✅ Adoptada |
 
 ---
 
@@ -979,6 +980,15 @@ El sistema es ahora jurídicamente perfecto y responde a la realidad del profeso
 
 ---
 
+### D-046 — Etapa como `str` Enum de Python en lugar de tabla catálogo en BD
+
+**Estado:** ✅ Adoptada (`refactor/multi-region-extensibility`, Issue #12 — Fase 5)  
+**Fecha:** Julio 2026 (22/07/2026)
+
+Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `Etapa` extensible a futuras CC.AA.: (A) tabla `etapas_educativas` en BD y (B) `class Etapa(str, enum.Enum)` en Python. Se eligió la **Opción B** por alineación con decisiones previas — D-004 (la extensibilidad multi-autonómica ya está resuelta en el JSONB de `rubrica_completa`), D-033 (YAGNI: frecuencia de cambio de las etapas educativas ≈ cero), D-040 (las etapas son obligación legal LOMLOE, no configuración de centro) y D-041 (que ya adoptó `Literal["ESO","BACH"]`). La Opción A habría eliminado la validación automática de Pydantic en el contrato del LLM sin justificación de ganancia proporcional. Esfuerzo de implementación: 3 líneas en `models/marco.py`, cero migraciones de columna.
+
+---
+
 *Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 19/07/2026 — añadidas D-040 a D-045 (Auditoría Normativa)*  
-*Total de decisiones registradas: 45*
+*Actualizado el 22/07/2026 — añadida D-046 (Fase 5, Issue #12)*  
+*Total de decisiones registradas: 46*

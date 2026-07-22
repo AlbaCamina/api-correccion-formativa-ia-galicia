@@ -68,10 +68,10 @@ async def evaluate_submission(
                 status_code=status.HTTP_404_NOT_FOUND,
                 detail="El marco de evaluación legislativo especificado no existe o no está activo."
             )
-        if marco.etapa != request.etapa:
+        if marco.etapa != request.etapa.value:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
-                detail=f"La etapa declarada '{request.etapa}' no coincide con la etapa del marco normativo '{marco.etapa}'."
+                detail=f"La etapa declarada '{request.etapa.value}' no coincide con la etapa del marco normativo '{marco.etapa}'."
             )
 
     # 3. Crear el registro de la entrega en estado ANALYZING

@@ -3,14 +3,17 @@ Módulo de modelos de datos y esquemas de validación para los Marcos de Evaluac
 Implementa el modelo ORM de SQLAlchemy y los esquemas Pydantic v2 correspondientes.
 Soporta metadatos de vigencia legislativa en cumplimiento con el ADR [D-033] y Hito [v0.2-003].
 """
+import enum
 from datetime import date
-from typing import Any, Dict, List, Optional, Literal
+from typing import Any, Dict, List, Optional
 from sqlalchemy import Column, Integer, String, Boolean, JSON, Date
 from pydantic import BaseModel, Field, ConfigDict
 from .database import Base
 
-# Etapa educativa: gobierna la escala y la oficialidad de la cualitativa.
-Etapa = Literal["ESO", "BACH"]
+class Etapa(str, enum.Enum):
+    """Etapa educativa: gobierna la escala de calificación y la oficialidad de la cualitativa (D-041, D-046)."""
+    ESO = "ESO"
+    BACH = "BACH"
 
 # =====================================================================
 # 1. MODELO ORM DE SQLALCHEMY (TABLA 'marcos_evaluacion')
