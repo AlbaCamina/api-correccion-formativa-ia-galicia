@@ -437,7 +437,7 @@
 
 ---
 
-### [v0.2-011] Seed de Normativa ESO (Decreto 156/2022)
+### [v0.2-012] Seed de Normativa ESO (Decreto 156/2022)
 
 **Como** desarrolladora,  
 **quiero** disponer de un registro base (`seed`) en la BBDD con la normativa oficial de la ESO en Galicia  
@@ -550,12 +550,12 @@
 ### [v0.4-002] Endpoint asíncrono de evaluación
 
 **Como** profesora,  
-**quiero** subir una entrega con sus folios y recibir confirmación inmediata  
+**quiero** subir una entrega con sus folios y recibir confirmación inmediata a 
 **para** poder seguir trabajando mientras la IA lo procesa.
 
 **Criterios de aceptación:**
 - [ ] `POST /api/v1/submissions` acepta `archivos_urls`, `marco_id`, `rubrica_id` y `alumno_id` devolviendo `{ "submission_id": "...", "status": "PENDING" }` (`202 Accepted`) en <500ms
-- [ ] La tarea de corrección multimodal se encola en Celery y no bloquea al servidor
+- [ ] La tarea de corrección multimodal se ejecuta de forma asíncrona vía FastAPI BackgroundTasks (implementación real del MVP, ver nota arquitectónica en v0.4-004 y D-048) y no bloquea al servidor. Celery + Redis queda documentado como mejora futura de escalado en Roadmap.
 - [ ] `GET /api/v1/submissions/{id}` devuelve el estado actual (PENDING/ANALYZING/REVIEW/GRADED)
 - [ ] El worker actualiza el estado y guarda las evaluaciones en BBDD al terminar
 
@@ -827,7 +827,8 @@
 
 ## 🩺 Notas de Deuda Técnica Activa
 
-- **Tests sin validación de migraciones (v0.3-002):** Los tests unitarios utilizan SQLite en memoria llamando a `metadata.create_all()` en lugar de aplicar revisiones Alembic, por lo que no validan si las migraciones coinciden con los modelos reales. Esta es una limitación técnica conocida que obliga a validar las nuevas columnas (como `estado_feed_forward`) manualmente contra Postgres.
+- **Tests sin validación de migraciones (v0.3-002):** Tests sin validación de migraciones (v0.3-002+): Los tests unitarios utilizan SQLite en memoria llamando a metadata.create_all() en lugar de aplicar revisiones Alembic, por lo que no validan si las migraciones coinciden con los modelos reales. Esta es una limitación técnica conocida que obliga a validar las nuevas columnas (como estado_feed_forward) manualmente contra Postgres.
+Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificada como Parcial por este mismo motivo (evidencia indirecta, riesgo de falso "verde"). Cerrar esta deuda requiere una suite de tests de integración contra un contenedor Postgres real (no SQLite) que aplique alembic upgrade head antes de cada batería de pruebas.
 - **Advertencia de Dependencias (v0.5):** Los tests arrojan un `StarletteDeprecationWarning: Using 'httpx' with 'starlette.testclient' is deprecated; install 'httpx2' instead.` que debe resolverse actualizando la dependencia del cliente HTTP de pruebas.
 
 ---

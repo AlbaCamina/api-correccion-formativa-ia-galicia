@@ -6,7 +6,8 @@
 
 > [!NOTE]
 > **SÍNTESIS DEL MOMENTO ACTUAL (Julio 2026):**  
-> La Versión 0.2 está 100% completada y auditada bajo el ADR D-035. La deuda técnica de Alembic (v0.2-008), el circuito de aprobación docente HitL (v0.2-009), los endpoints de consulta (v0.2-010) y el seed de la ESO (v0.2-011) están en main con 31 tests en verde. El foco actual es la reunión con el contacto de la AESIA (Bloque 3) como puente para iniciar la arquitectura multimodal pre-nube de la v0.3.
+> Estado: Versión 0.2 Avanzada. Completada y Auditada. Listos para demo AESIA y Bloque 3.
+SÍNTESIS DEL MOMENTO ACTUAL (actualizado 22/07/2026): La Versión 0.2 está 100% completada y auditada bajo el ADR D-035. Además de la deuda técnica de Alembic (v0.2-008), el circuito HitL (v0.2-009), los endpoints de consulta (v0.2-010), el validador de etapa ESO/BACH (v0.2-011, D-049) y el seed de la ESO (v0.2-012), se ha incorporado el bloque de auditoría normativa LOMLOE (D-040 a D-046: etapa obligatoria ESO/BACH, escala BE, media ponderada determinista en backend), cerrado en la Fase 5 de la Issue 12 (D-046, 22/07). El foco actual sigue siendo la reunión con el contacto de la AESIA (Bloque 3) como puente hacia la arquitectura multimodal pre-nube de la v0.3.
 
 ---
 
@@ -306,7 +307,7 @@ B2B — Canal institucional / integración
     },
     "teacherSummary": "Resumen para el cuaderno del profesor. Aquí se reportan avisos de configuración: pesos que no suman 100 %, criterios sin evaluar o brechas curriculares (modo AUDITORIA_CURRICULAR)."
   },
-  "calificacion_cualitativa": "NA",
+  "calificacion_cualitativa": null,
   "calificacion_numerica": 7.5,
   "siguiente_paso_accionable": "Feed Forward (Hattie): directriz concreta y realizable hoy. Debe decir QUÉ y CÓMO.",
   "confidence_score": 0.9,
@@ -317,7 +318,7 @@ B2B — Canal institucional / integración
 
 **Notas de contrato (importantes):**
 - `type` de `visualMarkers` usa el vocabulario real: `"ERROR"`, `"MEJORA"`, `"CORRECTO"`, `"error_excluido"`. Ya NO se usa `"GRAMMAR_ERROR"` (obsoleto del contrato v0.1).
-- `calificacion_cualitativa` admite: `"IN"`, `"SU"`, `"BE"`, `"NT"`, `"SB"`, `"NA"`. En Bachillerato se usa `"NA"` (no es oficial); en ESO es el dato oficial fuerte. Nunca `"BI"` (D-042).
+- `calificacion_cualitativa` admite: `"IN"`, `"SU"`, `"BE"`, `"NT"`, `"SB"`. En Bachillerato el backend lo fuerza a `null` (D-049, no es oficial); en ESO es el dato oficial fuerte. Nunca `"BI"` (D-042).
 - `calificacion_numerica` es ORIENTATIVA con decimales (media ponderada de criterios, D-043). El docente redondea al aprobar (D-045).
 - `criterio_codigo` + `competencias_clave` habilitan la trazabilidad hacia competencias (D-044).
 

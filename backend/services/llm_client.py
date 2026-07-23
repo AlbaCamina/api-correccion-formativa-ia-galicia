@@ -93,7 +93,7 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "", 
                 teacherSummary="Buen dominio competencial de los símbolos clave del Mito de la Caverna. El alumno capta la dimensión ética del retorno filosófico. Se recomienda reforzar el vocabulario técnico epistemológico."
             ),
             calificacion_numerica=8.0,
-            calificacion_cualitativa="NA",
+            calificacion_cualitativa="NT",
             siguiente_paso_accionable="En tu próximo repaso de hoy, redacta una frase de 3 líneas donde conectes la palabra 'paideia' con la metáfora de 'girar la mirada' desde las sombras hacia la luz del conocimiento real.",
             confidence_score=0.92,
             ortografia_detectada=["esfuerço"],

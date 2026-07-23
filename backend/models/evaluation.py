@@ -10,8 +10,8 @@ from backend.models.marco import Etapa
 
 # Escala cualitativa OFICIAL (Art. 27.1, Decreto 156/2022 - ESO).
 # CORRECCIÓN CRÍTICA: "Bien" se abrevia "BE", NUNCA "BI".
-# Se añade "NA" porque en Bachillerato la cualitativa NO es oficial (solo la numérica 0-10).
-CalificacionCualitativa = Literal["IN", "SU", "BE", "NT", "SB", "NA"]
+# La cualitativa solo es oficial en ESO. En BACH será None (D-049).
+CalificacionCualitativa = Literal["IN", "SU", "BE", "NT", "SB"]
 
 # Competencias clave LOMLOE (comunes a todas las CCAA).
 CompetenciaClave = Literal["CCL", "CP", "STEM", "CD", "CPSAA", "CC", "CE", "CCEC"]
@@ -77,9 +77,9 @@ class EvaluacionIA(BaseModel):
     )
 
     # --- Calificación ORIENTATIVA (HitL: el docente decide y redondea al aprobar) ---
-    calificacion_cualitativa: CalificacionCualitativa = Field(
-        ...,
-        description="Cualitativa Decreto 156/2022 (SOLO oficial en ESO): IN=1-4, SU=5, BE=6, NT=7-8, SB=9-10. En BACH usar 'NA'."
+    calificacion_cualitativa: Optional[CalificacionCualitativa] = Field(
+        None,
+        description="Cualitativa Decreto 156/2022 (SOLO oficial en ESO): IN=1-4, SU=5, BE=6, NT=7-8, SB=9-10. En BACH debe ser null."
     )
     calificacion_numerica: float = Field(
         ..., ge=0.0, le=10.0,
@@ -103,6 +103,16 @@ class EvaluacionIA(BaseModel):
         default_factory=list,
         description="Subconjunto de errores ortográficos detectados pero EXCLUIDOS de penalización por adaptaciones del alumno."
     )
+
+    @model_validator(mode="after")
+    def forzar_cualitativa_segun_etapa(self) -> "EvaluacionIA":
+        """
+        Mutador (D-049): La cualitativa solo existe legalmente en ESO.
+        En Bachillerato se fuerza a None, independientemente de la IA.
+        """
+        if self.etapa == Etapa.BACH:
+            self.calificacion_cualitativa = None
+        return self
 
     @model_validator(mode="after")
     def recalcular_media_ponderada(self) -> "EvaluacionIA":

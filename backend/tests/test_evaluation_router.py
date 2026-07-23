@@ -114,7 +114,7 @@ class TestEvaluationRouter(unittest.TestCase):
 
         resultado = data["resultado_ia"]
         self.assertIn("transcription", resultado)
-        self.assertEqual(resultado["calificacion_cualitativa"], "NA")
+        self.assertIsNone(resultado["calificacion_cualitativa"])
         self.assertEqual(resultado["calificacion_numerica"], 8.0)
         self.assertEqual(len(resultado["visualMarkers"]), 1)
         self.assertEqual(resultado["visualMarkers"][0]["type"], "error_excluido")
@@ -471,7 +471,7 @@ class TestEvaluationRouter(unittest.TestCase):
                 "teacherSummary": "Summary"
             },
             "calificacion_numerica": 8.0,
-            "calificacion_cualitativa": "NA",
+            "calificacion_cualitativa": None,
             "siguiente_paso_accionable": "Siguiente paso",
             "confidence_score": 0.9
         }

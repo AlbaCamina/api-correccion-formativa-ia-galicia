@@ -989,6 +989,55 @@ Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `
 
 ---
 
-*Documento creado el 08/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 22/07/2026 — añadida D-046 (Fase 5, Issue #12)*  
-*Total de decisiones registradas: 46*
+### D-047 — Adopción de Groq Vision (LPU) con fallback GPT-4o como motor multimodal
+
+**Estado:** ✅ Adoptada (`v0.3-004`)  
+**Fecha:** Julio 2026
+
+**Contexto:** El MVP inicial (D-003) posterga el OCR/multimodal a v0.3, momento en el que la lógica de evaluación textual ya está validada. Se necesita seleccionar el motor de visión que procesará las imágenes anonimizadas.
+
+**Opciones consideradas:**
+- **GPT-4o Vision en exclusiva:** máxima calidad, pero coste recurrente incompatible con la Fase Ninja sin alta de autónomos (D-010).
+- **Modelo propio de OCR entrenado:** sobreingeniería, viola YAGNI.
+- **Groq Vision (llama-3.2-11b/90b-vision-preview) como primario, con fallback a GPT-4o:** coherente con D-028 (Groq como motor primario de coste cero).
+
+**Decisión:** Se adopta Groq Vision como motor multimodal primario, manteniendo la bifurcación plana de proveedor ya establecida en D-028 (`LLM_PROVIDER`), con fallback a `gpt-4o` cuando Groq no esté disponible o el caso de uso lo requiera. El contrato `EvaluacionIA` admite transcripción con marcadores `ILEGIBLE` y coordenadas aproximadas sin romper la validación Pydantic.
+
+**Consecuencias:** `llm_client.py` extiende su bifurcación plana para incluir el envío de imagen (Base64 si es local, URL si es nube) en el payload multimodal. Esta decisión depende funcionalmente de D-022 (seudonimización pre-nube) — solo la imagen ya anonimizada puede llegar a este cliente.
+
+---
+
+### D-048 — FastAPI BackgroundTasks como cola de tareas del MVP (Celery/Redis diferido a Roadmap)
+
+**Estado:** ✅ Adoptada (`v0.4-004`)  
+**Fecha:** Julio 2026
+
+**Contexto:** El plan de trabajo original (Bloque 6, Bloque 9) contemplaba Celery + Redis como sistema de colas para v0.4. Durante la implementación se detectó que configurar Celery en WSL añade una complejidad de entorno desproporcionada frente al valor demostrable en el MVP, y que el criterio de éxito real de v0.4 (5 correcciones simultáneas sin colapso, respuesta 202 en menos de 1 segundo) es alcanzable sin un broker dedicado.
+
+**Opciones consideradas:**
+1. **Celery + Redis desde el inicio:** arquitectura "correcta" a escala, pero bloquea el desarrollo con fricción de configuración en WSL sin aportar valor proporcional al MVP (viola YAGNI/Regla 5, Protocolo de Pausa Arquitectónica).
+2. **FastAPI BackgroundTasks:** nativo, sin dependencias nuevas, suficiente para la carga de prueba definida en v0.4-004.
+3. **Descartar la asincronía y usar procesamiento síncrono:** inviable, rompe la promesa de UX de confirmación inmediata (202 Accepted).
+
+**Decisión:** Se adopta BackgroundTasks de FastAPI como mecanismo real de asincronía en el MVP (v0.4). Celery + Redis queda documentado explícitamente en el README como mejora arquitectónica futura para producción a escala, demostrando conocimiento técnico sin sobre-ingeniería prematura.
+
+**Consecuencias:** Todos los criterios de aceptación de v0.4-001, v0.4-002 y v0.4-003 que mencionan "Celery" o "worker" se reinterpretan como BackgroundTasks en la implementación real; la mención a Celery se mantiene únicamente en v0.4-001 como ejercicio de configuración exploratoria y en el Roadmap. Esta ADR resuelve formalmente la inconsistencia detectada entre v0.4-002 (que citaba "Celery" en su criterio de aceptación) y la nota arquitectónica de v0.4-004.
+
+---
+
+### D-049 — Calificación cualitativa condicional por etapa (ESO vs BACH)
+
+**Estado:** ✅ Adoptada  
+**Fecha:** Julio 2026
+
+**Contexto:** El Decreto 156/2022 (ESO) traduce el proceso competencial a una etiqueta cualitativa de cierre de acta (IN, SU, BE, NT, SB — D-042). El Decreto 157/2022 (Bachillerato) cierra actas trimestrales y finales únicamente con nota numérica del 1 al 10 con un decimal, sin etiqueta cualitativa equivalente en el expediente oficial, aunque el proceso de evaluación por competencias (Capas 1-4) se aplica igual en ambas etapas.
+
+**Decisión:** El campo `calificacion_cualitativa` en `EvaluacionIA` es **Optional[Literal["IN","SU","BE","NT","SB"]]**, y el backend debe forzarlo a `null` cuando `etapa == "BACH"`. El desglose competencial interno (`competencias_criterios`, `rubricBreakdown`) permanece activo en ambas etapas; solo se omite la etiqueta de cierre de acta en Bachillerato.
+
+**Consecuencias:** Corrige el ejemplo JSON de `/api/v1/evaluate` en README.md y api_correccion_plan.md, que mostraban `"NA"` como valor inventado sin respaldo normativo. Requiere validador Pydantic que fuerce `None` si `etapa == "BACH"` independientemente de lo que devuelva el LLM.
+
+---
+
+*Documento creado el 08/07/2026 — Alba Camiña García con la ayuda de Antigravity AI*  
+*Actualizado el 23/07/2026 — añadida D-049*  
+*Total de decisiones registradas: 49*

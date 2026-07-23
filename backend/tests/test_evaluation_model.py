@@ -33,13 +33,13 @@ class TestEvaluacionIA(unittest.TestCase):
     def test_valid_evaluation(self):
         """Valida que un diccionario con los campos correctos se parsea exitosamente."""
         evaluation = EvaluacionIA(**self.valid_data)
-        self.assertEqual(evaluation.calificacion_cualitativa, "NT")
+        self.assertIsNone(evaluation.calificacion_cualitativa)
         self.assertEqual(evaluation.visualMarkers, [])
 
     def test_missing_required_field(self):
-        """Valida que falta un campo obligatorio (ej. calificacion_cualitativa) lanza ValidationError (422)."""
+        """Valida que falta un campo obligatorio (ej. transcription) lanza ValidationError (422)."""
         invalid_data = self.valid_data.copy()
-        del invalid_data["calificacion_cualitativa"]
+        del invalid_data["transcription"]
         with self.assertRaises(ValidationError):
             EvaluacionIA(**invalid_data)
 
@@ -53,7 +53,7 @@ class TestEvaluacionIA(unittest.TestCase):
     def test_invalid_calificacion_cualitativa(self):
         """Valida que un valor fuera de la Literal permitida lanza ValidationError (422)."""
         invalid_data = self.valid_data.copy()
-        invalid_data["calificacion_cualitativa"] = "APROBADO"  # Inválido, debe ser IN, SU, BE, NT, SB, NA
+        invalid_data["calificacion_cualitativa"] = "APROBADO"  # Inválido, debe ser IN, SU, BE, NT, SB
         with self.assertRaises(ValidationError):
             EvaluacionIA(**invalid_data)
 

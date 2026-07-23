@@ -7,15 +7,13 @@
 [![Decretos 156/2022 e 157/2022](https://img.shields.io/badge/Normativa-Decretos%20156%2F2022%20e%20157%2F2022%20Galicia-lightblue?style=flat)](#)
 [![Version](https://img.shields.io/badge/Version-v0.3--001-brightgreen?style=flat)](#)
 
-API de Corrección Formativa con IA diseñada para asistir al profesorado de **Filosofía de Bachillerato** en la Comunidad Autónoma de Galicia. Estructurada bajo el marco pedagógico oficial de la **LOMLOE**, los **Decretos 156/2022 y 157/2022 (Xunta de Galicia)** (garantizando el blindaje estricto de la etapa educativa ESO/BACH), y las directrices de privacidad de la Unión Europea (**RGPD / AI Act / ENS**).
-
----
+API de Corrección Formativa con IA diseñada para asistir al profesorado de Filosofía de Bachillerato en la Comunidad Autónoma de Galicia. Estructurada bajo el marco pedagógico oficial de la LOMLOE, los Decretos 156/2022 y 157/2022 (Xunta de Galicia) (garantizando el blindaje estricto de la etapa educativa ESO/BACH), y las directrices de privacidad de la Unión Europea (RGPD / AI Act / ENS).
 
 ## 🌟 Propuesta de Valor Diferencial
 
 *   **Alineamiento Curricular Gallego:** Diseñada específicamente sobre las competencias clave, competencias específicas y criterios de evaluación de la materia de Filosofía de Bachillerato definidos por la Xunta de Galicia (`[D-027] Modo Dual de Rúbrica`).
-*   **Deslinde Formativo vs Sumativo (`HitL`):** El sistema no califica de forma fría ni automática; realiza un desglose cualitativo por rúbricas pedagógicas, devuelve un **Siguiente Paso Accionable (Feed Forward)** y un **Índice de Confianza IA** para evitar alucinaciones. El docente siempre conserva la soberanía y firma la nota (`[D-002]`).
-*   **Blindaje de Privacidad y Seguridad (`Stealth/Phase Ninja`):** Seudonimización estricta del alumnado en la nube (`alumno_id = "A-14"`) sin cifrado de columnas frágil (`[D-031]`). La libreta de equivalencia con la identidad real del menor reside en exclusiva en el cuaderno local de la profesora, y la autenticación docente se resguarda con hacheo unidireccional irreversible `bcrypt` + sesiones `JWT`.
+*   **Deslinde Formativo vs Sumativo (HitL):** El sistema no califica de forma fría ni automática; realiza un desglose cualitativo por rúbricas pedagógicas, devuelve un **Siguiente Paso Accionable (Feed Forward)** y un **Índice de Confianza IA** para evitar alucinaciones. El docente siempre conserva la soberanía y firma la nota (`[D-002]`).
+*   **Blindaje de Privacidad y Seguridad (Stealth/Phase Ninja):** Seudonimización estricta del alumnado en la nube (`alumno_id = "A-14"`) sin cifrado de columnas frágil (`[D-031]`). La libreta de equivalencia con la identidad real del menor reside en exclusiva en el cuaderno local de la profesora, y la autenticación docente se resguarda con hacheo unidireccional irreversible `bcrypt` + sesiones `JWT`.
 *   **Resiliencia y Optimización FinOps:** Integración primaria con Groq LPU (`llama-3.3-70b-versatile` en `[D-028]`) con fallback dinámico a `json_object` si falla la API de Structured Outputs de algún proveedor.
 
 ---
@@ -39,17 +37,13 @@ docker compose up -d
 ### 2. Clonar e inicializar el entorno virtual Python
 
 ```bash
-# Activar entorno virtual en WSL
 python3 -m venv venv
 source venv/bin/activate
 
-# Instalar dependencias del proyecto (incluyendo seguridad passlib[bcrypt], pyjwt y pydantic[email])
 pip install -r requirements.txt
 ```
 
 ### 3. Configurar variables de entorno
-
-Copia el archivo de ejemplo a tu `.env` local:
 
 ```bash
 cp .env.example .env
@@ -57,18 +51,18 @@ cp .env.example .env
 
 Abre `.env` y configura tus API Keys reales de Groq/OpenAI, la cadena `DATABASE_URL` y tu `SECRET_KEY` transaccional para los tokens Bearer.
 
-> ⚠️ **IMPORTANTE — `SECRET_KEY`:** El servidor valida en el arranque que esta variable contenga un valor personalizado y único. Si se deja el valor por defecto del `.env.example`, el proceso **abortará con error crítico**. Genera una clave segura con:
+> ⚠️ **IMPORTANTE — SECRET_KEY:** El servidor valida en el arranque que esta variable contenga un valor personalizado y único. Si se deja el valor por defecto del `.env.example`, el proceso abortará con error crítico. Genera una clave segura con:
 > ```bash
 > openssl rand -hex 32
 > ```
 
 ### 4. Ejecutar las Migraciones Transaccionales de Alembic
 
-Sincroniza el esquema relacional (`profesores` y tablas del sistema) con tu base de datos PostgreSQL:
-
 ```bash
 alembic upgrade head
 ```
+
+> ⚠️ **Nota de deuda técnica:** Las migraciones se aplican correctamente en desarrollo, pero la suite de tests actual valida contra SQLite en memoria (`metadata.create_all()`), no contra un contenedor Postgres real con `alembic upgrade head`. Ver [AUDITORIA.md](file:///c:/Users/34636/Desktop/api-correccion/AUDITORIA.md), sección 4, fila "Alembic".
 
 ### 5. Ejecutar el Servidor FastAPI
 
@@ -91,7 +85,7 @@ venv/bin/pytest backend/tests/ -v
 ### Implementados
 
 | Endpoint | Verbo | Auth | Descripción |
-|---|---|---|---|
+| :--- | :---: | :---: | :--- |
 | `/health` | `GET` | ❌ Pública | Estado del servidor |
 | `/api/v1/auth/register` | `POST` | ❌ Pública | Registro de profesora |
 | `/api/v1/auth/login` | `POST` | ❌ Pública | Login → devuelve JWT Bearer |
@@ -100,15 +94,18 @@ venv/bin/pytest backend/tests/ -v
 | `/api/v1/marcos` | `GET` | ✅ JWT | Listar marcos normativos (Xunta) |
 | `/api/v1/rubricas` | `POST / GET` | ✅ JWT | Crear y listar rúbricas del docente |
 | `/api/v1/evaluate` | `POST` | ✅ JWT | Corrección formativa con IA (`REVIEW`) |
+| `/api/v1/evaluaciones/{id}/approve` | `PATCH` | ✅ JWT | Aprobación HitL docente (`REVIEW → GRADED`), `[v0.2-009]` |
+| `/api/v1/submissions` | `GET` | ✅ JWT | Lista de entregas del profesor autenticado, `[v0.2-010]` |
+| `/api/v1/evaluaciones/{submission_id}` | `GET` | ✅ JWT | Detalle evaluativo estructurado (`EvaluacionIA`), `[v0.2-010]` |
+| `/api/v1/submissions/{id}/feed-forward/realizado` | `PATCH` | ✅ JWT | Transición formativa a `REALIZADO_ALUMNO`, `[D-026]` |
+| `/api/v1/submissions/{id}/feed-forward/verificado` | `PATCH` | ✅ JWT | Transición formativa a `VERIFICADO_EN_PRUEBA_SIGUIENTE`, `[D-026]` |
 
 ### Próximos (Roadmap)
 
 | Endpoint | Verbo | Versión | Descripción |
-|---|---|---|---|
-| `/api/v1/submissions/upload` | `POST` | 🔜 v0.3 | Subida de imagen/PDF del examen |
-| `/api/v1/evaluaciones/{id}/approve` | `PATCH` | 🔜 v0.3 | Aprobación HitL docente (`REVIEW → GRADED`) |
-| `/api/v1/submissions` | `GET` | 🔜 v0.4 | Lista paginada de entregas |
-| `/api/v1/submissions/{id}/events` | `GET SSE` | 🔜 v0.4 | Notificación en tiempo real |
+| :--- | :---: | :---: | :--- |
+| `/api/v1/submissions/upload` | `POST` | 🔜 v0.3 | Subida de imagen/PDF del examen (multipart) |
+| `/api/v1/submissions/{id}/events` | `GET SSE` | 🔜 v0.4 | Notificación en tiempo real al finalizar corrección |
 | `/api/v1/submissions/{id}/changelog` | `GET` | 🔜 v1.0 | Historial inmutable de auditoría AI Act |
 
 > La documentación interactiva completa (Swagger UI) está disponible en `http://127.0.0.1:8000/docs` al ejecutar el servidor en local.
@@ -117,7 +114,7 @@ venv/bin/pytest backend/tests/ -v
 
 ## 🔒 Autenticación y Seguridad: Endpoints `/api/v1/auth/*` (`[v0.2-002]`)
 
-El backend incorpora autenticación transaccional por token Bearer transaccional, separando el registro docente del login y la validación de sesión.
+El backend incorpora autenticación transaccional por token Bearer, separando el registro docente del login y la validación de sesión.
 
 ### 1. Registro Docente: POST `/api/v1/auth/register`
 
@@ -135,7 +132,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/auth/register \
 
 ### 2. Inicio de Sesión (Obtener JWT): POST `/api/v1/auth/login`
 
-Acepta tanto **OAuth2 Form Data** nativo de FastAPI (compatible con el candado de Swagger UI `/docs`) como cargas JSON en `/api/v1/auth/login-json`. Devuelve el Bearer Token JWT transaccional.
+Acepta tanto **OAuth2 Form Data** nativo de FastAPI (compatible con el candado de Swagger UI `/docs`) como cargas JSON en `/api/v1/auth/login-json`. Devuelve el Bearer Token JWT.
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/auth/login-json \
@@ -148,7 +145,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/auth/login-json \
 
 ### 3. Verificar Sesión Activa: GET `/api/v1/auth/me`
 
-Ruta protegida que valida la cabecera `Authorization: Bearer <token>` transaccional.
+Ruta protegida que valida la cabecera `Authorization: Bearer <token>`.
 
 ```bash
 curl -X GET http://127.0.0.1:8000/api/v1/auth/me \
@@ -223,15 +220,15 @@ curl -X GET http://127.0.0.1:8000/api/v1/rubricas \
 
 ---
 
-## 📡 Corrección Formativa con IA: POST `/api/v1/evaluate` (`[v0.2-004]` - `[v0.2-007]`)
+## 📡 Corrección Formativa con IA: POST `/api/v1/evaluate` (`[v0.2-004]` – `[v0.2-007]`)
 
-Endpoint protegido por **Token Bearer JWT transaccional** conectado a base de datos PostgreSQL. Valida la pertenencia de la rúbrica al docente que realiza la petición (`[v0.2-004]`), inyecta el marco normativo gallego si se solicita (`modo_evaluacion`), aplica las instrucciones de exclusión pedagógica para adaptaciones NEAE/NEE (Decreto 229/2011) (`[v0.2-007]`), y registra la entrega y la evaluación de forma inmutable (`submissions`, `evaluaciones`, `changelog`).
+Endpoint protegido por **Token Bearer JWT** conectado a base de datos PostgreSQL. Valida la pertenencia de la rúbrica al docente que realiza la petición (`[v0.2-004]`), inyecta el marco normativo gallego si se solicita (`modo_evaluacion`), aplica las instrucciones de exclusión pedagógica para adaptaciones NEAE/NEE (Decreto 229/2011) (`[v0.2-007]`), y registra la entrega y la evaluación de forma inmutable (`submissions`, `evaluaciones`, `changelog`).
 
 ### Ejemplo de Petición (Request)
 
 > ⚠️ **BREAKING CHANGE (D-041):** El campo `etapa` ("ESO" | "BACH") es obligatorio en el payload. Sin él la API devuelve `422 Unprocessable Entity`, y si su valor contradice la etapa del marco normativo seleccionado devuelve `400 Bad Request`.
 
-Requiere cabecera de autenticación `Authorization: Bearer <token>` transaccional:
+Requiere cabecera de autenticación `Authorization: Bearer <token>`:
 
 ```bash
 curl -X POST http://127.0.0.1:8000/api/v1/evaluate \
@@ -255,7 +252,9 @@ curl -X POST http://127.0.0.1:8000/api/v1/evaluate \
 
 ### Ejemplo de Respuesta (Response: `EvaluacionResponse`)
 
-El servidor guarda la entrega en PostgreSQL y devuelve la evaluación estructurada con marcadores visuales neutros (`type: "error_excluido"`) y registro de ortografía excluida por adaptación. *Nota: En el ejemplo la calificación cualitativa es "NA" (Bachillerato). En ESO la escala oficial es IN, SU, BE, NT, SB (D-042: BE, no BI).*
+El servidor guarda la entrega en PostgreSQL y devuelve la evaluación estructurada con marcadores visuales neut (`type: "error_excluido"`) y registro de ortografía excluida por adaptación.
+
+> ⚠️ **Nota sobre la escala cualitativa:** La escala oficial confirmada por decreto (`D-042`) es la de ESO: `IN`, `SU`, `BE`, `NT`, `SB` (nunca `BI`). Para Bachillerato, la calificación cualitativa equivalente aún no tiene una ADR formal que fije su enum específico — el valor "NA" mostrado abajo es un placeholder de ejemplo y no debe interpretarse como escala oficial cerrada. Esto queda pendiente de formalizar como decisión antes de `v1.0`.
 
 ```json
 {
@@ -321,11 +320,10 @@ El backend gestiona el seguimiento formativo del **Siguiente Paso Accionable (`e
 
 ### Trazabilidad y Cumplimiento (`[D-002]`)
 
-1. **El motor LLM no persiste nunca el estado formativo:** Aunque la IA devuelva en su evaluación recomendaciones de verificación (`feed_forward_verification_suggestion`), la actualización en BBDD requiere confirmación humana explícita a través de los endpoints transicionables.
+1. **El motor LLM no persiste nunca el estado formativo:** Aunque la IA devuelva en su evaluación recomendaciones de verificación (`feed_forward_verification_suggestion`), la actualización en BBDD requiere confirmación humana explícita a través de los endpoints transicionales.
 2. **Auditoría estructurada en `ChangeLog`:** Cada transición persiste un registro atómico inmutable que separa el cambio de estado (`datos_anteriores` / `datos_nuevos`) del contexto de auditoría (`audit_metadata`, donde se traza si la IA recomendó el cambio y el ID de evaluación vinculada). El `actor` registrado en la base de datos es siempre el profesor autenticado (`PROFESOR_ID_X`).
 
 ---
-
 
 ## 🧠 AI Development & Governance Methodology (`Phase Ninja`)
 
