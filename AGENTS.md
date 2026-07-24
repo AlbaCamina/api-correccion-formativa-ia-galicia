@@ -31,10 +31,18 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
      3. **Evidencia:** Pruebas automatizadas (`pytest`) en verde en entorno limpio.
      4. **Documentación:** `README.md` y `backlog.md` sincronizados y cualquier deuda técnica residual explícita.
    * **Trazabilidad humana:** El agente nunca atribuye a la IA acciones persistidas de cambio de estado en BBDD cuando el flujo normativo exige autorización docente (`HitL`). La IA puede proponer y aportar contexto en `audit_metadata`; el `actor` que firma cambios formativos es siempre humano (profesor o alumno, según el caso).
-7. **Estandarización de Commits y Trazabilidad:**
+7. **Auto-Revisión Obligatoria Pre-Entrega (*Self-Review Gate*):**
+   * **Contexto:** Los agentes generan texto de forma secuencial, lo que puede producir fragmentos a medio corregir, fechas erróneas o contradicciones con decisiones ya adoptadas en `decisiones.md` que sobreviven sin querer hasta la entrega final.
+   * **Regla:** Antes de entregar cualquier salida extensa (más de ~150 palabras) o cualquier prompt/documento destinado a otro agente o a un tercero, el agente **DEBE** ejecutar una segunda pasada de auto-revisión completa, verificando explícitamente:
+     1. ¿Hay frases inconclusas, contradictorias o fragmentos de corrección a medio terminar?
+     2. ¿Las fechas, nombres de archivo, IDs de decisión (D-XXX) y números de Issue son correctos y verificables contra el contexto real?
+     3. ¿El contenido contradice alguna decisión ya adoptada en `decisiones.md`? Si es así, aplicar el Protocolo de Pausa Arquitectónica (D-029) en lugar de entregar el texto contradictorio.
+     4. ¿El texto final dice exactamente lo que se pretendía, sin restos del proceso de razonamiento intermedio?
+   * **Consecuencias:** Esta regla añade una pausa deliberada de calidad antes de la entrega, igual que D-029 la añade antes de parchear código. No sustituye la revisión humana final, pero reduce la probabilidad de que lleguen a ella errores mecánicos evitables.
+8. **Estandarización de Commits y Trazabilidad:**
    * Todos los commits deben seguir estrictamente el formato *Conventional Commits* (`feat:`, `fix:`, `docs:`, `style:`, `test:`) incluyendo el contexto de la modificación entre paréntesis (scope).
    * Es **obligatorio** incluir en el mensaje del commit la referencia cruzada al registro arquitectónico (ej. `[D-035]`) o a la tarea del backlog (ej. `[v0.2-009]`) que motiva el cambio, garantizando la trazabilidad probatoria del portfolio.
-8. **Defensa contra Context Overflow y Lost in the Middle:**
+9. **Defensa contra Context Overflow y Lost in the Middle:**
    * El agente debe estructurar grandes bloques de texto usando delimitadores `<xml>` para facilitar la atención del modelo.
    * Al construir prompts en el backend (`prompt_builder.py`), el agente aplicará **Prompt Anchoring**, repitiendo las reglas inquebrantables (como el retorno estricto de JSON o la Simetría Lingüística del alumno) estrictamente al final del prompt.
    * En sesiones de desarrollo prolongadas, si el orquestador humano exige un *"Context Reset"*, el agente generará un resumen de cierre para iniciar una sesión nueva en limpio.
@@ -96,7 +104,7 @@ Nunca presentes una decisión de centro como si fuera obligación legal.
 - **Semántica HitL (D-045):** `calificacion_numerica` es orientativa con decimales; el agente NO redondea. El docente decide y redondea al aprobar (`nota_final`). El agente evalúa una sola evidencia; la agregación al trimestre la hace el backend.
 
 ### Valores válidos del contrato `EvaluacionIA`
-- `calificacion_cualitativa`: `IN | SU | BE | NT | SB | NA` (usar `NA` en Bachillerato).
+- `calificacion_cualitativa`: `IN | SU | BE | NT | SB` en ESO; `null` en Bachillerato (D-049 — no existe escala cualitativa oficial en BACH).
 - `visualMarkers.type`: `ERROR | MEJORA | CORRECTO | error_excluido` (nunca `GRAMMAR_ERROR`).
 - `etapa`: `ESO | BACH`.
 
