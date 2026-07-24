@@ -41,7 +41,7 @@
 
 **Criterios de aceptación:**
 - [x] Adoptado modelo *Human-in-the-Loop* (HitL): la IA propone un borrador formativo; la profesora toma y aprueba la decisión final (`[D-002]`)
-- [x] Diseñado el mecanismo de seudonimización pre-nube: recorte de cabecera con `Pillow` (`[D-022]`) más herramienta de tampón manual en Canvas de la PWA para casos de borde fotográficos (nombre en pie o lateral) (`[D-034]`)
+- [x] Diseñado el mecanismo de seudonimización pre-nube: recorte de cabecera con `Pillow` (`[D-022]`) más herramienta de tampón manual en Canvas de la PWA para casos de borde fotográficos (nombre en pie o lateral) (`[D-034]`) *(Corregido 24/07: el recorte de producción definitivo ocurre en PWA/Canvas JS — jamás en backend Python. Pillow fue PoC de validación del algoritmo. Ver D-022, D-034 y AUDITORIA.md §5)*
 - [x] Almacenamiento nube en *Cold Storage* con purga automática por *Lifecycle Policy* (*Zero Data Retention* / expiración legal `[D-021]`)
 - [x] Inmutabilidad probatoria (*append-only*): las correcciones aprobadas (`GRADED`) se bloquean contra edición para preservar la cadena de custodia educativa (`[v0.5-005]`)
 
@@ -165,7 +165,7 @@
 **Criterios de aceptación:**
 - [x] Modelo `EvaluacionIA` con campos: `transcription`, `rubricBreakdown`, `visualMarkers`, `qualitativeAnalysis`
 - [x] `qualitativeAnalysis` incluye: `strengths[]`, `improvementNeeds.immediate[]`, `improvementNeeds.mediumLongTerm[]`, `teacherSummary`
-- [x] Modelo incluye `calificacion_cualitativa: Literal["IN","SU","BI","NT","SB"]`, `siguiente_paso_accionable: str` y `confidence_score: float` según [D-024]
+- [x] Modelo incluye `calificacion_cualitativa: Literal["IN","SU","BI","NT","SB"]`, `siguiente_paso_accionable: str` y `confidence_score: float` según [D-024] *(Corregido 24/07: "BI" es error tipográfico — valor correcto es "BE" según D-042. Campo ahora `Optional`: `null` en BACH, enum oficial en ESO — D-049)*
 - [x] `visual_markers: Optional[List[VisualMarker]] = []` — array vacío válido en v0.1 (texto plano, sin imagen). El prompt instruye al LLM a devolver `[]` cuando no hay imagen.
 - [x] Si la IA devuelve un JSON sin algún campo obligatorio, Pydantic lanza error 422
 - [x] Test unitario que valida un JSON correcto, uno incorrecto, y uno con `visual_markers: []`
@@ -454,7 +454,7 @@
 
 ## 📸 Versión 0.3 — Subida de Imágenes, Anonimización y OCR [GitHub Issue #3 (Open)]
 
-**Objetivo:** El profesor puede subir una foto o PDF del examen manuscrito. El sistema garantiza la privacidad recortando el nombre localmente con `Pillow` pre-nube, gestiona de forma resiliente el almacenamiento y procesa la corrección con un motor multimodal (Groq Vision / OpenAI).
+**Objetivo:** El profesor puede subir una foto o PDF del examen manuscrito. La privacidad se garantiza mediante recorte de cabecera en la **PWA del cliente (JavaScript/Canvas)** antes de que el archivo toque la red — el nombre del alumno jamás alcanza el servidor (`[D-022]`, `[D-034]`). El backend recibe únicamente el archivo ya seudonimizado, gestiona el almacenamiento y envía la imagen al motor multimodal (Groq Vision / OpenAI).
 
 ---
 
@@ -475,20 +475,27 @@
 
 ---
 
-### [v0.3-002] Anonimización y Recorte de Cabecera pre-nube (`Pillow`)
+### [v0.3-002] Anonimización Client-Side: Recorte de Cabecera en PWA (JavaScript/Canvas) `[D-022]` `[D-034]`
 
-**Como** desarrolladora (y en estricto cumplimiento RGPD/LOPDGDD art. 7 y AI Act),  
-**quiero** que el sistema recorte o difumine la cabecera del examen localmente (`Pillow`) antes de enviarlo o persistirlo externamente,  
-**para** garantizar que los datos identificativos del alumno jamás viajen a servicios de terceros ni a la nube.
+**Como** docente, **quiero** que la PWA recorte automáticamente el 20% superior del folio (cabecera con nombre del alumno) **en mi propio navegador** antes de enviarlo al servidor, **para** garantizar que ningún dato personal del alumno alcance nunca la nube (Zero Data Retention absoluto).
+
+> [!IMPORTANT]
+> Arquitectura invariante: la función de recorte vive en `frontend/src/utils/imageCrop.js` (JavaScript/Canvas API). El backend Python **solo recibe el archivo ya recortado y seudonimizado** — jamás el original con PII.
 
 **Criterios de aceptación:**
-- [ ] El backend utiliza `Pillow` para procesar y recortar localmente la imagen inmediatamente tras su recepción en el servidor (o en memoria pre-persistencia).
-- [ ] Se recorta o difumina el área superior del folio (cabecera con nombre del alumno, aprox. primeros 15-20% de altura del margen superior o coordenadas especificadas).
-- [ ] El archivo original con datos identificativos del menor se purga o sobrescribe localmente de forma irreversible, dejando únicamente el archivo anonimizado (`anon_{uuid}.jpg`).
-- [ ] El campo `alumno_id` o seudonimización se asigna por el docente y se vincula transaccionalmente al UUID en base de datos.
-- [ ] Tests de integración que comprueban que las dimensiones y contenido del archivo resultante han sido procesados por `Pillow` y el original eliminado.
+- [ ] Función pura `cropHeader(imageData, ratio = 0.20)` en `frontend/src/utils/imageCrop.js`
+- [ ] La función recibe un `HTMLCanvasElement` o `ImageBitmap` y devuelve el cuerpo evaluable (sin cabecera)
+- [ ] Separación estricta de lógica pura (cálculo de recorte) e I/O (upload del resultado)
+- [ ] Tests en **Vitest** cubriendo:
+  - [ ] Ratio estándar `0.20`: dado folio 794×1123px → cuerpo resultante 794×899px
+  - [ ] Ratio personalizado (`0.15`, `0.25`): verificar proporcionalidad
+  - [ ] Conservación de píxeles: `cabecera.alto + cuerpo.alto === original.alto`
+  - [ ] Caso borde `ratio = 0.0`: cuerpo === imagen completa
+  - [ ] Caso borde `ratio = 1.0`: cuerpo vacío
+- [ ] Nota histórica: el algoritmo fue validado matemáticamente en `scratch/pillow_crop_test.py` (PoC 24/07/2026, ignorado por git) antes de portarse a JS
 
-**Etiquetas:** `v0.3` `backend` `legal` `rgpd`
+**Etiquetas:** `v0.3` `frontend` `legal` `rgpd`
+
 
 ---
 
