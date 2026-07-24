@@ -112,7 +112,7 @@ Librerías y frameworks clave de api-correccion-formativa-ia-galicia:
 | `alembic` | Librería | Gestiona cambios de estructura de BBDD con control de versiones |
 | `passlib[bcrypt]` | Librería | Hashea contraseñas de profesoras de forma irreversible |
 | `pyjwt` | Librería | Genera y verifica tokens Bearer JWT de autenticación |
-| `pillow` | Librería | Recorta la cabecera del examen (nombre del alumno) en memoria pre-nube |
+| `pillow` | Librería | *(v0.3 — PoC)* Librería de procesado de imagen en Python. Usada en `scratch/pillow_crop_test.py` para validar el algoritmo de recorte de cabecera (ratio 0.20) antes de portarlo a JavaScript/Canvas. El recorte real en producción ocurre en el cliente (PWA), no en el backend (`[D-022]`, `[D-034]`) |
 | `python-dotenv` | Librería | Carga variables de entorno del archivo `.env` |
 | `pytesseract` | Librería | *(c0.8)* OCR offline para el escáner de PII pre-nube (`[D-034]`) |
 | `react` | Librería | Construye la interfaz de usuario de la PWA del docente |
@@ -495,6 +495,10 @@ Familia de modelos de lenguaje de Google. El modelo `gemini-2.5-flash` es el pre
 **Groq**  
 Proveedor de modelos de lenguaje con cuota gratuita muy generosa y velocidad de inferencia muy alta. Se usa en OpenCode para tareas de código complejo (`llama-3.3-70b-versatile`, `qwen3-32b`).
 
+**Jest / Vitest (Frameworks de Testing Frontend)**  
+Herramientas de testing unitario para JavaScript/TypeScript. **Jest** es el estándar clásico del ecosistema React (creado por Meta). **Vitest** es su alternativa moderna optimizada para proyectos con Vite, con sintaxis idéntica pero arranque mucho más rápido. En api-correccion-formativa-ia-galicia: los tests de la función `cropHeader()` (`[v0.3-001]`) se escribirán en Vitest por su integración nativa con el stack Vite + React de la PWA. Los tests de backend (Python) usan pytest; los tests de frontend (JS) usan Vitest — cada stack tiene su herramienta propia.
+
+
 **OpenCode**  
 Agente de IA que se ejecuta en la terminal de WSL. Lee y edita archivos directamente, ejecuta comandos, y trabaja dentro del mismo entorno donde corre Python/FastAPI. Se usa para código rutinario, boilerplate y edición de archivos.
 
@@ -664,7 +668,19 @@ Aplicación informática oficial de la Xunta de Galicia (Consellería de Educaci
 **YAGNI** (You Aren't Gonna Need It — No lo vas a necesitar)  
 Principio de desarrollo: no escribas código para funcionalidades que no necesitas ahora mismo. Evita sobre-ingeniería.
 
----
+**Code Freeze (Congelación de Código)**  
+Periodo de bloqueo temporal en el que no está permitido añadir código nuevo al repositorio ni iniciar nuevas funcionalidades, con el objetivo de garantizar la estabilidad del sistema antes de un evento crítico (demo, auditoría, lanzamiento, reunión de revisión). Solo están permitidas correcciones de errores graves y actualizaciones de documentación. En este proyecto: el code freeze arranca el sábado 25/07/2026 y se mantiene hasta después de la reunión AESIA del lunes 27/07.
+
+**Definition of Done / DoD (Definición de Hecho)**  
+Conjunto de criterios mínimos que una historia de usuario, tarea o funcionalidad debe cumplir para considerarse **verdaderamente terminada** — no solo "funciona en mi máquina". En api-correccion-formativa-ia-galicia el DoD está formalizado como los **4 pilares de `[D-035]`**: Diseño (ADR en `decisiones.md`), Implementación (código en `main`), Evidencia (`pytest` en verde) y Documentación (`README.md` + `backlog.md` sincronizados). En la Epic Issue de GitHub, los checkboxes representan el DoD público de la épica — se marcan solo cuando el código existe, los tests pasan y la documentación está actualizada.
+
+**Proof of Concept / PoC (Prueba de Concepto)**  
+Implementación mínima, exploratoria y desechable cuyo único objetivo es validar la viabilidad técnica o matemática de una idea **antes** de comprometer esfuerzo de arquitectura o código de producción. Un PoC no es un servicio definitivo ni forma parte del backend. En este proyecto: `scratch/pillow_crop_test.py` fue un PoC del algoritmo de recorte (ratio 0.20, 794×1123px → 224+899px) para confirmar la matemática antes de portarla a JavaScript/Canvas en el frontend PWA (`[v0.3-001]`). El script vive en `scratch/` (ignorado por git) precisamente por su naturaleza exploratoria transitoria.
+
+**Self-Review Gate (Auto-Revisión Pre-Entrega)**  
+Checkpoint de calidad de comunicación formalizado como `Regla 7 de AGENTS.md`. Exige que el agente, antes de entregar cualquier salida extensa (+150 palabras) o documento destinado a otro agente o tercero, ejecute una segunda pasada completa de revisión verificando: frases inconclusas, fechas/IDs/referencias erróneas, contradicciones con `decisiones.md` y residuos del razonamiento intermedio. Complementa al Protocolo Stop & Consult (`[D-029]`, Regla 5): mientras D-029 frena antes de parchear código, el Self-Review Gate frena antes de entregar texto. Motivado por la detección real del error "794×898px" (correcto: 899px) en la Issue #14 durante la sesión del 24/07/2026.
+
+
 
 ## 11. Seguridad y autenticación
 
