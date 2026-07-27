@@ -48,4 +48,13 @@ Demostración técnica en **Swagger UI**:
 3.  **Firma Docente:** Endpoint `PATCH /approve`. El sistema rechaza cualquier validez oficial de la nota hasta que el humano revisa la propuesta de la IA y transiciona el estado a `GRADED`.
 
 ---
+
+## 5. Calidad y Cobertura de Código
+
+El backend no es solo funcional, sino que cuenta con un arnés de seguridad automatizado:
+*   **Suite de Pruebas:** Ejecución de 31 tests unitarios y de integración mediante `pytest`.
+*   **Blindaje:** Garantizan que las reglas de negocio (escalas LOMLOE, privacidad, estados de bloqueo del HitL) no se rompan ante futuras refactorizaciones o actualizaciones de dependencias.
+
+---
 *Documento vivo — Generado para la revisión técnica (27/07/2026).*
+
