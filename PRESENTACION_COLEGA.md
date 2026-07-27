@@ -32,7 +32,9 @@ El sistema ha sido diseñado desde el inicio para satisfacer simultáneamente do
 
 1.  **AI Act (Europa) - Privacidad:**
     *   Arquitectura sin estado para los datos sensibles (Zero Data Retention).
-    *   *Consulta Abierta (v1.0):* Para el escalado multimodal, nuestra hipótesis es utilizar Object Storage (S3/Supabase) con **URLs prefirmadas de 2 minutos** de caducidad. Buscamos feedback experto para validar si este es el estándar más robusto para auditorías.
+    *   *Duda Abierta 1 (S3):* Para escalado multimodal, proponemos Object Storage (Supabase/AWS) con URLs prefirmadas de 2 minutos. ¿Es el estándar más robusto para pasar auditorías?
+    *   *Duda Abierta 2 (Frontend):* Planteamos que el recorte de cabeceras de exámenes con datos de menores se haga en local vía Canvas (Navegador) para que esa imagen nunca viaje al servidor. ¿Os parece un blindaje suficiente?
+    *   *Duda Abierta 3 (Asincronía):* Actualmente usamos `BackgroundTasks`. Para producción, ¿recomiendas dar el salto a `Celery+Redis` o es *over-engineering* para llamadas a la API de Groq?
 2.  **LOMLOE (Decretos 156/157 2022 - Galicia):**
     *   El motor no hace promedios aritméticos libres, califica bajo Competencias Clave y Criterios de Evaluación obligatorios.
     *   Devuelve los niveles de logro cualitativos oficiales (IN, SU, BE, NT, SB) para la ESO.
