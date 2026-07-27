@@ -254,7 +254,7 @@ curl -X POST http://127.0.0.1:8000/api/v1/evaluate \
 
 El servidor guarda la entrega en PostgreSQL y devuelve la evaluación estructurada con marcadores visuales neut (`type: "error_excluido"`) y registro de ortografía excluida por adaptación.
 
-> ⚠️ **Nota sobre la escala cualitativa:** La escala oficial confirmada por decreto (`D-042`) es la de ESO: `IN`, `SU`, `BE`, `NT`, `SB` (nunca `BI`). Para Bachillerato, la calificación cualitativa equivalente aún no tiene una ADR formal que fije su enum específico — el valor "NA" mostrado abajo es un placeholder de ejemplo y no debe interpretarse como escala oficial cerrada. Esto queda pendiente de formalizar como decisión antes de `v1.0`.
+> ⚠️ **Nota sobre la escala cualitativa (`D-042`, `D-049`):** La escala cualitativa oficial (`IN`, `SU`, `BE`, `NT`, `SB`) aplica **solo en ESO** (Decreto 156/2022). En Bachillerato no existe escala cualitativa oficial en el expediente — el campo `calificacion_cualitativa` es `null` (`D-049`). Nunca `"BI"` ni `"NA"`.
 
 ```json
 {
@@ -294,7 +294,7 @@ El servidor guarda la entrega en PostgreSQL y devuelve la evaluación estructura
       "teacherSummary": "Excelente base conceptual adaptada al perfil NEAE del alumno."
     },
     "calificacion_numerica": 8.0,
-    "calificacion_cualitativa": "NA",
+    "calificacion_cualitativa": null,
     "siguiente_paso_accionable": "Explica en un párrafo por qué el prisionero liberado debe regresar con sus compañeros en la oscuridad.",
     "confidence_score": 0.95,
     "ortografia_detectada": true,
