@@ -752,6 +752,12 @@ Modelo de negocio con una versión gratuita (con límites) y una versión de pag
 **SaaS** (Software as a Service — Software como Servicio)  
 Modelo en el que el software se ofrece como servicio por suscripción, sin que el usuario tenga que instalarlo. La PWA de api-correccion-formativa-ia-galicia es un SaaS.
 
+**Pytest**  
+Framework de automatización de pruebas para el lenguaje Python. Permite escribir pequeños programas (tests o pruebas unitarias) que comprueban automáticamente si el resto del código del proyecto funciona correctamente. En este proyecto se utiliza ejecutando `pytest -v` para certificar que ningún cambio arquitectónico rompa las reglas de negocio, garantizando siempre que los tests estén "en verde" (pasados) antes de cerrar una funcionalidad.
+
+**Swagger (Swagger UI)**  
+Interfaz web autogenerada e interactiva que permite visualizar, documentar y probar directamente los endpoints (rutas) de una API sin necesidad de escribir código. En FastAPI, Swagger viene integrado por defecto y se accede normalmente añadiendo `/docs` al final de la dirección local (ej. `http://localhost:8000/docs`). Facilita enormes ventajas para presentar el funcionamiento real del sistema a evaluadores o clientes de forma gráfica.
+
 ---
 
 *Glosario creado el 09/07/2026 — Antigravity para Alba Camiña García*  
