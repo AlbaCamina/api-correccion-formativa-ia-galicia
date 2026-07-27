@@ -758,6 +758,9 @@ Framework de automatización de pruebas para el lenguaje Python. Permite escribi
 **Swagger (Swagger UI)**  
 Interfaz web autogenerada e interactiva que permite visualizar, documentar y probar directamente los endpoints (rutas) de una API sin necesidad de escribir código. En FastAPI, Swagger viene integrado por defecto y se accede normalmente añadiendo `/docs` al final de la dirección local (ej. `http://localhost:8000/docs`). Facilita enormes ventajas para presentar el funcionamiento real del sistema a evaluadores o clientes de forma gráfica.
 
+**LPU (Language Processing Unit)**  
+Unidad de Procesamiento de Lenguaje. Es un tipo de microchip especializado diseñado por la empresa Groq exclusivamente para la inferencia (ejecución) de Modelos de Lenguaje Grande (LLMs) como Llama 3. A diferencia de las GPUs (Tarjetas Gráficas) que procesan cosas en paralelo, las LPUs están optimizadas para el procesamiento secuencial rapidísimo de texto, lo que permite alcanzar velocidades de respuesta de más de 800 tokens por segundo (casi instantáneo), siendo ideales para sistemas que requieren corrección formativa en tiempo real.
+
 ---
 
 *Glosario creado el 09/07/2026 — Antigravity para Alba Camiña García*  
