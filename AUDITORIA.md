@@ -53,7 +53,7 @@ Este documento existe para dar una visión rápida del estado global de auditor�
 | Trazabilidad extremo a extremo (cambio↔ticket↔ADR↔test)               | ⚠ conceptual (D-035)            | ⚠ parcial                         | ⚠ enlaces PR sin revisar         | ⚠ AUDITORIA.md reciente        | Parcial     | Marco definido, falta recorrido completo de un caso end-to-end.                                                           |
 | Motor multimodal (Groq Vision + fallback GPT-4o)                      | ✅ D-047                         | ❌ pendiente (v0.3)                | ❌ no aplica aún                  | ✅ backlog v0.3-004             | No iniciado | Decisión formalizada por adelantado; implementación bloqueada hasta iniciar v0.3.                                         |
 | Recorte de cabecera PII (seudonimización pre-nube)                    | ✅ D-022 / D-034                 | ❌ pendiente (v0.3-001 frontend)   | ❌ pendiente (Vitest/Jest)        | ✅ Issue #14 corregida 24/07   | No iniciado | Recorte en JS/Canvas del cliente (PWA), NUNCA en backend Python. PoC matemático validado en scratch/pillow_crop_test.py. |
-| Evidencias para auditoría externa (AI Act/AESIA)                      | ❌ no definida                   | ⚠ logs básicos                    | ❌ sin ensayos formales           | ⚠ docs centradas en lo técnico | No iniciado | Requiere checklist específico si se busca auditoría externa formal.                                                       |
+| Evidencias para auditoría externa (AI Act/Auditoría)                      | ❌ no definida                   | ⚠ logs básicos                    | ❌ sin ensayos formales           | ⚠ docs centradas en lo técnico | No iniciado | Requiere checklist específico si se busca auditoría externa formal.                                                       |
 
 ---
 
@@ -66,7 +66,7 @@ Este documento existe para dar una visión rápida del estado global de auditor�
 **Correcciones aplicadas (pre-code-freeze, solo documentación):**
 - Issue #14 en GitHub: historia `[v0.3-001]` reescrita — función `cropHeader()` en `frontend/src/utils/imageCrop.js` (JavaScript), tests en Vitest/Jest con 5 casos de aceptación.
 - `AUDITORIA.md`: nueva fila para el módulo de recorte con estado "No iniciado" y stack correcto (cliente, no backend).
-- `Pillow>=10.3.0` en `requirements.txt`: se mantiene provisionalmente (puede ser necesaria en `v0.3-002` para optimizar imágenes antes de enviarlas a Groq Vision), pero **no** para el recorte de cabecera. Decisión definitiva sobre mantener/retirar Pillow aplazada a la planificación técnica de `v0.3-002` (post-reunión AESIA, lunes 28/07 en adelante).
+- `Pillow>=10.3.0` en `requirements.txt`: se mantiene provisionalmente (puede ser necesaria en `v0.3-002` para optimizar imágenes antes de enviarlas a Groq Vision), pero **no** para el recorte de cabecera. Decisión definitiva sobre mantener/retirar Pillow aplazada a la planificación técnica de `v0.3-002` (post-revisión técnica, lunes 28/07 en adelante).
 - `scratch/pillow_crop_test.py` permanece intacto como evidencia histórica del PoC del algoritmo (ignorado por git).
 
 **Invariante reafirmada (D-022 + D-031 + D-034):** El nombre del alumno **jamás alcanza el servidor Python**, en ninguna versión del producto. La seudonimización es client-side y Zero Data Retention absoluto.

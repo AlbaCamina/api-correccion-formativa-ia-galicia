@@ -2,12 +2,12 @@
 **Proyecto:** API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)  
 **Perfil:** Programadora Junior Full-Stack — Alba Camiña García  
 **Fecha de inicio:** Julio 2026  
-**Estado:** Versión 0.2 Avanzada — Completada y Auditada. Listos para demo AESIA y Bloque 3.
+**Estado:** Versión 0.2 Avanzada — Completada y Auditada. Listos para demo técnica y Bloque 3.
 
 > [!NOTE]
 > **SÍNTESIS DEL MOMENTO ACTUAL (Julio 2026):**  
-> Estado: Versión 0.2 Avanzada. Completada y Auditada. Listos para demo AESIA y Bloque 3.
-SÍNTESIS DEL MOMENTO ACTUAL (actualizado 27/07/2026): La Versión 0.2 está 100% completada y auditada bajo el ADR D-035 (31/31 tests en verde). La semana 21-25/07 cerró la gobernanza de la Épica v0.3: Issue #14 reescrita con arquitectura *Client-Side First* (recorte de cabecera en PWA/JS/Canvas, D-022/D-034), Self-Review Gate añadido como Regla 7 de AGENTS.md y documentación alineada en backlog, glosario y AUDITORIA.md. Code freeze activo del 25/07. **Hoy (27/07):** reunión con el contacto de la AESIA (Bloque 3) como puente hacia la implementación de la v0.3 (cropHeader en frontend + Groq Vision).
+> Estado: Versión 0.2 Avanzada. Completada y Auditada. Listos para demo técnica y Bloque 3.
+SÍNTESIS DEL MOMENTO ACTUAL (actualizado 27/07/2026): La Versión 0.2 está 100% completada y auditada bajo el ADR D-035 (31/31 tests en verde). La semana 21-25/07 cerró la gobernanza de la Épica v0.3: Issue #14 reescrita con arquitectura *Client-Side First* (recorte de cabecera en PWA/JS/Canvas, D-022/D-034), Self-Review Gate añadido como Regla 7 de AGENTS.md y documentación alineada en backlog, glosario y AUDITORIA.md. Code freeze activo del 25/07. **Hoy (27/07):** reunión con el auditor externo (Bloque 3) como puente hacia la implementación de la v0.3 (cropHeader en frontend + Groq Vision).
 
 ---
 
@@ -35,7 +35,7 @@ El diseño y la viabilidad de **api-correccion-formativa-ia-galicia** están dir
 - **Reino Unido y EE.UU. (Acción inmediata y certeza):** Integración obligatoria de *Actionable Next Steps* (*Feed Forward* del modelo Hattie) y un *Confidence Score* que alerta visualmente cuando la caligrafía o respuesta requiere revisión humana prioritaria.
 
 > [!IMPORTANT]
-> **La combinación es imbatible:** usamos la legalidad y los criterios competenciales cualitativos de Galicia como cimiento (`marcos_evaluacion` en `JSONB`), e inyectamos las técnicas pedagógicas más avanzadas de Reino Unido y USA (*Next Steps* y *Confidence Score*) como superpoder del motor de IA. Es un producto redondísimo para presentar tanto en la AESIA como en cualquier instituto o entrevista de ingeniería EdTech.
+> **La combinación es imbatible:** usamos la legalidad y los criterios competenciales cualitativos de Galicia como cimiento (`marcos_evaluacion` en `JSONB`), e inyectamos las técnicas pedagógicas más avanzadas de Reino Unido y USA (*Next Steps* y *Confidence Score*) como superpoder del motor de IA. Es un producto redondísimo para presentar tanto en la Auditoría como en cualquier instituto o entrevista de ingeniería EdTech.
 
 ### 📢 Argumentario Comercial y Ventajas Clave para el Profesorado (Marketing B2C/B2B)
 El éxito de adopción de **api-correccion-formativa-ia-galicia** por parte de docentes, orientadores y jefes de estudio se sustenta en cinco promesas de valor directas que resuelven sus dolores diarios reales:
@@ -78,7 +78,7 @@ El valor real de api-correccion-formativa-ia-galicia radica en demostrar a futur
 
 **Hoja de ruta estratégica:**
 1. **Fase Ninja (Desarrollo):** Construir la Versión 1.0 manteniendo el subsidio. No hay alta de autónomos. Es formación práctica.
-2. **Fase Demo:** Desplegar el proyecto de forma gratuita para usarlo como carta de presentación ante empresas, el contacto de la AESIA y en entrevistas técnicas.
+2. **Fase Demo:** Desplegar el proyecto de forma gratuita para usarlo como carta de presentación ante empresas, el auditor externo y en entrevistas técnicas.
 3. **Fase Comercialización (Solo si aplica):** Si el proyecto genera una tracción orgánica masiva o un interés B2B (licenciamiento a colegios/EdTech), se procederá entonces al alta de autónomos y se pausará el subsidio, acudiendo a las vías de financiación.
 
 ### 💰 Financiación y Subvenciones (Solo en Fase de Comercialización)
@@ -97,7 +97,7 @@ En el momento en que se decida pausar el subsidio y darse de alta como autónoma
 Mientras se programa en la sombra sin alta de autónomos (Fase Ninja), se puede y debe aplicar a programas de incubación y apoyo que no exigen ser empresa:
 
 - **Red de Polos de Emprendemento e Apoio ao Emprego de Galicia (Xunta):** Red pública y gratuita por toda Galicia (centro en A Coruña y provincia) que no exige alta mercantil. Asignan tutores gratuitos para validar el modelo de negocio, te asisten en toda la tramitación de las ayudas directas de la Xunta (4.000€-7.000€) y ofrecen seguimiento personalizado.
-- **Ciudad de las TIC / Ecosistema TIC de A Coruña y contacto AESIA:** A Coruña es la sede nacional de la **AESIA** (Agencia Española de Supervisión de la Inteligencia Artificial) y el hub tecnológico *Ciudad de las TIC* (clúster TIC de Galicia y viveros tecnológicos de la UDC y Xunta). Desarrollar y presentar la versión funcional desde A Coruña te sitúa en el centro neurálgico e institucional de la IA en España.
+- **Ciudad de las TIC / Ecosistema TIC de A Coruña y auditor externo:** A Coruña es la sede nacional de la **Auditoría** (Agencia Española de Supervisión de la Inteligencia Artificial) y el hub tecnológico *Ciudad de las TIC* (clúster TIC de Galicia y viveros tecnológicos de la UDC y Xunta). Desarrollar y presentar la versión funcional desde A Coruña te sitúa en el centro neurálgico e institucional de la IA en España.
 - **Programa Explorer (Banco Santander / CISE - Sede UDC A Coruña):** Programa formativo de pre-incubación de 12 semanas sin alta mercantil, con mentorías presenciales o virtuales desde A Coruña y acceso a red de contactos/inversores.
 - **Programa Talento 45+ (Cámara de Comercio de A Coruña + SEPE):** Orientación, formación y planes de viabilidad a medida sin coste para mayores de 45 en A Coruña.
 - **Generación SAVIA (Fundación Endesa):** Red nacional enfocada en la empleabilidad y emprendimiento del talento sénior (>45 y >50 años).
@@ -112,7 +112,7 @@ Estos puntos ya tienen consenso y no deben consumir más tiempo de análisis. Ca
 
 | Decisión | Opción elegida | Motivo |
 |---|---|---|
-| Comunidad autónoma objetivo | **Galicia** (`seed` principal) | Coherencia con sede (A Coruña/AESIA) y testeo con docentes de la Xunta |
+| Comunidad autónoma objetivo | **Galicia** (`seed` principal) | Coherencia con sede (A Coruña/Auditoría) y testeo con docentes de la Xunta |
 | Corrección manual vs IA | **Human-in-the-Loop** | Escudo legal bajo AI Act |
 | Primer tipo de examen | **Texto plano (respuesta corta)** | Sin OCR en MVP |
 | La normativa es | **Una variable (campo JSON en BBDD)** | Inmunidad a cambios legislativos |
@@ -231,9 +231,9 @@ B2B — Canal institucional / integración
 
 ---
 
-## BLOQUE 3 — La Reunión con el Contacto de la AESIA (Sesión 3)
+## BLOQUE 3 — La Reunión con el Contacto de la Auditoría (Sesión 3)
 
-**Perfil del contacto:** Ingeniero en IA en AESIA (A Coruña). Ex Data Engineer (Hadoop, Spark, Python, AWS, Azure). Docente y artista.
+**Perfil del contacto:** Ingeniero en IA en Auditoría (A Coruña). Ex Data Engineer (Hadoop, Spark, Python, AWS, Azure). Docente y artista.
 
 ### Las 3 preguntas que debes llevar preparadas
 
@@ -344,7 +344,7 @@ B2B — Canal institucional / integración
 | **0.3** | Subida de imágenes, modelo multimodal, OCR real | Primer examen corregido desde foto |
 | **0.4** | Celery + Redis, estados de Submission, notificación al cliente | 5 exámenes simultáneos sin colapso |
 | **0.5** | Panel dual React, marcadores visuales, botón HitL, tampón PII `[D-034]` | Producto demostrable a un profesor con blindaje visual en cliente |
-| **1.0** | Anonimización completa, ChangeLog, README Compliance, desplegado | Portfolio — Fase Demo (presentar a empresas y AESIA) |
+| **1.0** | Anonimización completa, ChangeLog, README Compliance, desplegado | Portfolio — Fase Demo (presentar a empresas y Auditoría) |
 
 ---
 
@@ -474,7 +474,7 @@ api-correccion/                              ← workspace único de VS Code
 ## Calendario Orientativo
 
 > [!NOTE]
-> **Ubicación estratégica de la reunión con la AESIA:** No es un requisito para iniciar la base de datos (**v0.2**), pero se ubica en el momento ideal justo al completar la v0.2 y antes de abordar la subida de imágenes (**v0.3**). De esta forma, se acude al encuentro con un backend funcional y conectado a PostgreSQL, obteniendo el criterio institucional exacto sobre OCR, asincronía y seudonimización pre-nube para diseñar las versiones v0.3 y v0.4 con un sello de autoridad inexpugnable.
+> **Ubicación estratégica de la auditoría externa:** No es un requisito para iniciar la base de datos (**v0.2**), pero se ubica en el momento ideal justo al completar la v0.2 y antes de abordar la subida de imágenes (**v0.3**). De esta forma, se acude al encuentro con un backend funcional y conectado a PostgreSQL, obteniendo el criterio institucional exacto sobre OCR, asincronía y seudonimización pre-nube para diseñar las versiones v0.3 y v0.4 con un sello de autoridad inexpugnable.
 
 | Sesión | Bloque / Versión | Contenido | Estado |
 |---|---|---|---|
@@ -485,9 +485,9 @@ api-correccion/                              ← workspace único de VS Code
 | ✅ | **v0.1** | **Motor Síncrono y Contrato JSON Validados (`origin/main`)** | 🖥️ Completado |
 | ✅ | **v0.2-Núcleo** | **Capa de Datos & Auth:** PostgreSQL + ORM, JWT de profesores, `marcos_evaluacion`, `rubricas_docente` (`COMBINADO`/`AUDITORIA` [D-027]), `Feed-Forward` ([D-026]) y `ChangeLog` | 🖥️ **Completado y Auditado** (`main`) |
 | ✅ | **v0.2-008** | **Cierre Técnico & Auditoría:** Deuda de migraciones Alembic y cobertura de seguridad propiedad HTTP 403 en `Feed-Forward` | 🖥️ **Completado y Auditado** (`main`) |
-| ✅ | **v0.2-Demo HitL** | **Flujo Principal & Consulta AESIA (`[v0.2-009]` y `[v0.2-010]`):** Endpoint HitL aprobación docente (`PATCH /approve`) y `[v0.2-010] Endpoints GET de Consulta y Trazabilidad` | 🖥️ **Completado y Auditado** (`main`) |
-| ⭐ | **Bloque 3** | **Reunión con contacto AESIA (A Coruña):** Validación de pipeline multimodal, privacidad pre-nube y networking TIC | ⏳ **Pendiente (Siguiente Hito)** |
-| — | **v0.3** | **Multimodalidad y OCR:** Subida de fotos de exámenes y procesado visual con LLM Vision | ⏳ Pendiente de v0.2 y reunión AESIA |
+| ✅ | **v0.2-Demo HitL** | **Flujo Principal & Consulta Auditoría (`[v0.2-009]` y `[v0.2-010]`):** Endpoint HitL aprobación docente (`PATCH /approve`) y `[v0.2-010] Endpoints GET de Consulta y Trazabilidad` | 🖥️ **Completado y Auditado** (`main`) |
+| ⭐ | **Bloque 3** | **Reunión con auditor externo (A Coruña):** Validación de pipeline multimodal, privacidad pre-nube y networking TIC | ⏳ **Pendiente (Siguiente Hito)** |
+| — | **v0.3** | **Multimodalidad y OCR:** Subida de fotos de exámenes y procesado visual con LLM Vision | ⏳ Pendiente de v0.2 y revisión técnica |
 | — | **v0.4** | **Asincronía y Colas:** Celery + Redis para concurrencia masiva de correcciones | ⏳ Pendiente de v0.3 |
 | — | **v0.5** | **Frontend PWA React + Vite:** Interfaz móvil para profesorado y firma HitL | ⏳ Pendiente de v0.3 |
 | — | **v1.0** | **Compliance & Portfolio Final:** Seudonimización pre-nube ([D-022]), Cold Storage ([D-021]) y README | ⏳ Pendiente de v0.5 |
@@ -529,5 +529,5 @@ api-correccion/                              ← workspace único de VS Code
 *Documento generado el 07/07/2026 — Antigravity para Alba Camiña García*  
 *Actualizado el 08/07/2026 — BLOQUE 9 reescrito con entorno real desplegado*  
 *Actualizado el 09/07/2026 — sincronizadas reglas de trabajo (9, 10, 11), modelo multi-folio archivos_urls, compresión en cliente [D-020] y retención en Cold Storage [D-021]*  
-*Actualizado el 15/07/2026 — armonizada Defensa Multinivel de PII (`[D-022] + [D-034]`: Buffer RAM + Client-Side Blackout Tool + Escáner Offline) en benchmarking, argumentario y guion AESIA.*  
-*Actualizado el 16/07/2026 — alineado con la Versión 0.2 Avanzada, dividiendo la fase de datos en Núcleo terminado, cierre técnico [v0.2-008] y preparación de demo pre-AESIA con aprobación HitL [v0.2-009] y endpoints de consulta [v0.2-010].*
+*Actualizado el 15/07/2026 — armonizada Defensa Multinivel de PII (`[D-022] + [D-034]`: Buffer RAM + Client-Side Blackout Tool + Escáner Offline) en benchmarking, argumentario y guion Auditoría.*  
+*Actualizado el 16/07/2026 — alineado con la Versión 0.2 Avanzada, dividiendo la fase de datos en Núcleo terminado, cierre técnico [v0.2-008] y preparación de demo pre-auditoría con aprobación HitL [v0.2-009] y endpoints de consulta [v0.2-010].*

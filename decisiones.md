@@ -73,14 +73,14 @@
 **Estado:** ✅ Adoptada
 
 **Contexto:**  
-El sistema de evaluación educativa en España varía por comunidad autónoma. Adaptarlo a todas desde el principio haría el MVP inviable. La autora reside y está empadronada en **A Coruña (Galicia)**, hogar de la sede nacional de la **AESIA (Agencia Española de Supervisión de la IA)** y del clúster *Ciudad de las TIC*.
+El sistema de evaluación educativa en España varía por comunidad autónoma. Adaptarlo a todas desde el principio haría el MVP inviable. La autora reside y está empadronada en **A Coruña (Galicia)**, hogar de la sede nacional de la **Auditoría (Agencia Española de Supervisión de la IA)** y del clúster *Ciudad de las TIC*.
 
 **Opciones consideradas:**
 - **Galicia** — coherencia total entre sede técnica (A Coruña), normativa (Decreto autonómico de la Xunta / LOMLOE Galicia), facilidad de testeo con profesoras locales, potencial diferencial bilingüe (castellano/gallego) y alineación con las ayudas/aceleradoras locales (IGAPE, Polo de Emprendemento de A Coruña, Explorer UDC, Activa Startups Galicia).
 - **Andalucía** — mayor volumen demográfico en España, contemplado inicialmente, pero sin conexión física con el ecosistema en el que se mueve y desarrollará el proyecto.
 - **Nacional genérico** — inviable como MVP, demasiado amplio.
 
-**Decisión:** **Galicia** como comunidad autónoma objetivo principal y primer marco curricular precargado (`seed`). Logra la máxima cohesión entre la prueba de concepto, las validaciones con docentes de la zona y la presentación institucional ante la **AESIA en la Ciudad de las TIC**.
+**Decisión:** **Galicia** como comunidad autónoma objetivo principal y primer marco curricular precargado (`seed`). Logra la máxima cohesión entre la prueba de concepto, las validaciones con docentes de la zona y la presentación institucional ante la **Auditoría en la Ciudad de las TIC**.
 
 **Consecuencias:** La normativa gallega (rubricas LOMLOE Galicia y criterios curriculares de la Xunta) se convierte en el primer seed oficial de `marcos_evaluacion`. El diseño en `JSONB` ([D-004]) garantiza que añadir en el futuro el marco de Andalucía o Madrid no requerirá cambiar ni una línea de código. Tanto el producto como el ecosistema mercantil/financiero (`v1.0-005`) operan de forma unificada en A Coruña y Galicia.
 
@@ -167,7 +167,7 @@ Adaptar el sistema a múltiples asignaturas desde el principio requeriría múlt
 
 **Decisión:** 1 asignatura (**Filosofía de Bachillerato gallego**, Decreto 157/2022 Xunta de Galicia) con criterios de evaluación genéricos aplicables a respuesta corta. La rúbrica específica entra en v0.2.
 
-**Consecuencias:** El seed de la BBDD en v0.2 incluirá un marco de evaluación real de **Filosofía de Bachillerato gallego** (Decreto 157/2022, Xunta de Galicia) como primer registro. Coherente con D-001 (sede en A Coruña, AESIA, Decretos 156/157/2022).
+**Consecuencias:** El seed de la BBDD en v0.2 incluirá un marco de evaluación real de **Filosofía de Bachillerato gallego** (Decreto 157/2022, Xunta de Galicia) como primer registro. Coherente con D-001 (sede en A Coruña, Auditoría, Decretos 156/157/2022).
 
 ---
 
@@ -569,7 +569,7 @@ Nuestras elecciones pedagógicas están respaldadas por las tres máximas del mo
 **Consecuencias:** El esquema JSON del smoke test (`smoke_test_llm.py` en `v0.1-000`) y de Pydantic en FastAPI incluirá estos tres campos. La PWA mostrará el *confidence score* en el panel dual de corrección y destacará el "Siguiente Paso Accionable" como tarjeta prioritaria para el docente y el alumno.
 
 > [!IMPORTANT]
-> **La combinación es imbatible:** usamos la legalidad y los criterios competenciales cualitativos de Galicia como cimiento (`marcos_evaluacion` en `JSONB`), e inyectamos las técnicas pedagógicas más avanzadas de Reino Unido y USA (*Next Steps* y *Confidence Score*) como superpoder del motor de IA. Es un producto redondísimo para presentar tanto en la AESIA como en cualquier instituto o entrevista de ingeniería EdTech.
+> **La combinación es imbatible:** usamos la legalidad y los criterios competenciales cualitativos de Galicia como cimiento (`marcos_evaluacion` en `JSONB`), e inyectamos las técnicas pedagógicas más avanzadas de Reino Unido y USA (*Next Steps* y *Confidence Score*) como superpoder del motor de IA. Es un producto redondísimo para presentar tanto en la Auditoría como en cualquier instituto o entrevista de ingeniería EdTech.
 
 ---
 
@@ -804,7 +804,7 @@ Se adopta una defensa multinivel pre-nube para casos de borde de PII:
 2. **Evolución Offline en Backend (`Roadmap v0.8`):** Se planifica la integración de una comprobación automática offline en memoria como salvaguarda secundaria en el servidor antes de conectar con APIs externas de IA.
 
 **Consecuencias:**  
-Se elimina al 100% el riesgo de fuga de datos en folios atípicos, demostrando ante agencias de supervisión (*AESIA / AEPD*) una cultura de ingeniería de ciberseguridad *Privacy by Design / Privacy by Default* superior al estándar del sector.
+Se elimina al 100% el riesgo de fuga de datos en folios atípicos, demostrando ante agencias de supervisión (*Auditoría / AEPD*) una cultura de ingeniería de ciberseguridad *Privacy by Design / Privacy by Default* superior al estándar del sector.
 
 ---
 
@@ -869,7 +869,7 @@ En un proyecto orientado a construir un portfolio de ingeniería de alto nivel y
 Se adopta el uso riguroso y obligatorio del estándar **Conventional Commits** (`feat:`, `fix:`, `docs:`, `test:`, `style:`) acompañado siempre de un **scope** descriptivo entre paréntesis (ej. `feat(submissions):`). Adicionalmente, se decreta que todo mensaje de commit (o PR) **debe incluir la referencia cruzada** al ID de la tarea del backlog (ej. `[v0.2-009]`) o al registro arquitectónico que lo motiva (ej. `[D-035]`).
 
 **Consecuencias:**  
-1. **Portfolio auto-explicativo:** El repositorio de GitHub se convierte en un artefacto que demuestra madurez en ingeniería de software (*Governance*), facilitando su lectura por parte de empresas tecnológicas, consultoras o mentores (AESIA).
+1. **Portfolio auto-explicativo:** El repositorio de GitHub se convierte en un artefacto que demuestra madurez en ingeniería de software (*Governance*), facilitando su lectura por parte de empresas tecnológicas, consultoras o mentores (Auditoría).
 2. **Trazabilidad bidireccional real:** Cualquier evaluador técnico puede navegar desde una línea de código específica, ver el commit que la introdujo, leer el mensaje y saltar directamente al documento `decisiones.md` para entender el razonamiento de negocio que justificó ese cambio.
 
 ---

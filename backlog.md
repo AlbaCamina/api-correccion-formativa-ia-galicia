@@ -37,7 +37,7 @@
 ### [v0.0-001] Blindaje jurídico pre-nube y cumplimiento EU AI Act / RGPD
 **Como** arquitecta y desarrolladora,  
 **quiero** diseñar un sistema de tratamiento de datos personales de menores que sea 100% legal bajo la EU AI Act y el RGPD  
-**para** que el producto pueda presentarse con total seguridad jurídica ante inspecciones educativas, la AESIA o departamentos de orientación [D-002, D-011, D-021, D-022].
+**para** que el producto pueda presentarse con total seguridad jurídica ante inspecciones educativas, la Auditoría o departamentos de orientación [D-002, D-011, D-021, D-022].
 
 **Criterios de aceptación:**
 - [x] Adoptado modelo *Human-in-the-Loop* (HitL): la IA propone un borrador formativo; la profesora toma y aprueba la decisión final (`[D-002]`)
@@ -52,7 +52,7 @@
 ### [v0.0-002] Adopción de la Normativa de Evaluación de Galicia (`Decreto 156/2022 y 157/2022`)
 **Como** desarrolladora empadronada en A Coruña (Galicia),  
 **quiero** que el motor de evaluación adopte el marco autonómico gallego de la Xunta de Galicia como primer `seed` de base de datos (`JSONB`)  
-**para** lograr máxima coherencia con mi entorno institucional (Ciudad de las TIC, AESIA, Polos de Emprendemento) y soportar evaluación por competencias bilingüe [D-001, D-004].
+**para** lograr máxima coherencia con mi entorno institucional (Ciudad de las TIC, Auditoría, Polos de Emprendemento) y soportar evaluación por competencias bilingüe [D-001, D-004].
 
 **Criterios de aceptación:**
 - [x] Identificados los decretos rectores gallegos: `Decreto 156/2022` (ESO), `Decreto 157/2022` (Bachillerato) y `Orden de 26 de mayo de 2023` de la Consellería de Educación de la Xunta de Galicia
@@ -99,7 +99,7 @@
 
 **Criterios de aceptación:**
 - [x] Documentadas las convocatorias y redes pre-alta en Galicia (`Red de Polos de Emprendemento de la Xunta en A Coruña`, `Explorer UDC A Coruña`, `Talento 45+ Cámara de A Coruña`, `Generación SAVIA`, `PAEM MicroBank hasta 30.000€`)
-- [x] Identificado el contacto e itinerario para presentar el MVP funcional en el hub **Ciudad de las TIC / AESIA de A Coruña** (`[v1.0-005]`)
+- [x] Identificado el contacto e itinerario para presentar el MVP funcional en el hub **Ciudad de las TIC / Auditoría de A Coruña** (`[v1.0-005]`)
 - [x] Planificadas las ayudas de inicio de actividad en Galicia (`Emprego Autónomo >45 años de 4.000€ a 7.000€ + Cuota Cero`), `Activa Startups Galicia (hasta 40.000€)` y `ENISA Emprendedoras Digitales` para la fase de comercialización futura
 
 **Etiquetas:** `v0.0` `docs`
@@ -423,7 +423,7 @@
 
 ### [v0.2-010] Endpoints GET de Consulta y Trazabilidad
 
-**Como** desarrolladora y ponente técnica en la demostración ante la AESIA,  
+**Como** desarrolladora y ponente técnica en la demostración ante la Auditoría,  
 **quiero** disponer de endpoints de lectura limpios para listar entregas y consultar el detalle evaluativo  
 **para** poder navegar por el flujo completo en vivo en la interfaz de Swagger UI (`/docs`) y verificar la trazabilidad sin consultar la base de datos a mano.
 
@@ -433,7 +433,7 @@
 - [x] Pruebas unitarias correspondientes en verde en `test_evaluation_router.py`.
 - [x] Al completarse, refuerza el pilar de evidencia y visibilidad en `AUDITORIA.md`.
 
-**Etiquetas:** `v0.2` `endpoints` `swagger` `aesia-demo`
+**Etiquetas:** `v0.2` `endpoints` `swagger` `auditoría-demo`
 
 ---
 
@@ -717,7 +717,7 @@
 
 ## 🏆 Versión 1.0 — MVP Completo y Desplegado
 
-**Objetivo:** El producto está desplegado en una URL pública, documentado y listo para ser mostrado en portfolio y al contacto de la AESIA.
+**Objetivo:** El producto está desplegado en una URL pública, documentado y listo para ser mostrado en portfolio y al auditor externo.
 
 ---
 
@@ -798,7 +798,7 @@
 - [ ] Solicitud enviada al programa **Talento 45+** (Cámara de Comercio de A Coruña + SEPE)
 - [ ] Registro completado en la plataforma **Generación SAVIA** (Fundación Endesa)
 - [ ] Candidatura valorada para programas de incubación y ayudas en A Coruña (**Explorer UDC / Activa Startups / PAEM Galicia / IGAPE**)
-- [ ] Reunión agendada con el contacto de la **AESIA en A Coruña (Ciudad de las TIC)** para presentarle el sistema funcional
+- [ ] Reunión agendada con el contacto de la **Auditoría en A Coruña (Ciudad de las TIC)** para presentarle el sistema funcional
 
 **Etiquetas:** `v1.0` `docs`
 
@@ -841,6 +841,6 @@ Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificad
 ---
 
 *Backlog generado el 07/07/2026 — Antigravity para Alba Camiña García*  
-*Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] e incorporadas historias de cierre v0.2 y demo HitL pre-AESIA (`[v0.2-008]`, `[v0.2-009]`, `[v0.2-010]`).*  
+*Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] e incorporadas historias de cierre v0.2 y demo HitL pre-auditoría (`[v0.2-008]`, `[v0.2-009]`, `[v0.2-010]`).*  
 *Total de historias: 34 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 2*  
 *Actualizado el 20/07/2026 — Auditoría normativa LOMLOE (D-040–D-045): etapa obligatoria ESO/BACH, escala BE/NA, media ponderada en backend (issue #10, PR #11).*
