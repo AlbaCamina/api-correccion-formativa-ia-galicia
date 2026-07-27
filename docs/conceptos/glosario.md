@@ -761,6 +761,9 @@ Interfaz web autogenerada e interactiva que permite visualizar, documentar y pro
 **LPU (Language Processing Unit)**  
 Unidad de Procesamiento de Lenguaje. Es un tipo de microchip especializado diseñado por la empresa Groq exclusivamente para la inferencia (ejecución) de Modelos de Lenguaje Grande (LLMs) como Llama 3. A diferencia de las GPUs (Tarjetas Gráficas) que procesan cosas en paralelo, las LPUs están optimizadas para el procesamiento secuencial rapidísimo de texto, lo que permite alcanzar velocidades de respuesta de más de 800 tokens por segundo (casi instantáneo), siendo ideales para sistemas que requieren corrección formativa en tiempo real.
 
+**GPU (Graphics Processing Unit)**  
+Unidad de Procesamiento Gráfico (comúnmente conocida como Tarjeta Gráfica, como las de NVIDIA). Tradicionalmente diseñadas para videojuegos y renderizado 3D por su increíble capacidad para realizar miles de cálculos matemáticos en paralelo al mismo tiempo. Han sido el estándar para entrenar y ejecutar Inteligencia Artificial (como ChatGPT), pero presentan cuellos de botella al generar texto secuencial, siendo menos eficientes para inferencia conversacional que chips especializados como las LPUs.
+
 ---
 
 *Glosario creado el 09/07/2026 — Antigravity para Alba Camiña García*  
