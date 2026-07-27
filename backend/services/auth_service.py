@@ -7,15 +7,14 @@ import os
 from datetime import datetime, timedelta, timezone
 from typing import Optional
 import jwt
-from passlib.context import CryptContext
+import bcrypt as _bcrypt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from backend.models.database import get_db
 from backend.models.user import Profesor
 
-# Configuración del algoritmo bcrypt
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+# Configuración del algoritmo bcrypt (nativo, sin passlib)
 
 # Configuración de JWT
 SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key-galicia-2026-hitl-ninja")
@@ -30,14 +29,14 @@ def hash_password(password: str) -> str:
     """
     Convierte una contraseña en texto claro en un hash unidireccional irreversible con bcrypt.
     """
-    return pwd_context.hash(password)
+    return _bcrypt.hashpw(password.encode("utf-8"), _bcrypt.gensalt()).decode("utf-8")
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """
     Verifica si una contraseña en texto claro coincide con el hash almacenado.
     """
-    return pwd_context.verify(plain_password, hashed_password)
+    return _bcrypt.checkpw(plain_password.encode("utf-8"), hashed_password.encode("utf-8"))
 
 
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
