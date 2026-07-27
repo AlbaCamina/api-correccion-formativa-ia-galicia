@@ -7,7 +7,7 @@
 > [!NOTE]
 > **SÍNTESIS DEL MOMENTO ACTUAL (Julio 2026):**  
 > Estado: Versión 0.2 Avanzada. Completada y Auditada. Listos para demo AESIA y Bloque 3.
-SÍNTESIS DEL MOMENTO ACTUAL (actualizado 27/07/2026): La Versión 0.2 está 100% completada y auditada bajo el ADR D-035 (32/32 tests en verde). La semana 21-25/07 cerró la gobernanza de la Épica v0.3: Issue #14 reescrita con arquitectura *Client-Side First* (recorte de cabecera en PWA/JS/Canvas, D-022/D-034), Self-Review Gate añadido como Regla 7 de AGENTS.md y documentación alineada en backlog, glosario y AUDITORIA.md. Code freeze activo del 25/07. **Hoy (27/07):** reunión con el contacto de la AESIA (Bloque 3) como puente hacia la implementación de la v0.3 (cropHeader en frontend + Groq Vision).
+SÍNTESIS DEL MOMENTO ACTUAL (actualizado 27/07/2026): La Versión 0.2 está 100% completada y auditada bajo el ADR D-035 (31/31 tests en verde). La semana 21-25/07 cerró la gobernanza de la Épica v0.3: Issue #14 reescrita con arquitectura *Client-Side First* (recorte de cabecera en PWA/JS/Canvas, D-022/D-034), Self-Review Gate añadido como Regla 7 de AGENTS.md y documentación alineada en backlog, glosario y AUDITORIA.md. Code freeze activo del 25/07. **Hoy (27/07):** reunión con el contacto de la AESIA (Bloque 3) como puente hacia la implementación de la v0.3 (cropHeader en frontend + Groq Vision).
 
 ---
 
