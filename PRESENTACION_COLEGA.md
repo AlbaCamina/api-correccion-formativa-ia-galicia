@@ -55,6 +55,12 @@ El backend no es solo funcional, sino que cuenta con un arnés de seguridad auto
 *   **Suite de Pruebas:** Ejecución de 31 tests unitarios y de integración mediante `pytest`.
 *   **Blindaje:** Garantizan que las reglas de negocio (escalas LOMLOE, privacidad, estados de bloqueo del HitL) no se rompan ante futuras refactorizaciones o actualizaciones de dependencias.
 
+> **Comando de ejecución (WSL):**
+> ```bash
+> source venv/bin/activate
+> pytest backend/tests/ -v
+> ```
+
 ---
 *Documento vivo — Generado para la revisión técnica (27/07/2026).*
 
