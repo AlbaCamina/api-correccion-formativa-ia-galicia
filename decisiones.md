@@ -1036,8 +1036,22 @@ Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `
 
 **Consecuencias:** Corrige el ejemplo JSON de `/api/v1/evaluate` en README.md y api_correccion_plan.md, que mostraban `"NA"` como valor inventado sin respaldo normativo. Requiere validador Pydantic que fuerce `None` si `etapa == "BACH"` independientemente de lo que devuelva el LLM.
 
+### D-050 — Estrategia de RAG Relacional (Determinista) vs RAG Vectorial
+
+**Estado:** ✅ Adoptada  
+**Fecha:** 28/07/2026
+
+**Contexto:** Para evaluar formativamente un texto, la IA necesita conocer la rúbrica del profesor y el marco legal asociado (criterios y saberes de la LOMLOE). La tendencia general de la industria para recuperar información externa es usar RAG (*Retrieval-Augmented Generation*) semántico mediante bases de datos vectoriales (ej. ChromaDB, Pinecone). Sin embargo, en el ámbito jurídico-educativo, recuperar un artículo de ley "semánticamente parecido" es inaceptable; se requiere el articulado exacto para garantizar la legalidad de la evaluación.
+
+**Decisión:** Se rechaza la adopción de bases de datos vectoriales para el núcleo del sistema. Se adopta una estrategia de **RAG Relacional (Determinista)**. La API recupera el contexto (Rúbrica del docente y marco normativo LOMLOE) mediante transacciones SQL precisas a través de sus `id` exactos en PostgreSQL (`rubrica_id`, `marco_id`). Estos datos estructurados se inyectan en caliente dentro del prompt que se envía a Groq.
+
+**Consecuencias:**
+1. **YAGNI & Simplicidad:** No necesitamos añadir ni mantener microservicios extra para ChromaDB ni ejecutar modelos intermedios de *embeddings*.
+2. **Seguridad Legal:** La IA siempre evalúa con el 100% de la ley y los criterios vigentes inyectados de forma transaccional, eliminando la alucinación en la fase de recuperación de contexto (*Retrieval*).
+3. **Robustez Arquitectónica:** Proporciona un argumento sólido y demostrable ante auditorías técnicas para justificar que la API no sufre de "ruido semántico".
+
 ---
 
 *Documento creado el 08/07/2026 — Alba Camiña García con la ayuda de Antigravity AI*  
-*Actualizado el 23/07/2026 — añadida D-049*  
-*Total de decisiones registradas: 49*
+*Actualizado el 28/07/2026 — añadida D-050*  
+*Total de decisiones registradas: 50*
