@@ -769,6 +769,9 @@ Técnica que consiste en "recuperar" información externa y pasársela a un mode
 *En el mercado:* Se suele usar RAG Semántico (bases de datos vectoriales que buscan textos "parecidos", lo que puede introducir ruido).  
 *En api-correccion-formativa-ia-galicia:* Implementamos **RAG Determinista o Relacional**. En lugar de búsquedas semánticas borrosas, recuperamos la rúbrica exacta del docente y el marco legal LOMLOE mediante consultas SQL precisas a nuestra base de datos PostgreSQL (`rubrica_id`, `marco_id`). Estos datos estructurados se inyectan dinámicamente en el *prompt* de Groq, forzando a la IA a evaluar al alumno basándose al 100% en la legalidad y los criterios vigentes sin margen de error en la recuperación del contexto.
 
+**Base de Datos Vectorial (Vector Database)**  
+Tipo especializado de base de datos (como ChromaDB, Pinecone o Weaviate) diseñada para almacenar datos como "vectores matemáticos" (embeddings). En lugar de buscar palabras exactas o IDs como hace PostgreSQL, busca "conceptos matemáticos parecidos" en un espacio multidimensional. Son la pieza central del RAG Semántico tradicional, muy útiles para chatbots que buscan en miles de PDFs, pero menos precisas que una base de datos relacional (SQL) cuando necesitas inyectar un contrato o ley exacta sin riesgo de desviación.
+
 ---
 
 *Glosario creado el 09/07/2026 — Antigravity para Alba Camiña García*  
