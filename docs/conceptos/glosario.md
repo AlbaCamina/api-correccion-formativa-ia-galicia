@@ -764,6 +764,11 @@ Unidad de Procesamiento de Lenguaje. Es un tipo de microchip especializado dise�
 **GPU (Graphics Processing Unit)**  
 Unidad de Procesamiento Gráfico (comúnmente conocida como Tarjeta Gráfica, como las de NVIDIA). Tradicionalmente diseñadas para videojuegos y renderizado 3D por su increíble capacidad para realizar miles de cálculos matemáticos en paralelo al mismo tiempo. Han sido el estándar para entrenar y ejecutar Inteligencia Artificial (como ChatGPT), pero presentan cuellos de botella al generar texto secuencial, siendo menos eficientes para inferencia conversacional que chips especializados como las LPUs.
 
+**RAG (Retrieval-Augmented Generation)**  
+Técnica que consiste en "recuperar" información externa y pasársela a un modelo de IA para que genere una respuesta basada en esos datos exactos, evitando alucinaciones o invenciones.  
+*En el mercado:* Se suele usar RAG Semántico (bases de datos vectoriales que buscan textos "parecidos", lo que puede introducir ruido).  
+*En api-correccion-formativa-ia-galicia:* Implementamos **RAG Determinista o Relacional**. En lugar de búsquedas semánticas borrosas, recuperamos la rúbrica exacta del docente y el marco legal LOMLOE mediante consultas SQL precisas a nuestra base de datos PostgreSQL (`rubrica_id`, `marco_id`). Estos datos estructurados se inyectan dinámicamente en el *prompt* de Groq, forzando a la IA a evaluar al alumno basándose al 100% en la legalidad y los criterios vigentes sin margen de error en la recuperación del contexto.
+
 ---
 
 *Glosario creado el 09/07/2026 — Antigravity para Alba Camiña García*  
