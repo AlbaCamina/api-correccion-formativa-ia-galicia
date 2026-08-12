@@ -348,6 +348,9 @@ La unidad mínima de texto que procesa un modelo de lenguaje. Aproximadamente `1
 **Ventana de Contexto (`Context Window`)**  
 El límite máximo de tokens que el modelo puede leer de una vez (prompt + respuesta juntos). Si un examen escaneado con mucho texto supera ese límite, el modelo falla — por eso en `[D-020]` se comprime la imagen en la PWA antes de enviarla.
 
+**Workload Routing (Enrutamiento de Cargas)**  
+Estrategia arquitectónica (`[D-051]`) por la que el sistema decide dinámicamente qué proveedor de Inteligencia Artificial (ej. OpenAI vs. Groq) debe procesar una petición en función de la naturaleza de la carga de trabajo. En api-correccion-formativa-ia-galicia, las peticiones que contienen imágenes (Visión) se dirigen a OpenAI para aprovechar la fiabilidad de sus *Structured Outputs*, mientras que las peticiones de texto plano se enrutan a Groq para maximizar la velocidad y reducir el coste.
+
 ---
 
 ## 5. Almacenamiento e infraestructura
@@ -482,6 +485,12 @@ En la convención de `Conventional Commits` de este proyecto, es el texto entre 
 **AGENTS.md**  
 Archivo de texto en la raíz del proyecto que los agentes de IA (como Antigravity, OpenCode o Cursor) leen automáticamente al arrancar para inyectarlo en su `System Prompt`. Contiene el contexto del proyecto (arquitectura, convenciones, reglas) para que el agente trabaje con información actualizada sin tener que explicárselo cada vez.
 
+**Agentic Coding (Codificación Agentic)**  
+Paradigma avanzado de desarrollo de software donde la Inteligencia Artificial no actúa como un mero autocompletado pasivo, sino como un agente autónomo. Un agente es capaz de leer múltiples archivos simultáneamente, razonar sobre la arquitectura del proyecto, ejecutar comandos en terminal y aplicar parches de código complejos de forma proactiva, actuando como un copiloto de alto nivel.
+
+**AI-Augmented Engineering (Ingeniería Aumentada por IA)**  
+Modelo de trabajo y perfil profesional de la nueva era del desarrollo. En lugar de escribir cada línea de código a mano, la desarrolladora (orquestadora) se apoya en agentes de IA para eliminar tareas repetitivas (*boilerplate*) y acelerar la implementación. El humano dirige la estrategia, valida las decisiones arquitectónicas, garantiza el cumplimiento normativo y aprueba el resultado final, multiplicando drásticamente su productividad.
+
 **Antigravity**  
 El agente de IA integrado en VS Code (este). Se usa para arquitectura, decisiones de diseño, revisiones críticas y documentación. Consume cuota de Claude Sonnet.
 
@@ -504,6 +513,9 @@ Agente de IA que se ejecuta en la terminal de WSL. Lee y edita archivos directam
 
 **PonyTail**  
 Conjunto de reglas que se añade al `AGENTS.md` para que OpenCode siga el principio de mínimo código: antes de escribir algo, comprueba si ya existe una solución más simple. Reduce el consumo de tokens en ~22%.
+
+**State-of-the-Art (SOTA)**  
+Término técnico que define el nivel más alto y avanzado de desarrollo alcanzado en un momento particular en cualquier campo (la "tecnología punta"). En el contexto del proyecto, usar herramientas como Antigravity o modelos como GPT-4o-mini demuestra adopción de flujos de trabajo SOTA en lugar de prácticas de desarrollo tradicionales y obsoletas.
 
 **WSL** (Windows Subsystem for Linux — Subsistema de Windows para Linux)  
 Capa de compatibilidad que permite ejecutar un sistema Linux (Ubuntu) dentro de Windows. Todo el código Python/FastAPI del proyecto corre en WSL porque el ecosistema de herramientas de desarrollo es más estable en Linux.
@@ -772,7 +784,19 @@ Técnica que consiste en "recuperar" información externa y pasársela a un mode
 **Base de Datos Vectorial (Vector Database)**  
 Tipo especializado de base de datos (como ChromaDB, Pinecone o Weaviate) diseñada para almacenar datos como "vectores matemáticos" (embeddings). En lugar de buscar palabras exactas o IDs como hace PostgreSQL, busca "conceptos matemáticos parecidos" en un espacio multidimensional. Son la pieza central del RAG Semántico tradicional, muy útiles para chatbots que buscan en miles de PDFs, pero menos precisas que una base de datos relacional (SQL) cuando necesitas inyectar un contrato o ley exacta sin riesgo de desviación.
 
+**MCP (Model Context Protocol)**  
+Estándar abierto de arquitectura de comunicación diseñado para conectar modelos de Inteligencia Artificial (LLMs y Agentes) con herramientas externas, fuentes de datos y APIs de forma segura, mediante esquemas estandarizados en JSON-RPC. Funciona como un "enchufe universal": en lugar de crear conectores ad-hoc para cada servicio, un servidor MCP expone datos o funciones (como consultar rúbricas o validar notas) a cualquier cliente de IA manteniendo tipos estrictos y aislamiento de seguridad.
+
+**TrOCR (Transformer OCR)**  
+Modelo de reconocimiento óptico de caracteres desarrollado por Microsoft basado en arquitectura Transformer end-to-end (`VisionEncoderDecoder`). A diferencia de los motores OCR clásicos (como Tesseract, basado en LSTM), TrOCR está específicamente entrenado sobre conjuntos de datos de **escritura manuscrita real** (`microsoft/trocr-base-handwritten`), lo que lo hace superior para reconocer caligrafía irregular, tachones y letra variable típica de exámenes escolares de ESO y Bachillerato. Su rol en este proyecto se limita a la **Capa 1 de Defensa PII pre-nube** (`[Roadmap-002]`): detectar texto manuscrito en cabeceras de folios (nombre del alumno, firma) antes de enviar la imagen a la nube, complementando a Tesseract (que cubre texto impreso). TrOCR **no sustituye al motor de evaluación pedagógica** (Groq Vision), ya que no genera `visualMarkers (x,y)` ni comprensión semántica del contenido.
+
+**PaddleOCR**  
+Motor de OCR de deep learning desarrollado por Baidu, especializado en detección de texto, reconocimiento, orientación y estructura documental (tablas, columnas) sobre documentos corporativos impresos (facturas, contratos, planos). Ejecutable en local (CPU/GPU/ONNX Runtime) sin dependencia de APIs externas. En este proyecto, su rol potencial es como **escáner PII de Capa 1** para detectar texto impreso en cabeceras de folios (nombres tipografiados, DNIs) antes de la subida a Cloudinary o Groq Vision, siendo menos adecuado que TrOCR para caligrafía escolar manuscrita irregular.
+
 ---
 
 *Glosario creado el 09/07/2026 — Antigravity para Alba Camiña García*  
-*Documento vivo — se actualiza con cada término nuevo que aparezca en el proyecto*
+*Documento vivo — se actualiza con cada término nuevo que aparezca en el proyecto*  
+*Actualizado el 10/08/2026 — Añadidos TrOCR y PaddleOCR como candidatos Capa 1 PII pre-nube (`[Roadmap-002]`), contrastados con la decisión de Groq Vision para v0.3.*  
+*Actualizado el 11/08/2026 — Añadido Workload Routing al glosario tras el pivote D-051.*  
+*Actualizado el 12/08/2026 — Añadidos conceptos de IA moderna: AI-Augmented Engineering, Agentic Coding y SOTA.*

@@ -515,6 +515,7 @@ api-correccion/                              ← workspace único de VS Code
 - Notificaciones push, escáner optimizado, modo offline parcial
 
 ### 🔌 Integración Directa con Plataformas y LMS (Post-MVP / v2.x)
+- **Servidor MCP (Model Context Protocol):** Exposición de la API de corrección y rúbricas bajo el estándar abierto MCP (JSON-RPC), permitiendo que cualquier agente de IA externo (Claude Desktop, asistentes locales o IDEs de centro) consuma y ejecute evaluaciones formativas de forma transparente con tipos estrictos y cero retención de datos.
 - **Google Classroom / Moodle OAuth:** Conexión directa mediante API para importar automáticamente las entregas y tareas digitales de los alumnos sin necesidad de que el docente exporte o capture el PDF/imagen manualmente.
 - **Sincronización de calificaciones HitL con XADE:** Exportación automatizada y formateada del acta y de las calificaciones competenciales (`IN, SU, BE, NT, SB`) validadas por el docente para agilizar la carga oficial de notas en la plataforma autonómica galega (cumpliendo las restricciones del Esquema Nacional de Seguridad).
 

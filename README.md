@@ -5,7 +5,7 @@
 [![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16--Alpine-316192?style=flat&logo=postgresql)](https://www.postgresql.org/)
 [![Groq](https://img.shields.io/badge/LLM-Groq%20%2F%20OpenAI-orange?style=flat)](https://groq.com/)
 [![Decretos 156/2022 e 157/2022](https://img.shields.io/badge/Normativa-Decretos%20156%2F2022%20e%20157%2F2022%20Galicia-lightblue?style=flat)](#)
-[![Version](https://img.shields.io/badge/Version-v0.3--001-brightgreen?style=flat)](#)
+[![Version](https://img.shields.io/badge/Version-v0.3--004-brightgreen?style=flat)](#)
 
 API de Corrección Formativa con IA diseñada para asistir al profesorado de Filosofía de Bachillerato en la Comunidad Autónoma de Galicia. Estructurada bajo el marco pedagógico oficial de la LOMLOE, los Decretos 156/2022 y 157/2022 (Xunta de Galicia) (garantizando el blindaje estricto de la etapa educativa ESO/BACH), y las directrices de privacidad de la Unión Europea (RGPD / AI Act / ENS).
 
@@ -14,7 +14,7 @@ API de Corrección Formativa con IA diseñada para asistir al profesorado de Fil
 *   **Alineamiento Curricular Gallego:** Diseñada específicamente sobre las competencias clave, competencias específicas y criterios de evaluación de la materia de Filosofía de Bachillerato definidos por la Xunta de Galicia (`[D-027] Modo Dual de Rúbrica`).
 *   **Deslinde Formativo vs Sumativo (HitL):** El sistema no califica de forma fría ni automática; realiza un desglose cualitativo por rúbricas pedagógicas, devuelve un **Siguiente Paso Accionable (Feed Forward)** y un **Índice de Confianza IA** para evitar alucinaciones. El docente siempre conserva la soberanía y firma la nota (`[D-002]`).
 *   **Blindaje de Privacidad y Seguridad (Stealth/Phase Ninja):** Seudonimización estricta del alumnado en la nube (`alumno_id = "A-14"`) sin cifrado de columnas frágil (`[D-031]`). La libreta de equivalencia con la identidad real del menor reside en exclusiva en el cuaderno local de la profesora, y la autenticación docente se resguarda con hacheo unidireccional irreversible `bcrypt` + sesiones `JWT`.
-*   **Resiliencia y Optimización FinOps:** Integración primaria con Groq LPU (`llama-3.3-70b-versatile` en `[D-028]`) con fallback dinámico a `json_object` si falla la API de Structured Outputs de algún proveedor.
+*   **Resiliencia y Optimización FinOps:** *Workload Routing* multi-proveedor (`[D-051]`): el motor de texto usa Groq LPU (`llama-3.3-70b-versatile`, velocidad extrema y coste cero) y el motor de visión usa OpenAI (`gpt-4o-mini`, *Structured Outputs* nativos para garantizar el 100% de cumplimiento del esquema `EvaluacionIA`). La cualitativa ESO se asigna de forma determinista en el backend (`[D-052]`), sin depender del criterio del LLM.
 
 ---
 
@@ -107,6 +107,8 @@ venv/bin/pytest backend/tests/ -v
 | `/api/v1/submissions/upload` | `POST` | 🔜 v0.3 | Subida de imagen/PDF del examen (multipart) |
 | `/api/v1/submissions/{id}/events` | `GET SSE` | 🔜 v0.4 | Notificación en tiempo real al finalizar corrección |
 | `/api/v1/submissions/{id}/changelog` | `GET` | 🔜 v1.0 | Historial inmutable de auditoría AI Act |
+
+> ✅ **Pipeline Multimodal validado (12/08/2026):** El motor de visión (`gpt-4o-mini` vía OpenAI *Structured Outputs*) ha sido verificado con `smoke_test_vision.py` devolviendo el contrato `EvaluacionIA` completo y sin errores. La asignación de la cualitativa ESO es determinista en el backend. Ver [`[D-051]`](decisiones.md#d-051) y [`[D-052]`](decisiones.md#d-052).
 
 > La documentación interactiva completa (Swagger UI) está disponible en `http://127.0.0.1:8000/docs` al ejecutar el servidor en local.
 

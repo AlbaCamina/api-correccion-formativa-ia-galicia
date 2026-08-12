@@ -1,9 +1,4 @@
-"""
-Esquema estructurado de salida del agente de IA (contrato EvaluacionIA).
-Corregido para: abreviatura legal 'BE' (no 'BI'), soporte multi-etapa ESO/BACH,
-trazabilidad criterio->competencia clave, y semántica de nota orientativa (HitL).
-Base normativa: Decreto 156/2022 (ESO) y Decreto 157/2022 (Bachillerato) - Xunta de Galicia.
-"""
+# Contrato de Salida (EvaluacionIA) - Motor Pedagógico
 from typing import List, Literal, Optional
 from pydantic import BaseModel, Field, model_validator
 from backend.models.marco import Etapa
@@ -136,4 +131,29 @@ class EvaluacionIA(BaseModel):
             # Logueable externamente si fuera necesario
             pass
             
+        return self
+
+    @model_validator(mode="after")
+    def asignar_cualitativa_legal(self) -> "EvaluacionIA":
+        """
+        Mutador (D-052): Asignación determinista de la cualitativa ESO.
+        Se ejecuta DESPUÉS de recalcular_media_ponderada, por lo que opera
+        sobre la nota numérica ya corregida por el backend.
+        La IA no es una fuente fiable para esta asignación: la ley es fija.
+        Escala Decreto 156/2022 (Art. 27.1): IN=1-4, SU=5, BE=6, NT=7-8, SB=9-10.
+        En BACH, la cualitativa es None (D-049), no se toca.
+        """
+        if self.etapa == Etapa.BACH:
+            return self
+        nota = self.calificacion_numerica
+        if nota < 5.0:
+            self.calificacion_cualitativa = "IN"
+        elif nota < 6.0:
+            self.calificacion_cualitativa = "SU"
+        elif nota < 7.0:
+            self.calificacion_cualitativa = "BE"
+        elif nota < 9.0:
+            self.calificacion_cualitativa = "NT"
+        else:
+            self.calificacion_cualitativa = "SB"
         return self

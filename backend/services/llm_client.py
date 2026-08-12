@@ -32,9 +32,9 @@ def get_llm_client(provider: str) -> OpenAI:
     else:
         raise ValueError(f"Proveedor de LLM '{provider}' no soportado para llamadas reales.")
 
-async def evaluate_answer(student_answer: str, rubric: str, question: str = "", etapa: str = "") -> EvaluacionIA:
+async def evaluate_answer(student_answer: str, rubric: str, question: str = "", etapa: str = "", image_url: str = None) -> EvaluacionIA:
     """
-    Llama al LLM (OpenAI o Groq) con el prompt estructurado para evaluar la respuesta del alumno.
+    Llama al LLM (OpenAI o Groq) con el prompt estructurado para evaluar la respuesta del alumno (y opcionalmente una imagen).
     Tiene tolerancia a fallos con un reintento y fallback a json_object si falla el .parse() nativo.
     """
     provider = os.getenv("LLM_PROVIDER", "openai").lower()
@@ -46,7 +46,7 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "", 
         from backend.models.evaluation import RubricItem, QualitativeAnalysis, ImprovementNeeds, VisualMarker
         return EvaluacionIA(
             etapa="BACH",
-            transcription=student_answer,
+            transcription=student_answer if student_answer else "[Transcripción simulada desde imagen]",
             rubricBreakdown=[
                 RubricItem(
                     criterio_codigo="FILO-B2.3",
@@ -101,7 +101,15 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "", 
         )
 
     client = get_llm_client(provider)
-    user_prompt = build_user_prompt(student_answer, rubric, question, etapa)
+    user_prompt_text = build_user_prompt(student_answer, rubric, question, etapa)
+
+    if image_url:
+        user_content = [
+            {"type": "text", "text": user_prompt_text},
+            {"type": "image_url", "image_url": {"url": image_url}}
+        ]
+    else:
+        user_content = user_prompt_text
 
     max_attempts = 2
     last_exception = None
@@ -116,7 +124,7 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "", 
                     model=model_name,
                     messages=[
                         {"role": "system", "content": SYSTEM_PROMPT + get_schema_instructions()},
-                        {"role": "user", "content": user_prompt}
+                        {"role": "user", "content": user_content}
                     ],
                     response_format={"type": "json_object"},
                     temperature=0.2,
@@ -131,7 +139,7 @@ async def evaluate_answer(student_answer: str, rubric: str, question: str = "", 
                     model=model_name,
                     messages=[
                         {"role": "system", "content": SYSTEM_PROMPT},
-                        {"role": "user", "content": user_prompt}
+                        {"role": "user", "content": user_content}
                     ],
                     response_format=EvaluacionIA,
                     temperature=0.2,

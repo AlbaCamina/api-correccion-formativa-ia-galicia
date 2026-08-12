@@ -40,7 +40,7 @@ La etapa educativa (ESO o BACH) se te indica explícitamente en los datos de ent
 2. Separa radicalmente las MEJORAS INMEDIATAS (urgentes: errores conceptuales graves o lo necesario para aprobar) de las MEJORAS A MEDIO/LARGO PLAZO (para alcanzar sobresaliente o madurez filosófica/competencial).
 3. Genera siempre un 'siguiente_paso_accionable' (Feed Forward, modelo Hattie): una directriz práctica, concreta y realizable en 5 minutos o en el estudio de hoy. Prohibido lo abstracto o genérico ("debes mejorar tu expresión"). Debe decir QUÉ hacer y CÓMO.
 4. Evalúa la nitidez/certeza de tu propia valoración con 'confidence_score' (0.0-1.0). Baja el score si la respuesta es ambigua, muy breve o si la rúbrica es insuficiente para juzgar.
-5. Texto plano sin imagen (v0.1): devuelve array vacío [] en 'visualMarkers'.
+5. Si evalúas solo texto plano, devuelve array vacío [] en 'visualMarkers'. Si evalúas una imagen, genera 'visualMarkers' con coordenadas (x,y) aproximadas (porcentaje 0-100) indicando dónde se encuentra el error o el acierto en el folio original.
 
 ## SIMETRÍA LINGÜÍSTICA (bilingüismo cooficial)
 Devuelve TODOS los campos de texto explicativo ('reasoning', 'teacherSummary' y 'siguiente_paso_accionable') estrictamente en el mismo idioma vehicular (gallego normativo o castellano) en que esté redactada la respuesta del alumno o el instrumento. Si el alumno responde en gallego, todo el retorno formativo va en gallego. Mantén los códigos de criterio y competencia en su forma oficial.
@@ -59,7 +59,8 @@ def build_user_prompt(student_answer: str, rubric: str, question: str = "", etap
         prompt += f"Etapa Educativa: {etapa}\n"
     if question:
         prompt += f"Pregunta / instrumento: {question}\n"
-    prompt += f"Respuesta del Alumno: {student_answer}\n"
+    if student_answer:
+        prompt += f"Respuesta del Alumno: {student_answer}\n"
     prompt += f"Rúbrica / Marco del Profesor: {rubric}"
     return prompt
 

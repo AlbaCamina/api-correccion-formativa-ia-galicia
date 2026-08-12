@@ -61,6 +61,8 @@
 | [D-044](#d-044) | Trazabilidad obligatoria criterio de evaluación → competencia clave | Jul 2026 | ✅ Adoptada |
 | [D-045](#d-045) | Semántica HitL de la nota: `calificacion_numerica` es orientativa con decimales; el redondeo a entero de boletín lo hace el docente | Jul 2026 | ✅ Adoptada |
 | [D-046](#d-046) | Etapa como `str` Enum de Python en lugar de tabla catálogo en BD | Jul 2026 | ✅ Adoptada |
+| [D-051](#d-051) | Adopción de OpenAI (`gpt-4o-mini`) para Visión y retención de Groq para Texto (Workload Routing) | Ago 2026 | ✅ Adoptada |
+| [D-052](#d-052) | Asignación determinista de la cualitativa ESO en el backend (umbral de suelo); la regla de redondeo al entero de boletín es configuración de centro | Ago 2026 | ✅ Adoptada |
 
 ---
 
@@ -999,7 +1001,7 @@ Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `
 **Opciones consideradas:**
 - **GPT-4o Vision en exclusiva:** máxima calidad, pero coste recurrente incompatible con la Fase Ninja sin alta de autónomos (D-010).
 - **Modelo propio de OCR entrenado:** sobreingeniería, viola YAGNI.
-- **Groq Vision (llama-3.2-11b/90b-vision-preview) como primario, con fallback a GPT-4o:** coherente con D-028 (Groq como motor primario de coste cero).
+- **Groq Vision (`qwen/qwen3.6-27b`) como primario:** coherente con D-028 (Groq como motor primario de coste cero). *(Nota: `llama-3.2-11b/90b-vision-preview`, opción considerada originalmente, fue deprecado por Groq antes de la implementación. Ver D-051.)*
 
 **Decisión:** Se adopta Groq Vision como motor multimodal primario, manteniendo la bifurcación plana de proveedor ya establecida en D-028 (`LLM_PROVIDER`), con fallback a `gpt-4o` cuando Groq no esté disponible o el caso de uso lo requiera. El contrato `EvaluacionIA` admite transcripción con marcadores `ILEGIBLE` y coordenadas aproximadas sin romper la validación Pydantic.
 
@@ -1050,8 +1052,51 @@ Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `
 2. **Seguridad Legal:** La IA siempre evalúa con el 100% de la ley y los criterios vigentes inyectados de forma transaccional, eliminando la alucinación en la fase de recuperación de contexto (*Retrieval*).
 3. **Robustez Arquitectónica:** Proporciona un argumento sólido y demostrable ante auditorías técnicas para justificar que la API no sufre de "ruido semántico".
 
+### D-051 — Adopción de OpenAI (`gpt-4o-mini`) para Visión y retención de Groq para Texto (Workload Routing)
+
+**Estado:** ✅ Adoptada  
+**Fecha:** 11/08/2026
+
+**Contexto:** La v0.3 introduce el soporte de imágenes de exámenes manuscritos. Originalmente se documentó el uso de `qwen/qwen3.6-27b` en Groq como motor Vision para mantener el coste a cero. Sin embargo, durante el *Smoke Test* (`smoke_test_vision.py`), se detectó un fallo crítico (HTTP 400): el modelo Qwen de 27B colapsa al intentar parsear el complejo esquema Pydantic anidado `EvaluacionIA` (que contiene listas de rúbricas y coordenadas) en el *JSON Mode* de Groq. 
+
+**Opciones consideradas:**
+1. **Pipeline de 2 saltos en Groq:** Usar Qwen solo para OCR simple y pasar el texto a Llama 70B para la evaluación compleja. *Rechazado:* Añade fragilidad (doble punto de fallo), incrementa la latencia y rompe el principio de simplicidad YAGNI.
+2. **Google Gemini (`gemini-2.0-flash`):** Uso gratuito mediante AI Studio. *Rechazado:* Violación de YAGNI (requiere un SDK completamente distinto, refactorizando `llm_client.py`) y problemas legales (la capa gratuita de Google se reserva el derecho de entrenar con datos, violando el RGPD y AI Act para menores).
+3. **OpenAI (`gpt-4o-mini`):** Reemplazo directo (drop-in) aprovechando la compatibilidad de SDK existente en `llm_client.py`. *Elegida.*
+
+**Decisión:** Se pivota la arquitectura multimodal hacia **OpenAI (`gpt-4o-mini`)** aprovechando sus **Structured Outputs** nativos que garantizan un 100% de cumplimiento del esquema Pydantic sin errores 400. Simultáneamente, **se retiene Groq (`llama-3.3-70b-versatile`)** como motor para las peticiones de texto plano. Este diseño de *Workload Routing* (encaminamiento de cargas) permite mantener el coste a cero y velocidad extrema para correcciones de texto, invirtiendo saldo de API de OpenAI exclusivamente cuando se requiere la fiabilidad de sus "ojos" (Visión) para JSON complejos.
+
+**Consecuencias:**
+1. Demostración de madurez arquitectónica: se prioriza la **estabilidad del contrato de datos** (Structured Outputs) frente al ahorro marginal en el MVP.
+2. El cliente `llm_client.py` ahora bifurca su comportamiento: el frontend enviará las peticiones con imagen dirigidas explícitamente a OpenAI, y las peticiones de texto a Groq.
+3. Se blinda el proyecto contra la volatilidad de los modelos *Preview* de Groq, adoptando un motor de Producción estable.
+
+---
+
+### D-052 — Asignación determinista de la cualitativa ESO en backend y gobernanza del redondeo al entero de boletín
+
+**Estado:** ✅ Adoptada  
+**Fecha:** 12/08/2026
+
+**Contexto:** El smoke test de la v0.3 reveló que el LLM (`gpt-4o-mini`) puede devolver una `calificacion_cualitativa` inconsistente con la `calificacion_numerica` final calculada por el backend (ej. retornaba `BE` para una nota de `5.0`, que legalmente es `SU` según el Decreto 156/2022). Además, surge la pregunta de quién decide a qué decimal una nota sube al siguiente entero de boletín, ya que el Decreto 156/2022 exige que la nota final sea un entero pero **no fija ninguna regla de redondeo**.
+
+**Análisis (D-040 — LEY vs CONFIGURACIÓN DE CENTRO):**
+- **Obligatorio por ley:** La nota final de boletín en ESO debe ser un entero (1-10). La escala cualitativa oficial es `IN`=1-4, `SU`=5, `BE`=6, `NT`=7-8, `SB`=9-10.
+- **NO fijado por ley:** La regla de redondeo (si 5.5 sube a 6 o se queda en 5). Esto es potestad del departamento didáctico o del centro educativo.
+
+**Decisión (dos pilares):**
+1. **Asignación determinista de la cualitativa:** Se añade un tercer `model_validator` en `EvaluacionIA` (`asignar_cualitativa_legal`) que, después de que `recalcular_media_ponderada` corrija la nota numérica, asigna la cualitativa ESO de forma automática usando la escala oficial del Decreto 156/2022. Se usa **umbral de suelo** (*floor*) como criterio neutro y conservador (ej. `5.9` → `SU`). La IA ya no es responsable de esta asignación.
+2. **Redondeo al entero es HitL (D-045):** La `calificacion_numerica` con decimales que produce el backend es **orientativa**. El docente (Human-in-the-Loop) ve la nota decimal y la cualitativa orientativa, aplica la regla de redondeo de su centro (que puede diferir del suelo) y firma el entero final (`nota_final`) en el endpoint de aprobación. El backend **nunca redondea**.
+
+**Consecuencias:**
+1. Se elimina una fuente de error legal: la cualitativa nunca puede contradecir la nota numérica, independientemente de lo que proponga la IA.
+2. Se respeta la soberanía pedagógica del centro: el backend no impone una regla de redondeo que la ley no exige.
+3. La responsabilidad del entero de boletín sigue siendo 100% humana, en línea con el EU AI Act (sistema de alto riesgo con supervisión humana significativa).
+
 ---
 
 *Documento creado el 08/07/2026 — Alba Camiña García con la ayuda de Antigravity AI*  
 *Actualizado el 28/07/2026 — añadida D-050*  
-*Total de decisiones registradas: 50*
+*Actualizado el 11/08/2026 — añadida D-051 (Pivote arquitectónico a OpenAI para Visión manteniendo Groq para Texto).*  
+*Actualizado el 12/08/2026 — añadida D-052 (Asignación determinista de cualitativa ESO y gobernanza del redondeo).*  
+*Total de decisiones registradas: 52*

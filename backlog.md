@@ -522,7 +522,7 @@
 **para** transcribir su contenido y evaluarlo contra la rúbrica sin intervención manual de picado de datos.
 
 **Criterios de aceptación:**
-- [ ] El cliente LLM (`llm_client.py`) incorpora soporte para modelos multimodales (ej. `llama-3.2-11b-vision-preview` o `llama-3.2-90b-vision-preview` en Groq, con fallback a `gpt-4o`).
+- [ ] El cliente LLM (`llm_client.py`) incorpora soporte para modelos multimodales usando `gpt-4o-mini` en OpenAI (modelo Vision activo, ver [D-051]). El modelo soporta imagen vía URL o Base64 y Structured Outputs nativos para el JSON.
 - [ ] El servicio recupera `submissions.archivos_urls` (o rutas locales) y adjunta la imagen (en Base64 si es local o URL si es nube) al payload del prompt formativo.
 - [ ] El modelo multimodal retorna el contrato JSON estructurado (`EvaluacionIA`), incluyendo la transcripción fiel (`transcription`) del examen manuscrito.
 - [ ] Si la caligrafía presenta tramos ilegibles, el modelo los marca pedagógicamente con `[ILEGIBLE]` y sus coordenadas aproximadas sin romper la validación Pydantic del contrato.
@@ -821,14 +821,30 @@
 
 ### [Roadmap-002] Escáner Local Offline de Datos Personales Pre-Nube (`Automated Offline PII Shield`)
 **Como** administradora de ciberseguridad del sistema,  
-**quiero** que el backend local pase la imagen por un micro-motor OCR offline en RAM (*Tesseract / Microsoft Presidio*) antes de conectar con la nube exterior  
+**quiero** que el backend local pase la imagen por un micro-motor OCR offline en RAM antes de conectar con la nube exterior  
 **para** detectar y bloquear automáticamente cualquier nombre o rastro de PII del alumnado que haya escapado al recorte manual de cabecera (`[D-034]`).
 
 * **Dependencias:** `[v0.3-002]` (Recorte pre-nube Pillow), `pytesseract` / `presidio-image-redactor`.
+* **Candidatos de motor OCR offline (a evaluar en implementación):**
+  - `Tesseract` — OCR clásico LSTM, óptimo para texto impreso (cabeceras, nombres tipografiados).
+  - `TrOCR` (`microsoft/trocr-base-handwritten`) — Transformer end-to-end, candidato preferido para caligrafía manuscrita escolar irregular (letra del alumno en el cuerpo del examen). Ver `glosario.md`.
 * **Criterios de aceptación:**
   - Un middleware local en WSL/Docker inspecciona el buffer de la imagen en memoria antes de llamar al SDK de Cloudinary o al motor de Groq.
   - Si detecta coincidencias con nombres del listado de la clase (`PII Confidence > 0.8`), aborta la subida y devuelve error HTTP `422` alertando al docente para redacción visual en la PWA.
   - El intento bloqueado queda registrado en el `changelog` con `actor = "PII_SHIELD"` para trazabilidad AI Act.
+
+---
+
+### [Roadmap-003] Servidor MCP para Integración Agéntica Externa (Model Context Protocol)
+**Como** arquitecta de software,  
+**quiero** exponer un servidor MCP (Model Context Protocol) sobre el backend  
+**para** que cualquier agente de IA externo (Claude Desktop, IDEs o asistentes de centro) pueda consultar rúbricas y ejecutar la evaluación formativa de forma estandarizada y segura.
+
+* **Dependencias:** `[v0.2-001]` (CRUD Rúbricas SQL), `[v0.2-004]` (Motor Evaluador FastAPI), SDK `mcp` en Python.
+* **Criterios de aceptación:**
+  - Un servidor MCP en Python (protocolo JSON-RPC) expone las herramientas: `obtener_rubrica_oficial`, `validar_contrato_evaluacion` y `ejecutar_evaluacion_formativa`.
+  - Los agentes externos interactúan con la API utilizando esquemas estrictos Pydantic sin necesidad de conectores ad-hoc.
+  - Se mantiene la garantía de privacidad por diseño (*Zero Data Retention*) exigida en el sistema.
 
 ---
 
@@ -842,5 +858,6 @@ Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificad
 
 *Backlog generado el 07/07/2026 — Antigravity para Alba Camiña García*  
 *Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] e incorporadas historias de cierre v0.2 y demo HitL pre-auditoría (`[v0.2-008]`, `[v0.2-009]`, `[v0.2-010]`).*  
-*Total de historias: 34 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 2*  
-*Actualizado el 20/07/2026 — Auditoría normativa LOMLOE (D-040–D-045): etapa obligatoria ESO/BACH, escala BE/NA, media ponderada en backend (issue #10, PR #11).*
+*Total de historias: 34 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 3*  
+*Actualizado el 20/07/2026 — Auditoría normativa LOMLOE (D-040–D-045): etapa obligatoria ESO/BACH, escala BE/NA, media ponderada en backend (issue #10, PR #11).*  
+*Actualizado el 10/08/2026 — [Roadmap-002] añadido TrOCR como candidato alternativo a Tesseract para Capa 1 PII (caligrafía manuscrita). [D-051] registrado en decisiones.md.*
