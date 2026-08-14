@@ -532,6 +532,23 @@
 
 ---
 
+### [v0.3-005] Migración Urgente de Motor LLM (Deuda Técnica / D-053)
+
+**Como** desarrolladora,  
+**quiero** migrar el motor de texto de Groq a OpenAI ante la deprecación inminente de `llama-3.3-70b-versatile`  
+**para** garantizar que el sistema no se rompa el 16/08/2026.
+
+**Criterios de aceptación:**
+- [x] Probar Qwen en Groq como primera alternativa (fallida: no soporta JSON complejo).
+- [x] Migrar el motor de texto a OpenAI (`gpt-4o-mini`) unificando texto y visión.
+- [x] Actualizar `llm_client.py`, `.env` y eliminar SDK de Groq.
+- [x] Registrar la decisión formal en ADR `[D-053]`.
+- [x] Validar que `pytest` pasa en verde con la nueva configuración unificada.
+
+**Etiquetas:** `v0.3` `tech-debt` `llm`
+
+---
+
 ## ⚡ Versión 0.4 — Asincronía y Colas de Tareas
 
 **Objetivo:** El servidor puede recibir múltiples exámenes simultáneamente sin bloquearse. El profesor recibe una notificación cuando cada corrección termina.

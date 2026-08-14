@@ -35,7 +35,9 @@ def get_llm_client(provider: str) -> OpenAI:
 async def evaluate_answer(student_answer: str, rubric: str, question: str = "", etapa: str = "", image_url: str = None) -> EvaluacionIA:
     """
     Llama al LLM (OpenAI o Groq) con el prompt estructurado para evaluar la respuesta del alumno (y opcionalmente una imagen).
-    Tiene tolerancia a fallos con un reintento y fallback a json_object si falla el .parse() nativo.
+    Usa Structured Outputs nativos de OpenAI (.parse) para garantizar el 100% de cumplimiento del esquema EvaluacionIA.
+    La rama Groq (json_object) se mantiene como resiliencia latente activable via LLM_PROVIDER=groq en .env (D-053).
+    Tiene tolerancia a fallos con hasta 2 reintentos al mismo proveedor.
     """
     provider = os.getenv("LLM_PROVIDER", "openai").lower()
     model_name = os.getenv("LLM_MODEL", "gpt-4o-mini")

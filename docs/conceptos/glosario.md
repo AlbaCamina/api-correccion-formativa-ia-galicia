@@ -74,7 +74,9 @@ Una URL concreta de la API a la que se puede hacer una petición HTTP con un ver
 Un error en el sistema que no interrumpe la ejecución ni muestra un mensaje de error visible, pero que corrompe el estado o produce resultados incorrectos. Ejemplo en código: si la API no validara correctamente una respuesta nula y la IA asignase un "NA" sin avisar.
 
 **Fallback**  
-Plan B o mecanismo de respaldo automático cuando el sistema principal falla. Ejemplo de decisión arquitectónica: el uso de `json_object` como fallback en caso de que falle la API de `Structured Outputs` con el proveedor principal (Groq).
+Plan B o mecanismo de respaldo automático que se activa cuando el sistema principal falla en tiempo de ejecución. Un fallback entre proveedores LLM consistiría en: si la llamada a OpenAI falla, el sistema lo detecta automáticamente y reintenta con Groq (o viceversa), sin intervención humana.
+
+En api-correccion-formativa-ia-galicia este patrón fue considerado pero **descartado por YAGNI** al implementar la v0.3 (`[D-051]`): añadir un fallback real entre OpenAI (Vision) y Groq no es trivial, porque Groq no tiene *Structured Outputs* nativos para esquemas JSON complejos — exactamente el problema que originó la migración a OpenAI. Un fallback hacia Groq en visión reproduciría el error 400 que se quería evitar. En su lugar se optó por *Workload Routing* estático (decisión de proveedor fija por tipo de carga) y 2 reintentos al mismo proveedor como resiliencia suficiente para el MVP.
 
 **Frontend**  
 La parte del sistema que ve el usuario: botones, pantallas, formularios. En este proyecto: React + Vite (se implementa en v0.5).

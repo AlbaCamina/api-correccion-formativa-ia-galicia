@@ -63,6 +63,7 @@
 | [D-046](#d-046) | Etapa como `str` Enum de Python en lugar de tabla catálogo en BD | Jul 2026 | ✅ Adoptada |
 | [D-051](#d-051) | Adopción de OpenAI (`gpt-4o-mini`) para Visión y retención de Groq para Texto (Workload Routing) | Ago 2026 | ✅ Adoptada |
 | [D-052](#d-052) | Asignación determinista de la cualitativa ESO en el backend (umbral de suelo); la regla de redondeo al entero de boletín es configuración de centro | Ago 2026 | ✅ Adoptada |
+| [D-053](#d-053) | Unificación del motor LLM en OpenAI (`gpt-4o-mini`) para texto e imagen tras deprecación de `llama-3.3-70b-versatile` en Groq y fallo de Qwen con JSON complejo | Ago 2026 | ✅ Adoptada |
 
 ---
 
@@ -1095,8 +1096,31 @@ Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `
 
 ---
 
+### D-053 — Unificación del motor LLM en OpenAI (`gpt-4o-mini`) tras deprecación de Groq Llama 3.3 70B
+
+**Estado:** ✅ Adoptada  
+**Fecha:** 14/08/2026
+
+**Contexto:** El 14/08/2026 se recibió un aviso oficial de Groq indicando que `llama-3.3-70b-versatile` (motor de texto de referencia desde D-028) sería dado de baja el 16/08/2026. Se inició un protocolo de migración urgente con tres opciones.
+
+**Opciones evaluadas:**
+1. **`qwen/qwen3.6-27b` en Groq (Opción A):** Primer candidato recomendado por Groq. *Descartado:* error 400 (`json_validate_failed`) idéntico al documentado en D-051 para visión. El modelo Qwen no parsea fiablemente el esquema `EvaluacionIA` con `json_object`.
+2. **GPT OSS 120B en Groq (Opción B):** Segundo candidato mencionado en el correo de Groq. *Descartado antes de probar:* el ID exacto del modelo en GroqCloud no es públicamente conocido y el riesgo de repetir el mismo patrón de inestabilidad de modelos Preview es alto.
+3. **OpenAI `gpt-4o-mini` para texto (Opción C):** *Elegida.* Smoke test (`smoke_test_llm.py`) verde en la primera ejecución.
+
+**Decisión:** Se unifica el motor LLM en **OpenAI (`gpt-4o-mini`)** para ambos tipos de carga (texto e imagen). El `LLM_PROVIDER=openai` y `LLM_MODEL=gpt-4o-mini` quedan como valores por defecto en `.env`. La rama de código `if provider == "groq"` se mantiene en `llm_client.py` como resiliencia latente (el operador puede activar Groq si en el futuro ofrece un modelo estable con Structured Outputs) pero no se ejecuta en la configuración estándar.
+
+**Consecuencias:**
+1. Simplificación operativa: un solo proveedor, una sola API Key activa, un solo modelo.
+2. El SDK `groq` se elimina de `requirements.txt` (era redundante: `llm_client.py` usa el SDK de `openai` con `base_url` para llamar a Groq).
+3. Mayor coste por petición de texto respecto a Groq (coste cero → saldo OpenAI), aceptable en MVP donde el volumen de peticiones es bajo.
+4. El docstring de `evaluate_answer` se actualiza para reflejar la arquitectura real.
+
+---
+
 *Documento creado el 08/07/2026 — Alba Camiña García con la ayuda de Antigravity AI*  
 *Actualizado el 28/07/2026 — añadida D-050*  
 *Actualizado el 11/08/2026 — añadida D-051 (Pivote arquitectónico a OpenAI para Visión manteniendo Groq para Texto).*  
 *Actualizado el 12/08/2026 — añadida D-052 (Asignación determinista de cualitativa ESO y gobernanza del redondeo).*  
-*Total de decisiones registradas: 52*
+*Actualizado el 14/08/2026 — añadida D-053 (Unificación en OpenAI tras deprecación de Groq Llama 3.3 70B).*  
+*Total de decisiones registradas: 53*
