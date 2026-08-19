@@ -865,11 +865,46 @@
 
 ---
 
+### [Roadmap-004] Generador de Pruebas y Exámenes Competenciales Dinámicos
+**Como** docente,  
+**quiero** que la API utilice el contexto normativo y las rúbricas almacenadas en la base de datos para generar modelos de examen aleatorios y competenciales  
+**para** evaluar a los alumnos con escenarios prácticos donde el uso de IAs generativas por parte del estudiante no invalide la prueba.
+
+* **Dependencias:** `[v0.2-003]` (Marcos Normativos), `[v0.2-004]` (Rúbricas Docentes).
+* **Criterios de aceptación:**
+  - Un nuevo endpoint `POST /api/v1/exams/generate` acepta un `marco_id` y `rubrica_id`.
+  - El LLM cruza los descriptores operativos de la ley con la rúbrica y devuelve un JSON estructurado con preguntas basadas en escenarios prácticos reales (no de memorización).
+* **Notas de diseño / Inspiración:**
+  - Inspirado en la arquitectura multi-agente de generación de contenidos de Miguel Egea. El diseño evaluará la viabilidad de utilizar plantillas deterministas orquestadas antes de la fase de generación LLM para asegurar la consistencia curricular.
+
+---
+
+### [Roadmap-005] RAG Semántico con Materiales Didácticos del Docente
+**Como** docente,  
+**quiero** poder subir mis apuntes, fragmentos del libro de texto y criterios específicos del examen al sistema  
+**para** que la IA evalúe al alumno conforme a lo que yo he impartido en el aula, y no solo conforme al conocimiento general del modelo y la normativa oficial.
+
+* **Dependencias:** `[v0.2-004]` (Rúbricas Docentes), `[v0.3-001]` (Subida de archivos), vector store (Pinecone, Chroma o PGVector).
+* **Contexto:** Limitación conocida y documentada en `[D-054]`. El RAG actual es determinista (recuperación por ID exacto), lo que garantiza consistencia normativa pero impide que el modelo sepa qué temario concreto ha dado el docente hasta la prueba.
+* **Criterios de aceptación:**
+  - El docente puede subir documentos (PDF, TXT) como "materiales de aula" vinculados a una asignatura y período.
+  - El sistema los procesa mediante chunking + embeddings y los indexa en un vector store.
+  - En cada evaluación, antes de llamar al LLM, el sistema recupera los fragmentos más relevantes a la pregunta del alumno y los inyecta como contexto adicional en el prompt.
+  - Si no hay materiales cargados, el sistema evalúa en modo RAG Determinista actual con aviso en el panel docente.
+
+---
+
 ## 🩺 Notas de Deuda Técnica Activa
 
 - **Tests sin validación de migraciones (v0.3-002):** Tests sin validación de migraciones (v0.3-002+): Los tests unitarios utilizan SQLite en memoria llamando a metadata.create_all() en lugar de aplicar revisiones Alembic, por lo que no validan si las migraciones coinciden con los modelos reales. Esta es una limitación técnica conocida que obliga a validar las nuevas columnas (como estado_feed_forward) manualmente contra Postgres.
 Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificada como Parcial por este mismo motivo (evidencia indirecta, riesgo de falso "verde"). Cerrar esta deuda requiere una suite de tests de integración contra un contenedor Postgres real (no SQLite) que aplique alembic upgrade head antes de cada batería de pruebas.
 - **Advertencia de Dependencias (v0.5):** Los tests arrojan un `StarletteDeprecationWarning: Using 'httpx' with 'starlette.testclient' is deprecated; install 'httpx2' instead.` que debe resolverse actualizando la dependencia del cliente HTTP de pruebas.
+- **Revisión Pre-Publicación (Open Source):** Antes de cambiar la visibilidad del repositorio a público, se debe ejecutar el siguiente checklist:
+  1. **Auditoría de Markdown:** Asegurar que no hay rutas locales absolutas (ej. `C:\Users\...`), comentarios sobre estrategia personal, o planes de networking en `backlog.md`, `decisiones.md`, etc. El tono debe ser estrictamente técnico.
+  2. **Limpieza del repositorio:** Eliminar archivos basura, scripts temporales (scratchpads) y verificar que el `.gitignore` funciona correctamente (`__pycache__`, etc).
+  3. **Seguridad de Secretos:** Revisar el historial de Git para garantizar que nunca se ha subido una API Key real en el pasado (usar BFG Repo-Cleaner si fuera necesario).
+  4. **Licenciamiento:** Añadir un archivo `LICENSE` (ej. MIT License) en la raíz del proyecto.
+  5. **README Onboarding:** Añadir una sección de "Getting Started" o "Instalación Local" clara para que un evaluador externo sepa cómo levantar la API en 2 minutos.
 
 ---
 

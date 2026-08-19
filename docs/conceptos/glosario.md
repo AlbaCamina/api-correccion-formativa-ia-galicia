@@ -797,8 +797,38 @@ Motor de OCR de deep learning desarrollado por Baidu, especializado en detecció
 
 ---
 
+## 13. Marca Personal y Comunicación Digital
+
+**Ghostwriting (Redacción Delegada)**
+Técnica de escritura en la que una persona o herramienta ayuda a redactar contenido que otra publica en su propio nombre. En el contexto de LinkedIn y marca personal: usar una IA como asistente para articular ideas propias en publicaciones, manteniendo siempre la voz y la veracidad de la autora. No es deshonesto si el contenido refleja experiencias y pensamientos reales.
+
+**Hook (Gancho de Apertura)**
+La primera línea o frase de una publicación en LinkedIn, diseñada para captar la atención del lector antes de que pulse "ver más". Es el elemento más crítico de un post: si el hook no engancha, el algoritmo de LinkedIn penaliza el contenido con menor alcance. Los tipos más efectivos incluyen: problema inesperado, tensión técnica, número concreto, historia personal, afirmación contracorriente o pregunta directa.
+
+**CTA (Call to Action — Llamada a la Acción)**
+Frase o elemento al final de un post que invita al lector a realizar una acción concreta: responder una pregunta, guardar el post, conectar con el autor o compartir su experiencia. Sin CTA, la mayoría de los lectores consumen el contenido y siguen sin interactuar. Tipos comunes: pregunta abierta, invitación a conectar, recomendación de guardar el post, o solicitud de experiencia del lector.
+
+**Build in Public (Construir en Público)**
+Estrategia de marca personal y transparencia donde un desarrollador o equipo documenta y comparte públicamente el proceso de construcción de su proyecto (decisiones, errores, aprendizajes, hitos) en tiempo real a través de redes sociales como LinkedIn. Genera comunidad, credibilidad y visibilidad sin necesitar un producto terminado.
+
+**Marca Personal (Personal Branding)**
+La percepción que otros tienen de un profesional basada en su presencia, reputación y contenido en línea. En el sector tecnológico, una marca personal sólida en LinkedIn (con publicaciones técnicas y portfolio visible en GitHub) genera más oportunidades de empleo que un CV tradicional. Se construye con consistencia, autenticidad y especialización temática.
+
+**Engagement (Interacción)**
+Métrica que mide la calidad de la interacción de una audiencia con el contenido publicado: likes, comentarios, compartidos y visualizaciones. En LinkedIn, el algoritmo amplifica el alcance de publicaciones con alto engagement en las primeras horas, haciendo que las interacciones tempranas sean cruciales.
+
+**Algoritmo de LinkedIn**
+Sistema automatizado que decide qué publicaciones ve cada usuario en su feed. Prioriza contenido que genera engagement temprano (primeros 60-90 minutos), publicaciones de contactos de primer y segundo grado, y posts que retienen al usuario en la plataforma (sin URLs externas en el cuerpo del post). Penaliza publicaciones muy cortas sin sustancia o posts con muchos hashtags irrelevantes.
+
+**Calendario Editorial**
+Planificación anticipada de las fechas, horarios y contenidos de publicación en redes sociales. Permite mantener una cadencia consistente sin agotarse. En este proyecto: alternancia entre semanas de 2 posts (martes 8:00 + jueves 12:30) y semanas de 1 post (miércoles 9:00), adaptando el ritmo al avance real del desarrollo sin inventar hitos técnicos.
+
+---
+
 *Glosario creado el 09/07/2026 — Antigravity para Alba Camiña García*  
 *Documento vivo — se actualiza con cada término nuevo que aparezca en el proyecto*  
 *Actualizado el 10/08/2026 — Añadidos TrOCR y PaddleOCR como candidatos Capa 1 PII pre-nube (`[Roadmap-002]`), contrastados con la decisión de Groq Vision para v0.3.*  
 *Actualizado el 11/08/2026 — Añadido Workload Routing al glosario tras el pivote D-051.*  
-*Actualizado el 12/08/2026 — Añadidos conceptos de IA moderna: AI-Augmented Engineering, Agentic Coding y SOTA.*
+*Actualizado el 12/08/2026 — Añadidos conceptos de IA moderna: AI-Augmented Engineering, Agentic Coding y SOTA.*  
+*Actualizado el 19/08/2026 — Añadida sección 13 (Marca Personal y Comunicación Digital) con conceptos de ghostwriting, hook, CTA, Build in Public, engagement y algoritmo de LinkedIn.*
+

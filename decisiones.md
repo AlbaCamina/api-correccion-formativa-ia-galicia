@@ -64,6 +64,7 @@
 | [D-051](#d-051) | Adopción de OpenAI (`gpt-4o-mini`) para Visión y retención de Groq para Texto (Workload Routing) | Ago 2026 | ✅ Adoptada |
 | [D-052](#d-052) | Asignación determinista de la cualitativa ESO en el backend (umbral de suelo); la regla de redondeo al entero de boletín es configuración de centro | Ago 2026 | ✅ Adoptada |
 | [D-053](#d-053) | Unificación del motor LLM en OpenAI (`gpt-4o-mini`) para texto e imagen tras deprecación de `llama-3.3-70b-versatile` en Groq y fallo de Qwen con JSON complejo | Ago 2026 | ✅ Adoptada |
+| [D-054](#d-054) | Limitación conocida del RAG Determinista v1: ausencia de materiales didácticos del docente como contexto evaluativo | Ago 2026 | ✅ Adoptada |
 
 ---
 
@@ -1116,6 +1117,36 @@ Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `
 3. Mayor coste por petición de texto respecto a Groq (coste cero → saldo OpenAI), aceptable en MVP donde el volumen de peticiones es bajo.
 4. El docstring de `evaluate_answer` se actualiza para reflejar la arquitectura real.
 
+
+---
+
+### D-054
+## Limitación conocida del RAG Determinista v1: ausencia de materiales didácticos del docente como contexto evaluativo
+
+**Estado:** ✅ Adoptada (Limitación documentada)  
+**Fecha:** 18/08/2026
+
+**Contexto:**  
+La arquitectura actual implementa un **RAG Determinista** (`[Roadmap-003]`): la normativa autonómica (Decretos 156/157/2022 de la Xunta de Galicia) y la rúbrica del docente se recuperan de PostgreSQL por `marco_id` y `rubrica_id` respectivos y se inyectan como contexto estructurado en el prompt del LLM. Esta estrategia fue validada técnicamente por el mentor de AESIA (Doctor en BBDD) durante la revisión del sistema en julio de 2026.
+
+Sin embargo, esta aproximación tiene una **limitación pedagógica real e identificada por la propia autora del sistema**: el LLM evalúa al alumno usando su conocimiento general (lo que GPT-4o-mini sabe sobre la materia) más el marco normativo y la rúbrica. El sistema **no tiene acceso** a los materiales específicos que el docente ha impartido: el libro de texto adoptado por el departamento, los apuntes propios, los ejemplos del aula, el alcance real del temario tratado hasta la prueba, ni las instrucciones concretas dadas en el examen.
+
+Esto puede generar dos tipos de error evaluativo:
+1. **Falso negativo:** Penalizar a un alumno por no aplicar un concepto que el profesor aún no había explicado en clase.
+2. **Falso positivo:** Valorar positivamente una respuesta que el alumno ha copiado de una fuente externa que el profesor no reconoce como válida según su criterio de aula.
+
+**Opciones consideradas:**
+- **Ignorar la limitación y asumir que el conocimiento general del LLM es suficiente:** Aceptable en v1 donde el flujo HitL garantiza que el docente revisa y aprueba siempre la corrección antes de firmarla (`[D-002]`). El professor detectará manualmente cualquier desvío del contenido impartido.
+- **RAG Semántico con materiales del docente (`[Roadmap-005]`):** Permitir al docente subir apuntes, fragmentos del libro de texto y criterios de examen. El sistema los chunkea, los embebe (embeddings) y los indexa en un vector store. Antes de evaluar, recupera los fragmentos más relevantes a la pregunta del alumno y los inyecta como contexto adicional. Esta es la evolución natural pero introduce complejidad técnica significativa (pipeline de embeddings, vector store, chunking strategy) que supera el alcance del MVP v1.
+
+**Decisión:**  
+Se documenta formalmente como **limitación conocida y aceptada** de la v1 actual, mitigada por el flujo HitL obligatorio (`[D-002]`). La evolución hacia un **RAG Semántico con materiales didácticos del docente** se planifica como `[Roadmap-005]` en el `backlog.md`.
+
+**Consecuencias:**  
+1. El `README.md` de v1.0 (`[v1.0-003]`) documentará esta limitación en la sección de arquitectura con honestidad técnica.
+2. El panel PWA del docente en v0.5 mostrará un aviso recordatorio de que la IA evalúa conforme a la normativa y la rúbrica, pero no conoce los materiales específicos del aula.
+3. Esta limitación refuerza el argumento pedagógico del HitL: el docente no es un mero firmante burocrático, sino el garante activo de la coherencia entre lo enseñado y lo evaluado.
+
 ---
 
 *Documento creado el 08/07/2026 — Alba Camiña García con la ayuda de Antigravity AI*  
@@ -1123,4 +1154,5 @@ Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `
 *Actualizado el 11/08/2026 — añadida D-051 (Pivote arquitectónico a OpenAI para Visión manteniendo Groq para Texto).*  
 *Actualizado el 12/08/2026 — añadida D-052 (Asignación determinista de cualitativa ESO y gobernanza del redondeo).*  
 *Actualizado el 14/08/2026 — añadida D-053 (Unificación en OpenAI tras deprecación de Groq Llama 3.3 70B).*  
-*Total de decisiones registradas: 53*
+*Actualizado el 18/08/2026 — añadida D-054 (Limitación conocida del RAG Determinista v1 y planificación de RAG Semántico con materiales docentes como Roadmap-005).*  
+*Total de decisiones registradas: 54*
