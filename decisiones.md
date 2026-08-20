@@ -1149,10 +1149,34 @@ Se documenta formalmente como **limitación conocida y aceptada** de la v1 actua
 
 ---
 
+### D-055 — Arquitectura de evaluación asíncrona mediante FastAPI BackgroundTasks (v0.4)
+
+**Estado:** ✅ Adoptada  
+**Fecha:** 20/08/2026
+
+**Contexto:**  
+En la v0.3, el endpoint `POST /api/v1/submissions/upload-and-evaluate` ejecutaba en un único ciclo HTTP la validación del archivo, el almacenamiento local, la llamada a OpenAI Vision para transcripción y la evaluación LLM. Esto causaba latencias de respuesta de 4 a 8 segundos en el cliente, bloqueando la PWA y ofreciendo una experiencia poco fluida si la conexión docente sufría interrupciones.
+
+**Opciones consideradas:**
+1. **Pipelining sincrónico mantenido:** Mantener la petición sincrónica. *Descartada:* Latencia inaceptable para producción y mala UX.
+2. **Celery + Redis:** Cola de tareas distribuida y bróker de mensajes pesado. *Descartada por YAGNI (D-001):* Introduce infraestructura compleja que sobrecarga el MVP.
+3. **FastAPI `BackgroundTasks` nativo:** Iniciar la tarea de procesamiento en segundo plano inmediatamente después de validar la entrega y persistir el registro inicial en estado `ANALYZING`. *Elegida.*
+
+**Decisión:**  
+Se refactoriza el endpoint `POST /api/v1/submissions/upload-and-evaluate` para responder con un estado `HTTP 202 Accepted` en menos de 500ms devolviendo un esquema `SubmissionAsyncResponse` (`submission_id`, `status="ANALYZING"`, `message`). El procesamiento pesado (transcripción Vision + evaluación LLM) se ejecuta asíncronamente mediante `BackgroundTasks.add_task(procesar_evaluacion_en_segundo_plano)`. Al finalizar, se actualiza el estado en BBDD a `REVIEW` (o `ERROR` si ocurre algún fallo no controlado) y se añade la trazabilidad en `ChangeLog`.
+
+**Consecuencias:**  
+1. Reducción drástica de la latencia percibida (<500ms).
+2. Resiliencia: si el docente navega fuera de la vista o cierra la PWA, la evaluación continúa ejecutándose en el servidor y persistiéndose en la BBDD.
+3. Compatibilidad fluida con el sistema de notificaciones SSE (`[v0.4-002]`) y polling.
+
+---
+
 *Documento creado el 08/07/2026 — Alba Camiña García con la ayuda de Antigravity AI*  
 *Actualizado el 28/07/2026 — añadida D-050*  
 *Actualizado el 11/08/2026 — añadida D-051 (Pivote arquitectónico a OpenAI para Visión manteniendo Groq para Texto).*  
 *Actualizado el 12/08/2026 — añadida D-052 (Asignación determinista de cualitativa ESO y gobernanza del redondeo).*  
 *Actualizado el 14/08/2026 — añadida D-053 (Unificación en OpenAI tras deprecación de Groq Llama 3.3 70B).*  
 *Actualizado el 18/08/2026 — añadida D-054 (Limitación conocida del RAG Determinista v1 y planificación de RAG Semántico con materiales docentes como Roadmap-005).*  
-*Total de decisiones registradas: 54*
+*Actualizado el 20/08/2026 — añadida D-055 (Arquitectura de evaluación asíncrona mediante FastAPI BackgroundTasks).*  
+*Total de decisiones registradas: 55*

@@ -2,13 +2,13 @@ import os
 import uuid
 import json
 import io
-from fastapi import APIRouter, Body, Depends, HTTPException, UploadFile, File, Form, status
+from fastapi import APIRouter, BackgroundTasks, Body, Depends, HTTPException, UploadFile, File, Form, status
 from sqlalchemy.orm import Session
 from PIL import Image
 
 from typing import Optional, List, Literal
 from pydantic import BaseModel, Field
-from backend.models.database import get_db
+from backend.models.database import SessionLocal, get_db
 from backend.models.submission import (
     ChangeLog,
     FeedForwardVerificadoRequest,
@@ -38,6 +38,12 @@ FEED_FORWARD_TRANSITIONS: dict[str, str] = {
     "PENDIENTE": "REALIZADO_ALUMNO",
     "REALIZADO_ALUMNO": "VERIFICADO_EN_PRUEBA_SIGUIENTE",
 }
+
+
+class SubmissionAsyncResponse(BaseModel):
+    submission_id: str
+    status: str
+    message: str
 
 
 @router.post("/upload", status_code=status.HTTP_201_CREATED)
@@ -278,8 +284,155 @@ def validar_recorte_cabecera(file_bytes: bytes, filename: str):
         )
 
 
-@router.post("/upload-and-evaluate", response_model=EvaluacionResponse, status_code=status.HTTP_201_CREATED)
+async def procesar_evaluacion_en_segundo_plano(
+    submission_id: str,
+    file_bytes: bytes,
+    url: str,
+    rubrica_id: int,
+    marco_id: Optional[int],
+    etapa: Etapa,
+    modo_evaluacion: Optional[str],
+    question: Optional[str],
+    adaptaciones: Optional[dict]
+):
+    """
+    Tarea asíncrona de segundo plano para procesar la transcripción y evaluación LLM.
+    Persiste los resultados y transiciona el estado de ANALYZING -> REVIEW (o ERROR).
+    """
+    from backend.main import app
+    db_gen = app.dependency_overrides.get(get_db, get_db)()
+    db = next(db_gen)
+    try:
+        submission = db.query(Submission).filter(Submission.id == submission_id).first()
+        if not submission:
+            return
+
+        # 1. Transcribir la imagen
+        try:
+            transcription = await transcribir_imagen(file_bytes)
+        except Exception as e:
+            transcription = "[ERROR_TRANSCRIPCION]"
+
+        if not transcription or not transcription.strip():
+            transcription = "[ILEGIBLE]"
+
+        # 2. Recuperar rúbrica y marco
+        rubrica = db.query(RubricaDocente).filter(RubricaDocente.id == rubrica_id).first()
+        marco = db.query(MarcoEvaluacion).filter(MarcoEvaluacion.id == marco_id).first() if marco_id else None
+
+        # 3. Construir prompt para el LLM
+        criterios_format = []
+        if rubrica and rubrica.criterios:
+            for c in rubrica.criterios:
+                codigo = c.get('criterio_codigo')
+                codigo_str = f" [{codigo}]" if codigo else ""
+                comps = c.get('competencias_clave')
+                comps_str = f" (Competencias: {', '.join(comps)})" if comps else ""
+                peso = c.get('peso')
+                peso_str = f" (Peso: {peso}%)" if peso is not None else ""
+                criterios_format.append(f"- Criterio {c.get('id', '')}{codigo_str} ({c.get('nombre', '')}): {c.get('descripcion', '')}{peso_str}{comps_str}")
+        
+        rubric_str = "\n".join(criterios_format)
+
+        adaptaciones_str = ""
+        if adaptaciones:
+            adaptaciones_str += "\n\nADAPTACIONES CURRICULARES DEL ALUMNO APLICADAS (NEAE/NEE):\n"
+            for k, v in adaptaciones.items():
+                adaptaciones_str += f"- {k}: {v}\n"
+            if adaptaciones.get("excluir_ortografia") is True:
+                adaptaciones_str += (
+                    "\nINSTRUCCIÓN DE ADAPTACIÓN CRÍTICA (RGPD/NEAE):\n"
+                    "El alumno tiene adaptaciones curriculares oficiales por dificultades de aprendizaje (ej. dislexia).\n"
+                    "1. Identifica y lista TODAS las faltas de ortografía o gramática detectadas en la respuesta del alumno en el campo 'ortografia_detectada'.\n"
+                    "2. Registra esas mismas faltas de ortografía en el campo 'errores_excluidos_por_adaptacion'.\n"
+                    "3. Asegúrate de que estas faltas de ortografía NO afecten ni penalicen la puntuación final de ningún criterio de la rúbrica, ni influyan negativamente en la calificación cualitativa general.\n"
+                    "4. Si creas marcadores visuales para estos errores de ortografía excluidos, clasifícalos con tipo 'error_excluido' (en lugar de 'ERROR') para que la PWA pueda mostrarlos en gris/neutro.\n"
+                )
+
+        if marco:
+            marco_str = f"Currículo Oficial Xunta de Galicia ({marco.asignatura} - {marco.curso}):\n"
+            marco_str += json.dumps(marco.rubrica_completa, indent=2, ensure_ascii=False)
+            
+            if modo_evaluacion == "COMBINADO":
+                rubric_prompt = (
+                    f"MODO DE EVALUACIÓN: COMBINADO\n"
+                    f"Instrucción: Fusiona de forma aditiva los saberes básicos oficiales y la rúbrica del docente para calificar.\n\n"
+                    f"Rúbrica de la Profesora:\n{rubric_str}\n\n"
+                    f"{marco_str}"
+                )
+            else:  # AUDITORIA_CURRICULAR
+                rubric_prompt = (
+                    f"MODO DE EVALUACIÓN: AUDITORIA_CURRICULAR\n"
+                    f"Instrucción: Evalúa la entrega usando la rúbrica de la profesora. Además, audita si la rúbrica docente omite saberes obligatorios o contradice la ley, reportando en 'teacherSummary' cualquier brecha curricular de forma pedagógica.\n\n"
+                    f"Rúbrica de la Profesora:\n{rubric_str}\n\n"
+                    f"{marco_str}"
+                )
+        else:
+            rubric_prompt = (
+                f"MODO DE EVALUACIÓN: RÚBRICA PURA (Evaluación General)\n"
+                f"Instrucción: Corrige la entrega del alumno utilizando única y exclusivamente los criterios de la rúbrica de la profesora.\n\n"
+                f"Rúbrica de la Profesora:\n{rubric_str}"
+            )
+
+        rubric_prompt += adaptaciones_str
+
+        # 4. Invocar al motor LLM
+        resultado = await evaluate_answer(
+            student_answer=transcription,
+            rubric=rubric_prompt,
+            question=question or "",
+            etapa=etapa
+        )
+
+        resultado.transcription = transcription
+
+        # 5. Guardar evaluación y actualizar estado a REVIEW
+        evaluacion = Evaluacion(
+            submission_id=submission.id,
+            resultado_ia=resultado.model_dump(),
+            nota_final=None,
+            aprobado_por_profesor=False
+        )
+        db.add(evaluacion)
+
+        log_entry = ChangeLog(
+            submission_id=submission.id,
+            accion="IA_EVALUATION",
+            actor="IA",
+            datos_anteriores={"estado": "ANALYZING"},
+            datos_nuevos={"estado": "REVIEW", "resultado_ia": resultado.model_dump()},
+            audit_metadata={"url_archivo": url}
+        )
+        db.add(log_entry)
+
+        submission.estado = "REVIEW"
+        db.commit()
+
+    except Exception as e:
+        db.rollback()
+        try:
+            sub_err = db.query(Submission).filter(Submission.id == submission_id).first()
+            if sub_err:
+                sub_err.estado = "ERROR"
+                log_err = ChangeLog(
+                    submission_id=submission_id,
+                    accion="IA_EVALUATION_ERROR",
+                    actor="IA",
+                    datos_anteriores={"estado": "ANALYZING"},
+                    datos_nuevos={"estado": "ERROR"},
+                    audit_metadata={"error_detail": str(e)}
+                )
+                db.add(log_err)
+                db.commit()
+        except Exception:
+            pass
+    finally:
+        db.close()
+
+
+@router.post("/upload-and-evaluate", response_model=SubmissionAsyncResponse, status_code=status.HTTP_202_ACCEPTED)
 async def upload_and_evaluate(
+    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     rubrica_id: int = Form(...),
     marco_id: Optional[int] = Form(None),
@@ -292,14 +445,13 @@ async def upload_and_evaluate(
     current_profesor: Profesor = Depends(get_current_profesor)
 ):
     """
-    Pipeline unificado de corrección multimodal:
+    Pipeline unificado de corrección multimodal asíncrono (v0.4 [D-048]):
     1. Valida el formato del archivo y su tamaño (máx 25MB).
     2. Valida las proporciones de la imagen (exige recorte en el cliente / Privacy by Design).
-    3. Guarda la imagen localmente/nube de forma segura.
-    4. Envía la imagen al servicio de transcripción (vision_service).
-    5. Crea la Submission en la base de datos (estado ANALYZING).
-    6. Invoca al LLM (llm_client.evaluate_answer) para la evaluación.
-    7. Registra la Evaluacion y el ChangeLog en la base de datos (estado REVIEW).
+    3. Almacena el archivo.
+    4. Crea la Submission en estado ANALYZING.
+    5. Inicia el procesado de transcripción y evaluación LLM en segundo plano (BackgroundTasks).
+    6. Retorna HTTP 202 Accepted inmediatamente (<500ms) con submission_id y estado ANALYZING.
     """
     if not file.filename:
         raise HTTPException(
@@ -315,11 +467,9 @@ async def upload_and_evaluate(
             detail=f"Formato de archivo '{ext}' no soportado. Formatos admitidos: {', '.join(sorted(ALLOWED_EXTENSIONS))}"
         )
 
-    # Leer los bytes del archivo
     file_bytes = await file.read()
-    await file.seek(0)  # Resetear cursor del archivo para storage_service
+    await file.seek(0)
 
-    # Validar tamaño
     file_size = len(file_bytes)
     if file_size > MAX_FILE_SIZE:
         raise HTTPException(
@@ -327,10 +477,8 @@ async def upload_and_evaluate(
             detail=f"El archivo excede el límite máximo de 25 MB (Tamaño subido: {file_size / (1024 * 1024):.2f} MB)."
         )
 
-    # Validar proporciones (recorte de cabecera en cliente)
     validar_recorte_cabecera(file_bytes, filename)
 
-    # Parsear adaptaciones curriculares si vienen como string JSON
     adaptaciones = None
     if adaptaciones_alumno:
         try:
@@ -341,7 +489,6 @@ async def upload_and_evaluate(
                 detail="El campo adaptaciones_alumno debe ser un JSON válido."
             )
 
-    # 1. Recuperar y verificar la rúbrica
     rubrica = db.query(RubricaDocente).filter(
         RubricaDocente.id == rubrica_id,
         RubricaDocente.profesor_id == current_profesor.id
@@ -352,7 +499,6 @@ async def upload_and_evaluate(
             detail="La rúbrica especificada no existe o no tienes autorización para usarla."
         )
 
-    # 2. Recuperar el marco si aplica
     marco = None
     if marco_id is not None:
         marco = db.query(MarcoEvaluacion).filter(
@@ -370,7 +516,6 @@ async def upload_and_evaluate(
                 detail=f"La etapa declarada '{etapa.value}' no coincide con la etapa del marco normativo '{marco.etapa}'."
             )
 
-    # 3. Guardar el archivo en el storage service
     try:
         url = await storage_service.upload_file(file, ext)
     except Exception as e:
@@ -379,19 +524,6 @@ async def upload_and_evaluate(
             detail=f"Error al almacenar el archivo: {str(e)}"
         )
 
-    # 4. Transcribir la imagen
-    try:
-        transcription = await transcribir_imagen(file_bytes)
-    except Exception as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error durante la transcripción de imagen: {str(e)}"
-        )
-
-    if not transcription.strip():
-        transcription = "[ILEGIBLE]"
-
-    # 5. Crear registro Submission en la BD (estado ANALYZING)
     submission = Submission(
         profesor_id=current_profesor.id,
         marco_id=marco.id if marco else None,
@@ -404,105 +536,23 @@ async def upload_and_evaluate(
     db.commit()
     db.refresh(submission)
 
-    # 6. Construir prompt para la evaluación con el LLM
-    criterios_format = []
-    for c in rubrica.criterios:
-        codigo = c.get('criterio_codigo')
-        codigo_str = f" [{codigo}]" if codigo else ""
-        comps = c.get('competencias_clave')
-        comps_str = f" (Competencias: {', '.join(comps)})" if comps else ""
-        peso = c.get('peso')
-        peso_str = f" (Peso: {peso}%)" if peso is not None else ""
-        criterios_format.append(f"- Criterio {c.get('id', '')}{codigo_str} ({c.get('nombre', '')}): {c.get('descripcion', '')}{peso_str}{comps_str}")
-    
-    rubric_str = "\n".join(criterios_format)
-
-    adaptaciones_str = ""
-    if adaptaciones:
-        adaptaciones_str += "\n\nADAPTACIONES CURRICULARES DEL ALUMNO APLICADAS (NEAE/NEE):\n"
-        for k, v in adaptaciones.items():
-            adaptaciones_str += f"- {k}: {v}\n"
-        if adaptaciones.get("excluir_ortografia") is True:
-            adaptaciones_str += (
-                "\nINSTRUCCIÓN DE ADAPTACIÓN CRÍTICA (RGPD/NEAE):\n"
-                "El alumno tiene adaptaciones curriculares oficiales por dificultades de aprendizaje (ej. dislexia).\n"
-                "1. Identifica y lista TODAS las faltas de ortografía o gramática detectadas en la respuesta del alumno en el campo 'ortografia_detectada'.\n"
-                "2. Registra esas mismas faltas de ortografía en el campo 'errores_excluidos_por_adaptacion'.\n"
-                "3. Asegúrate de que estas faltas de ortografía NO afecten ni penalicen la puntuación final de ningún criterio de la rúbrica, ni influyan negativamente en la calificación cualitativa general.\n"
-                "4. Si creas marcadores visuales para estos errores de ortografía excluidos, clasifícalos con tipo 'error_excluido' (en lugar de 'ERROR') para que la PWA pueda mostrarlos en gris/neutro.\n"
-            )
-
-    if marco:
-        marco_str = f"Currículo Oficial Xunta de Galicia ({marco.asignatura} - {marco.curso}):\n"
-        marco_str += json.dumps(marco.rubrica_completa, indent=2, ensure_ascii=False)
-        
-        if modo_evaluacion == "COMBINADO":
-            rubric_prompt = (
-                f"MODO DE EVALUACIÓN: COMBINADO\n"
-                f"Instrucción: Fusiona de forma aditiva los saberes básicos oficiales y la rúbrica del docente para calificar.\n\n"
-                f"Rúbrica de la Profesora:\n{rubric_str}\n\n"
-                f"{marco_str}"
-            )
-        else:  # AUDITORIA_CURRICULAR
-            rubric_prompt = (
-                f"MODO DE EVALUACIÓN: AUDITORIA_CURRICULAR\n"
-                f"Instrucción: Evalúa la entrega usando la rúbrica de la profesora. Además, audita si la rúbrica docente omite saberes obligatorios o contradice la ley, reportando en 'teacherSummary' cualquier brecha curricular de forma pedagógica.\n\n"
-                f"Rúbrica de la Profesora:\n{rubric_str}\n\n"
-                f"{marco_str}"
-            )
-    else:
-        # Modo Rúbrica Pura (sin marco normativo)
-        rubric_prompt = (
-            f"MODO DE EVALUACIÓN: RÚBRICA PURA (Evaluación General)\n"
-            f"Instrucción: Corrige la entrega del alumno utilizando única y exclusivamente los criterios de la rúbrica de la profesora.\n\n"
-            f"Rúbrica de la Profesora:\n{rubric_str}"
-        )
-
-    rubric_prompt += adaptaciones_str
-
-    # 7. Invocar al motor LLM pasándole la transcripción obtenida
-    try:
-        resultado = await evaluate_answer(
-            student_answer=transcription,
-            rubric=rubric_prompt,
-            question=question or "",
-            etapa=etapa
-        )
-    except Exception as e:
-        submission.estado = "FAILED"
-        db.commit()
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error durante el análisis del motor de IA: {str(e)}"
-        )
-
-    # Forzar que la transcripción en el resultado sea exactamente la transcrita
-    resultado.transcription = transcription
-
-    # 8. Guardar la evaluación y actualizar estado a REVIEW (HitL)
-    evaluacion = Evaluacion(
+    background_tasks.add_task(
+        procesar_evaluacion_en_segundo_plano,
         submission_id=submission.id,
-        resultado_ia=resultado.model_dump(),
-        nota_final=None,
-        aprobado_por_profesor=False
+        file_bytes=file_bytes,
+        url=url,
+        rubrica_id=rubrica.id,
+        marco_id=marco.id if marco else None,
+        etapa=etapa,
+        modo_evaluacion=modo_evaluacion,
+        question=question,
+        adaptaciones=adaptaciones
     )
-    db.add(evaluacion)
 
-    # Loguear la acción en el changelog de auditoría
-    log_entry = ChangeLog(
+    return SubmissionAsyncResponse(
         submission_id=submission.id,
-        accion="IA_EVALUATION",
-        actor="IA",
-        datos_anteriores=None,
-        datos_nuevos={"estado": "REVIEW", "resultado_ia": resultado.model_dump()},
-        audit_metadata={"url_archivo": url}
+        status="ANALYZING",
+        message="Procesamiento de evaluación iniciado en segundo plano."
     )
-    db.add(log_entry)
-
-    submission.estado = "REVIEW"
-    db.commit()
-    db.refresh(evaluacion)
-    
-    return evaluacion
 
 

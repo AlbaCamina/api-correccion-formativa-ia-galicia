@@ -204,18 +204,13 @@ class TestSubmissionRouter(unittest.TestCase):
             }
         )
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 202)
         data = response.json()
-        self.assertEqual(data["submission_id"], data["submission_id"])
-        self.assertFalse(data["aprobado_por_profesor"])
-        
-        # Verificar la transcripción en el contrato de resultado de la IA
-        resultado_ia = data["resultado_ia"]
-        self.assertIn("transcription", resultado_ia)
-        # Como es modo mock de vision_service, devolverá el texto del mock
-        self.assertIn("Examen de Filosofía", resultado_ia["transcription"])
+        self.assertIn("submission_id", data)
+        self.assertEqual(data["status"], "ANALYZING")
+        self.assertIn("segundo plano", data["message"])
 
-        # Verificar persistencia en base de datos
+        # Verificar persistencia en base de datos tras la ejecución del background task
         sub_db = self.db.query(Submission).filter(Submission.alumno_id == "ALU-99").first()
         self.assertIsNotNone(sub_db)
         self.assertEqual(sub_db.estado, "REVIEW")
@@ -262,9 +257,10 @@ class TestSubmissionRouter(unittest.TestCase):
             }
         )
 
-        self.assertEqual(response.status_code, 201)
+        self.assertEqual(response.status_code, 202)
         data = response.json()
-        self.assertIn("transcription", data["resultado_ia"])
+        self.assertEqual(data["status"], "ANALYZING")
+
 
     def test_upload_and_evaluate_invalid_adaptaciones(self):
         """Valida que pasar un JSON corrupto de adaptaciones retorne HTTP 400."""
@@ -286,6 +282,42 @@ class TestSubmissionRouter(unittest.TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertIn("debe ser un JSON válido", response.json()["detail"])
 
+    def test_upload_and_evaluate_async_error_handling(self):
+        """Valida que si falla la invocación LLM durante la tarea asíncrona, el estado de la entrega pase a ERROR."""
+        from unittest.mock import patch
+
+        img = Image.new("RGB", (100, 100), color="white")
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format="PNG")
+        img_bytes = img_byte_arr.getvalue()
+
+        # Simular fallo en el motor LLM
+        with patch("backend.routers.submission.evaluate_answer", side_effect=RuntimeError("Fallo simulado en LLM")):
+            response = self.client.post(
+                "/api/v1/submissions/upload-and-evaluate",
+                files={"file": ("cropped_fail.png", img_bytes, "image/png")},
+                data={
+                    "rubrica_id": 1,
+                    "etapa": "BACH",
+                    "modo_evaluacion": "COMBINADO",
+                    "alumno_id": "ALU-ERR"
+                }
+            )
+
+        self.assertEqual(response.status_code, 202)
+        sub_db = self.db.query(Submission).filter(Submission.alumno_id == "ALU-ERR").first()
+        self.assertIsNotNone(sub_db)
+        self.assertEqual(sub_db.estado, "ERROR")
+
+        # Verificar ChangeLog de error
+        log_err = self.db.query(ChangeLog).filter(
+            ChangeLog.submission_id == sub_db.id,
+            ChangeLog.accion == "IA_EVALUATION_ERROR"
+        ).first()
+        self.assertIsNotNone(log_err)
+        self.assertIn("Fallo simulado en LLM", log_err.audit_metadata["error_detail"])
+
 
 if __name__ == "__main__":
     unittest.main()
+
