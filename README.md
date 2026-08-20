@@ -5,9 +5,10 @@
 [![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16--Alpine-316192?style=flat&logo=postgresql)](https://www.postgresql.org/)
 [![Groq](https://img.shields.io/badge/LLM-Groq%20%2F%20OpenAI-orange?style=flat)](https://groq.com/)
 [![Decretos 156/2022 e 157/2022](https://img.shields.io/badge/Normativa-Decretos%20156%2F2022%20e%20157%2F2022%20Galicia-lightblue?style=flat)](#)
-[![Version](https://img.shields.io/badge/Version-v0.3-brightgreen?style=flat)](#)
+[![Version](https://img.shields.io/badge/Version-v0.4-brightgreen?style=flat)](#)
 
 API de Corrección Formativa con IA diseñada para asistir al profesorado de Filosofía de Bachillerato en la Comunidad Autónoma de Galicia. Estructurada bajo el marco pedagógico oficial de la LOMLOE, los Decretos 156/2022 y 157/2022 (Xunta de Galicia) (garantizando el blindaje estricto de la etapa educativa ESO/BACH), y las directrices de privacidad de la Unión Europea (RGPD / AI Act / ENS).
+
 
 ## 🌟 Propuesta de Valor Diferencial
 
@@ -100,7 +101,8 @@ venv/bin/pytest backend/tests/ -v
 | `/api/v1/submissions/{id}/feed-forward/realizado` | `PATCH` | ✅ JWT | Transición formativa a `REALIZADO_ALUMNO`, `[D-026]` |
 | `/api/v1/submissions/{id}/feed-forward/verificado` | `PATCH` | ✅ JWT | Transición formativa a `VERIFICADO_EN_PRUEBA_SIGUIENTE`, `[D-026]` |
 | `/api/v1/submissions/upload` | `POST` | ✅ JWT | Subida de imagen/PDF del examen (multipart), `[v0.3-001]` |
-| `/api/v1/submissions/upload-and-evaluate` | `POST` | ✅ JWT | Pipeline unificado: subida, transcripción y evaluación, `[v0.3-006]` |
+| `/api/v1/submissions/upload-and-evaluate` | `POST` | ✅ JWT | Pipeline asíncrono unificado (`202 Accepted` + `BackgroundTasks`), `[v0.4-002]`, `[D-055]` |
+
 
 ### Próximos (Roadmap)
 

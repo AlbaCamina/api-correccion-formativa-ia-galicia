@@ -589,16 +589,17 @@
 ### [v0.4-002] Endpoint asíncrono de evaluación
 
 **Como** profesora,  
-**quiero** subir una entrega con sus folios y recibir confirmación inmediata a 
+**quiero** subir una entrega con sus folios y recibir confirmación inmediata  
 **para** poder seguir trabajando mientras la IA lo procesa.
 
 **Criterios de aceptación:**
-- [ ] `POST /api/v1/submissions` acepta `archivos_urls`, `marco_id`, `rubrica_id` y `alumno_id` devolviendo `{ "submission_id": "...", "status": "PENDING" }` (`202 Accepted`) en <500ms
-- [ ] La tarea de corrección multimodal se ejecuta de forma asíncrona vía FastAPI BackgroundTasks (implementación real del MVP, ver nota arquitectónica en v0.4-004 y D-048) y no bloquea al servidor. Celery + Redis queda documentado como mejora futura de escalado en Roadmap.
-- [ ] `GET /api/v1/submissions/{id}` devuelve el estado actual (PENDING/ANALYZING/REVIEW/GRADED)
-- [ ] El worker actualiza el estado y guarda las evaluaciones en BBDD al terminar
+- [x] `POST /api/v1/submissions/upload-and-evaluate` acepta imagen recortada o PDF devolviendo `{ "submission_id": "...", "status": "ANALYZING", "message": "Procesamiento de evaluación iniciado en segundo plano." }` (`202 Accepted`) en <500ms [D-055].
+- [x] La tarea de corrección multimodal se ejecuta de forma asíncrona vía FastAPI BackgroundTasks (`procesar_evaluacion_en_segundo_plano`) y no bloquea el hilo del servidor HTTP.
+- [x] `GET /api/v1/submissions` y `GET /api/v1/submissions/{id}` devuelven el estado actual (ANALYZING/REVIEW/GRADED/ERROR).
+- [x] La tarea de segundo plano actualiza el estado a `REVIEW`, persiste la evaluación y el `ChangeLog` (o `ERROR` con trazabilidad si ocurre un fallo).
 
-**Etiquetas:** `v0.4` `backend`
+**Etiquetas:** `v0.4` `backend` `async` `backgroundtasks`
+
 
 ---
 
@@ -744,6 +745,23 @@
 - [ ] El semáforo formativo en el panel PWA de la profesora se actualiza visualmente en cuanto el estudiante completa su checklist personal.
 
 **Etiquetas:** `v0.5` `frontend` `backend` `pwa`
+
+---
+
+### [v0.5-007] Entorno de Pruebas de Integración con Postgres en Docker
+
+**Como** desarrolladora y auditora de calidad,  
+**quiero** disponer de una suite de pruebas de integración que ejecute `alembic upgrade head` y `pytest` sobre una base de datos PostgreSQL real aislada en Docker  
+**para** verificar que todas las migraciones de esquemas y los tipos avanzados (`JSONB`) funcionan idénticamente a producción sin contaminar la base de datos de desarrollo local.
+
+**Criterios de aceptación:**
+- [ ] Configurar una fixture de pruebas en `pytest` que levante o se conecte a una BBDD/esquema aislado `api_correccion_test` en PostgreSQL 16 Alpine (Docker).
+- [ ] La suite ejecuta las migraciones reales de `alembic upgrade head` antes de lanzar las pruebas de integración.
+- [ ] Saldar la deuda técnica documentada en `AUDITORIA.md` (Sección 4, fila Alembic) y en `backlog.md`.
+- [ ] Mantener los tests rápidos con SQLite en memoria para desarrollo local ultrarrápido (`pytest -m unit`).
+
+**Etiquetas:** `v0.5` `testing` `docker` `alembic` `tech-debt`
+
 
 ---
 

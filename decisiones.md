@@ -1149,10 +1149,60 @@ Se documenta formalmente como **limitación conocida y aceptada** de la v1 actua
 
 ---
 
+### D-055 — Arquitectura de evaluación asíncrona mediante FastAPI BackgroundTasks (v0.4)
+
+**Estado:** ✅ Adoptada  
+**Fecha:** 20/08/2026
+
+**Contexto:**  
+En la v0.3, el endpoint `POST /api/v1/submissions/upload-and-evaluate` ejecutaba en un único ciclo HTTP la validación del archivo, el almacenamiento local, la llamada a OpenAI Vision para transcripción y la evaluación LLM. Esto causaba latencias de respuesta de 4 a 8 segundos en el cliente, bloqueando la PWA y ofreciendo una experiencia poco fluida si la conexión docente sufría interrupciones.
+
+**Opciones consideradas:**
+1. **Pipelining sincrónico mantenido:** Mantener la petición sincrónica. *Descartada:* Latencia inaceptable para producción y mala UX.
+2. **Celery + Redis:** Cola de tareas distribuida y bróker de mensajes pesado. *Descartada por YAGNI (D-001):* Introduce infraestructura compleja que sobrecarga el MVP.
+3. **FastAPI `BackgroundTasks` nativo:** Iniciar la tarea de procesamiento en segundo plano inmediatamente después de validar la entrega y persistir el registro inicial en estado `ANALYZING`. *Elegida.*
+
+**Decisión:**  
+Se refactoriza el endpoint `POST /api/v1/submissions/upload-and-evaluate` para responder con un estado `HTTP 202 Accepted` en menos de 500ms devolviendo un esquema `SubmissionAsyncResponse` (`submission_id`, `status="ANALYZING"`, `message`). El procesamiento pesado (transcripción Vision + evaluación LLM) se ejecuta asíncronamente mediante `BackgroundTasks.add_task(procesar_evaluacion_en_segundo_plano)`. Al finalizar, se actualiza el estado en BBDD a `REVIEW` (o `ERROR` si ocurre algún fallo no controlado) y se añade la trazabilidad en `ChangeLog`.
+
+**Consecuencias:**  
+1. Reducción drástica de la latencia percibida (<500ms).
+2. Resiliencia: si el docente navega fuera de la vista o cierra la PWA, la evaluación continúa ejecutándose en el servidor y persistiéndose en la BBDD.
+3. Compatibilidad fluida con el sistema de notificaciones SSE (`[v0.4-002]`) y polling.
+
+---
+
+### D-056 — Estrategia dual de testing: SQLite en RAM para TDD local y PostgreSQL en Docker para Integración Continua y Despliegue Continuo (CI/CD) (v0.5)
+
+**Estado:** ✅ Adoptada  
+**Fecha:** 20/08/2026
+
+**Contexto:**  
+Actualmente, los tests unitarios (`pytest`) ejecutan `Base.metadata.create_all()` sobre una base de datos SQLite en memoria (`sqlite:///:memory:`). Esto permite una velocidad de ejecución extrema (<4s) y evita modificar o contaminar la base de datos PostgreSQL en Docker usada durante el desarrollo local. Sin embargo, no permite validar que las migraciones reales de Alembic (`alembic upgrade head`) ni que tipos nativos de Postgres (como `JSONB`) funcionen idénticamente en un entorno relacional real.
+
+**Opciones consideradas:**
+1. **Forzar PostgreSQL para todos los tests locales:** Ejecutar la suite de pruebas siempre contra el Postgres de desarrollo local. *Descartada:* Contamina los datos persistentes de prueba del profesor y ralentiza la retroalimentación en TDD (*Test-Driven Development*).
+2. **Mantener únicamente SQLite sin plan de integración:** Ignorar las diferencias entre motores relacionales. *Descartada:* Genera deuda técnica y riesgo de fallos no detectados en scripts de migración DDL (*Data Definition Language*).
+3. **Estrategia Dual de Testing (Dual Testing Strategy):** Separar los tests en dos capas: desarrollo TDD ultrarrápido con SQLite local y entorno de integración automatizado en CI/CD (*Continuous Integration / Continuous Deployment*) con un contenedor PostgreSQL 16 vaciado antes de cada suite. *Elegida.*
+
+**Decisión:**  
+Se formaliza la Estrategia Dual de Testing. En la v0.5 (`[v0.5-007]`), se configurará un contenedor o esquema aislado de PostgreSQL (`api_correccion_test`) en Docker para ejecutar las migraciones de `alembic upgrade head` y la suite de integración previa al despliegue. Los tests unitarios diarios mantendrán la capa ultrarrápida con SQLite en memoria.
+
+
+**Consecuencias:**  
+1. Máxima velocidad en desarrollo diario (TDD) sin riesgo de corrupción de datos locales.
+2. Garantía de paridad 100% con producción antes de cada fusión en la rama principal (*main*).
+3. Cierre planificado de la deuda técnica de validación de migraciones Alembic registrada en `AUDITORIA.md`.
+
+---
+
 *Documento creado el 08/07/2026 — Alba Camiña García con la ayuda de Antigravity AI*  
 *Actualizado el 28/07/2026 — añadida D-050*  
 *Actualizado el 11/08/2026 — añadida D-051 (Pivote arquitectónico a OpenAI para Visión manteniendo Groq para Texto).*  
 *Actualizado el 12/08/2026 — añadida D-052 (Asignación determinista de cualitativa ESO y gobernanza del redondeo).*  
 *Actualizado el 14/08/2026 — añadida D-053 (Unificación en OpenAI tras deprecación de Groq Llama 3.3 70B).*  
 *Actualizado el 18/08/2026 — añadida D-054 (Limitación conocida del RAG Determinista v1 y planificación de RAG Semántico con materiales docentes como Roadmap-005).*  
-*Total de decisiones registradas: 54*
+*Actualizado el 20/08/2026 — añadida D-055 (Arquitectura de evaluación asíncrona mediante FastAPI BackgroundTasks).*  
+*Actualizado el 20/08/2026 — añadida D-056 (Estrategia dual de testing: SQLite en RAM para TDD local y PostgreSQL en Docker para CI/CD).*  
+*Total de decisiones registradas: 56*
+

@@ -138,6 +138,13 @@ Guía de estilo oficial para la escritura de código en el lenguaje Python. Defi
 **Pipeline** (Cadena de Procesamiento o Tubería de Datos)  
 Secuencia ordenada y automatizada de pasos donde la salida (*output*) de un proceso se convierte directamente en la entrada (*input*) del siguiente paso, similar a una cadena de montaje industrial. En api-correccion-formativa-ia-galicia se analiza en la Versión 0.3 (`sesion_03_ocr_vs_multimodal_vision.md`) comparando un *Pipeline en 2 pasos* (Foto $\rightarrow$ OCR $\rightarrow$ LLM $\rightarrow$ JSON) frente a un *Pipeline Unificado Multimodal en 1 paso* (Foto $\rightarrow$ Vision LLM $\rightarrow$ JSON con marcadores espaciales x,y).
 
+**Polling (Consulta Periódica)**  
+Técnica cliente-servidor en la que la aplicación (PWA) realiza peticiones HTTP repetidas a intervalos regulares (ej. cada 3 segundos a `GET /api/v1/submissions/{id}`) para verificar si una tarea en segundo plano ha cambiado de estado (`ANALYZING → REVIEW`). Es sencilla pero genera tráfico redundante si la tarea tarda tiempo. Es el mecanismo alternativo/complementario a Server-Sent Events (SSE).
+
+**Server-Sent Events (SSE — Eventos Enviados por el Servidor)**  
+Mecanismo de comunicación en tiempo real en una sola dirección (servidor $\rightarrow$ cliente) basado en el protocolo HTTP (`text/event-stream`). Permite que el backend notifique automáticamente a la PWA del docente en cuanto la IA termina la evaluación en segundo plano (`STATUS_UPDATE: REVIEW`), sin necesidad de recargar la página ni realizar peticiones repetidas (*polling*). Si el cliente cierra el navegador, el servidor detecta el cierre del canal y destruye el stream de forma limpia mientras la tarea de fondo continúa su ejecución en BBDD.
+
+
 **Scaffolding** (Andamiaje o Estructura Inicial de Código)  
 Generación automática o manual del esqueleto básico de un proyecto antes de empezar a escribir la lógica interna de negocio. Consiste en crear la jerarquía de carpetas principales, archivos de configuración (como `package.json`, `.env.example`, `main.py` o `docker-compose.yml`) y plantillas estructurales vacías. Proporciona los cimientos ordenados sobre los que evoluciona el código.
 
@@ -179,6 +186,10 @@ Dos conceptos relacionados pero distintos que trabajan juntos:
 
 **Alembic**  
 Herramienta oficial de migraciones transaccionales para SQLAlchemy. Funciona como un "Git para la estructura de tu base de datos": en lugar de crear o modificar tablas a mano con comandos SQL sueltos (lo que causaría caos entre entornos), Alembic genera archivos de revisión temporales en Python (`alembic revision -m "nombre"`) dentro de `alembic/versions/` que describen exactamente cómo subir (`upgrade`) o retroceder (`downgrade`) el esquema. Al ejecutar `alembic upgrade head`, el motor aplica las revisiones en orden estricto, garantizando que la estructura de la base de datos sea siempre auditable, reproducible y 100% idéntica entre tu WSL local, tu Docker y el servidor de producción (`[D-030]`).
+
+**BackgroundTasks (Tareas en Segundo Plano de FastAPI)**  
+Herramienta nativa de FastAPI que permite desencadenar funciones asíncronas de ejecución prolongada inmediatamente después de enviar la respuesta HTTP al cliente. En nuestra arquitectura (`[D-048]`), al recibir una entrega de examen, el endpoint responde de inmediato con HTTP `202 Accepted` (`status: ANALYZING`) y delega la llamada pesada a OpenAI Vision (`vision_service` + `llm_client`) a una `BackgroundTask`. Esto garantiza latencias mínimas (<500ms) sin necesidad de infraestructura compleja como Celery/Redis en la fase MVP. Si el cliente/docente cierra la ventana del navegador o apaga el dispositivo, la tarea en segundo plano continúa ejecutándose hasta guardar el resultado final en la base de datos (`status: REVIEW`).
+
 
 
 **FastAPI**  
@@ -689,10 +700,26 @@ Principio de desarrollo: no escribas código para funcionalidades que no necesit
 **Code Freeze (Congelación de Código)**  
 Periodo de bloqueo temporal en el que no está permitido añadir código nuevo al repositorio ni iniciar nuevas funcionalidades, con el objetivo de garantizar la estabilidad del sistema antes de un evento crítico (demo, auditoría, lanzamiento, reunión de revisión). Solo están permitidas correcciones de errores graves y actualizaciones de documentación. En este proyecto: el code freeze arranca el sábado 25/07/2026 y se mantiene hasta después de la revisión técnica del lunes 27/07.
 
+**CI/CD (Continuous Integration / Continuous Deployment — Integración y Despliegue Continuos)**  
+Práctica de ingeniería de software que automatiza la verificación y publicación del código. Cada vez que se suben cambios al repositorio en GitHub:
+- **CI (Integración Continua)**: Un robot automatizado en la nube clona el proyecto, instala dependencias, levanta la base de datos de prueba en Docker, aplica las migraciones de Alembic (`alembic upgrade head`) y ejecuta la suite de pruebas (`pytest`). Si algún test falla, el cambio se rechaza automáticamente y bloquea la integración.
+- **CD (Despliegue Continuo)**: Si todas las pruebas dan verde, el sistema actualiza automáticamente el servidor en producción sin requerir intervención manual.
+
 **Definition of Done / DoD (Definición de Hecho)**  
+
 Conjunto de criterios mínimos que una historia de usuario, tarea o funcionalidad debe cumplir para considerarse **verdaderamente terminada** — no solo "funciona en mi máquina". En api-correccion-formativa-ia-galicia el DoD está formalizado como los **4 pilares de `[D-035]`**: Diseño (ADR en `decisiones.md`), Implementación (código en `main`), Evidencia (`pytest` en verde) y Documentación (`README.md` + `backlog.md` sincronizados). En la Epic Issue de GitHub, los checkboxes representan el DoD público de la épica — se marcan solo cuando el código existe, los tests pasan y la documentación está actualizada.
 
+**Estrategia Dual de Testing (Dual Testing Strategy)**  
+Estrategia de arquitectura de pruebas (`[D-056]`) que combina dos capas complementarias de testing:
+- **Capa 1 (Unitarios TDD)**: Ejecución ultra-rápida (<4s) utilizando SQLite en memoria RAM (`sqlite:///:memory:`) para el desarrollo diario, permitiendo refactorizar e iterar sin necesidad de depender de contenedores ni contaminar los datos locales del desarrollador.
+- **Capa 2 (Integración CI/CD)**: Ejecución automatizada en la v0.5 (`[v0.5-007]`) utilizando un esquema/contenedor vaciado de PostgreSQL 16 Alpine en Docker. Esta capa ejecuta las migraciones reales de Alembic (`alembic upgrade head`) para validar la sintaxis DDL y el comportamiento estricto de tipos de datos avanzados (`JSONB`).
+
+**GitHub Actions**  
+Plataforma de automatización y CI/CD integrada directamente en GitHub. Mediante archivos de configuración YAML (ubicados en `.github/workflows/`), permite definir flujos de trabajo (*workflows*) que se disparan ante eventos del repositorio (como un `git push` o un `Pull Request`), ejecutando tests automatizados en contenedores Docker y desplegando la API sin intervención manual.
+
 **Proof of Concept / PoC (Prueba de Concepto)**  
+
+
 Implementación mínima, exploratoria y desechable cuyo único objetivo es validar la viabilidad técnica o matemática de una idea **antes** de comprometer esfuerzo de arquitectura o código de producción. Un PoC no es un servicio definitivo ni forma parte del backend. En este proyecto: `scratch/pillow_crop_test.py` fue un PoC del algoritmo de recorte (ratio 0.20, 794×1123px → 224+899px) para confirmar la matemática antes de portarla a JavaScript/Canvas en el frontend PWA (`[v0.3-001]`). El script vive en `scratch/` (ignorado por git) precisamente por su naturaleza exploratoria transitoria.
 
 **Self-Review Gate (Auto-Revisión Pre-Entrega)**  
