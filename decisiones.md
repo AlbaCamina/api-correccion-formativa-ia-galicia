@@ -1172,6 +1172,30 @@ Se refactoriza el endpoint `POST /api/v1/submissions/upload-and-evaluate` para r
 
 ---
 
+### D-056 — Estrategia dual de testing: SQLite en RAM para TDD local y PostgreSQL en Docker para Integración Continua y Despliegue Continuo (CI/CD) (v0.5)
+
+**Estado:** ✅ Adoptada  
+**Fecha:** 20/08/2026
+
+**Contexto:**  
+Actualmente, los tests unitarios (`pytest`) ejecutan `Base.metadata.create_all()` sobre una base de datos SQLite en memoria (`sqlite:///:memory:`). Esto permite una velocidad de ejecución extrema (<4s) y evita modificar o contaminar la base de datos PostgreSQL en Docker usada durante el desarrollo local. Sin embargo, no permite validar que las migraciones reales de Alembic (`alembic upgrade head`) ni que tipos nativos de Postgres (como `JSONB`) funcionen idénticamente en un entorno relacional real.
+
+**Opciones consideradas:**
+1. **Forzar PostgreSQL para todos los tests locales:** Ejecutar la suite de pruebas siempre contra el Postgres de desarrollo local. *Descartada:* Contamina los datos persistentes de prueba del profesor y ralentiza la retroalimentación en TDD (*Test-Driven Development*).
+2. **Mantener únicamente SQLite sin plan de integración:** Ignorar las diferencias entre motores relacionales. *Descartada:* Genera deuda técnica y riesgo de fallos no detectados en scripts de migración DDL (*Data Definition Language*).
+3. **Estrategia Dual de Testing (Dual Testing Strategy):** Separar los tests en dos capas: desarrollo TDD ultrarrápido con SQLite local y entorno de integración automatizado en CI/CD (*Continuous Integration / Continuous Deployment*) con un contenedor PostgreSQL 16 vaciado antes de cada suite. *Elegida.*
+
+**Decisión:**  
+Se formaliza la Estrategia Dual de Testing. En la v0.5 (`[v0.5-007]`), se configurará un contenedor o esquema aislado de PostgreSQL (`api_correccion_test`) en Docker para ejecutar las migraciones de `alembic upgrade head` y la suite de integración previa al despliegue. Los tests unitarios diarios mantendrán la capa ultrarrápida con SQLite en memoria.
+
+
+**Consecuencias:**  
+1. Máxima velocidad en desarrollo diario (TDD) sin riesgo de corrupción de datos locales.
+2. Garantía de paridad 100% con producción antes de cada fusión en la rama principal (*main*).
+3. Cierre planificado de la deuda técnica de validación de migraciones Alembic registrada en `AUDITORIA.md`.
+
+---
+
 *Documento creado el 08/07/2026 — Alba Camiña García con la ayuda de Antigravity AI*  
 *Actualizado el 28/07/2026 — añadida D-050*  
 *Actualizado el 11/08/2026 — añadida D-051 (Pivote arquitectónico a OpenAI para Visión manteniendo Groq para Texto).*  
@@ -1179,4 +1203,6 @@ Se refactoriza el endpoint `POST /api/v1/submissions/upload-and-evaluate` para r
 *Actualizado el 14/08/2026 — añadida D-053 (Unificación en OpenAI tras deprecación de Groq Llama 3.3 70B).*  
 *Actualizado el 18/08/2026 — añadida D-054 (Limitación conocida del RAG Determinista v1 y planificación de RAG Semántico con materiales docentes como Roadmap-005).*  
 *Actualizado el 20/08/2026 — añadida D-055 (Arquitectura de evaluación asíncrona mediante FastAPI BackgroundTasks).*  
-*Total de decisiones registradas: 55*
+*Actualizado el 20/08/2026 — añadida D-056 (Estrategia dual de testing: SQLite en RAM para TDD local y PostgreSQL en Docker para CI/CD).*  
+*Total de decisiones registradas: 56*
+

@@ -700,10 +700,26 @@ Principio de desarrollo: no escribas código para funcionalidades que no necesit
 **Code Freeze (Congelación de Código)**  
 Periodo de bloqueo temporal en el que no está permitido añadir código nuevo al repositorio ni iniciar nuevas funcionalidades, con el objetivo de garantizar la estabilidad del sistema antes de un evento crítico (demo, auditoría, lanzamiento, reunión de revisión). Solo están permitidas correcciones de errores graves y actualizaciones de documentación. En este proyecto: el code freeze arranca el sábado 25/07/2026 y se mantiene hasta después de la revisión técnica del lunes 27/07.
 
+**CI/CD (Continuous Integration / Continuous Deployment — Integración y Despliegue Continuos)**  
+Práctica de ingeniería de software que automatiza la verificación y publicación del código. Cada vez que se suben cambios al repositorio en GitHub:
+- **CI (Integración Continua)**: Un robot automatizado en la nube clona el proyecto, instala dependencias, levanta la base de datos de prueba en Docker, aplica las migraciones de Alembic (`alembic upgrade head`) y ejecuta la suite de pruebas (`pytest`). Si algún test falla, el cambio se rechaza automáticamente y bloquea la integración.
+- **CD (Despliegue Continuo)**: Si todas las pruebas dan verde, el sistema actualiza automáticamente el servidor en producción sin requerir intervención manual.
+
 **Definition of Done / DoD (Definición de Hecho)**  
+
 Conjunto de criterios mínimos que una historia de usuario, tarea o funcionalidad debe cumplir para considerarse **verdaderamente terminada** — no solo "funciona en mi máquina". En api-correccion-formativa-ia-galicia el DoD está formalizado como los **4 pilares de `[D-035]`**: Diseño (ADR en `decisiones.md`), Implementación (código en `main`), Evidencia (`pytest` en verde) y Documentación (`README.md` + `backlog.md` sincronizados). En la Epic Issue de GitHub, los checkboxes representan el DoD público de la épica — se marcan solo cuando el código existe, los tests pasan y la documentación está actualizada.
 
+**Estrategia Dual de Testing (Dual Testing Strategy)**  
+Estrategia de arquitectura de pruebas (`[D-056]`) que combina dos capas complementarias de testing:
+- **Capa 1 (Unitarios TDD)**: Ejecución ultra-rápida (<4s) utilizando SQLite en memoria RAM (`sqlite:///:memory:`) para el desarrollo diario, permitiendo refactorizar e iterar sin necesidad de depender de contenedores ni contaminar los datos locales del desarrollador.
+- **Capa 2 (Integración CI/CD)**: Ejecución automatizada en la v0.5 (`[v0.5-007]`) utilizando un esquema/contenedor vaciado de PostgreSQL 16 Alpine en Docker. Esta capa ejecuta las migraciones reales de Alembic (`alembic upgrade head`) para validar la sintaxis DDL y el comportamiento estricto de tipos de datos avanzados (`JSONB`).
+
+**GitHub Actions**  
+Plataforma de automatización y CI/CD integrada directamente en GitHub. Mediante archivos de configuración YAML (ubicados en `.github/workflows/`), permite definir flujos de trabajo (*workflows*) que se disparan ante eventos del repositorio (como un `git push` o un `Pull Request`), ejecutando tests automatizados en contenedores Docker y desplegando la API sin intervención manual.
+
 **Proof of Concept / PoC (Prueba de Concepto)**  
+
+
 Implementación mínima, exploratoria y desechable cuyo único objetivo es validar la viabilidad técnica o matemática de una idea **antes** de comprometer esfuerzo de arquitectura o código de producción. Un PoC no es un servicio definitivo ni forma parte del backend. En este proyecto: `scratch/pillow_crop_test.py` fue un PoC del algoritmo de recorte (ratio 0.20, 794×1123px → 224+899px) para confirmar la matemática antes de portarla a JavaScript/Canvas en el frontend PWA (`[v0.3-001]`). El script vive en `scratch/` (ignorado por git) precisamente por su naturaleza exploratoria transitoria.
 
 **Self-Review Gate (Auto-Revisión Pre-Entrega)**  

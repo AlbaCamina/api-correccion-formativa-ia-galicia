@@ -748,6 +748,23 @@
 
 ---
 
+### [v0.5-007] Entorno de Pruebas de Integración con Postgres en Docker
+
+**Como** desarrolladora y auditora de calidad,  
+**quiero** disponer de una suite de pruebas de integración que ejecute `alembic upgrade head` y `pytest` sobre una base de datos PostgreSQL real aislada en Docker  
+**para** verificar que todas las migraciones de esquemas y los tipos avanzados (`JSONB`) funcionan idénticamente a producción sin contaminar la base de datos de desarrollo local.
+
+**Criterios de aceptación:**
+- [ ] Configurar una fixture de pruebas en `pytest` que levante o se conecte a una BBDD/esquema aislado `api_correccion_test` en PostgreSQL 16 Alpine (Docker).
+- [ ] La suite ejecuta las migraciones reales de `alembic upgrade head` antes de lanzar las pruebas de integración.
+- [ ] Saldar la deuda técnica documentada en `AUDITORIA.md` (Sección 4, fila Alembic) y en `backlog.md`.
+- [ ] Mantener los tests rápidos con SQLite en memoria para desarrollo local ultrarrápido (`pytest -m unit`).
+
+**Etiquetas:** `v0.5` `testing` `docker` `alembic` `tech-debt`
+
+
+---
+
 ## 🏆 Versión 1.0 — MVP Completo y Desplegado
 
 **Objetivo:** El producto está desplegado en una URL pública, documentado y listo para ser mostrado en portfolio y al auditor externo.
