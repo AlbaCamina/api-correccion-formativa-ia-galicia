@@ -549,6 +549,21 @@
 
 ---
 
+### [v0.3-006] Pipeline Completo: Upload → Transcribir → Evaluar `[D-022]` `[D-053]` ✅
+
+**Como** docente, **quiero** un flujo unificado que suba, transcriba y evalúe en una sola petición, **para** simplificar la experiencia de corrección.
+
+**Criterios de aceptación:**
+- [x] `POST /api/v1/submissions/upload-and-evaluate` acepta `multipart/form-data` + metadatos JSON (`rubrica_id`, `marco_id`, `alumno_id`)
+- [x] El backend valida las proporciones del archivo (señal de recorte en cliente)
+- [x] Orquestación: `StorageService.upload()` → `vision_service.transcribir_imagen()` → `llm_client.evaluate()`
+- [x] Respuesta incluye el contrato `EvaluacionIA` completo con `transcription` relleno
+- [x] Pipeline documentado en `README.md`
+
+**Etiquetas:** `v0.3` `backend` `endpoints`
+
+---
+
 ## ⚡ Versión 0.4 — Asincronía y Colas de Tareas
 
 **Objetivo:** El servidor puede recibir múltiples exámenes simultáneamente sin bloquearse. El profesor recibe una notificación cuando cada corrección termina.

@@ -550,6 +550,10 @@ La ley española que desarrolla el RGPD. Su artículo 7 regula el consentimiento
 **NEAE / NEE** (Necesidades Específicas de Apoyo Educativo / Necesidades Educativas Especiales)  
 Clasificación legal en España para el alumnado que requiere una atención educativa diferente a la ordinaria por presentar dificultades específicas de aprendizaje (DEA como dislexia), TDAH, altas capacidades o discapacidad (NEE). api-correccion-formativa-ia-galicia adapta su motor formativo para que estos perfiles sean evaluados con justicia sin penalizar errores derivados de su condición ([D-023]).
 
+**Privacy by Design** (Privacidad desde el Diseño)  
+Enfoque de ingeniería de software que exige integrar la protección de datos desde la fase inicial de arquitectura del sistema, y no como un parche a posteriori (mandato del Art. 25 del RGPD). En este proyecto se materializa en medidas proactivas como la anonimización local en el navegador del docente (antes del envío a la nube) y la creación de plantillas físicas de examen con fronteras de recorte (`[v0.5-007]`) para evitar que el nombre del alumno se envíe a la IA.
+
+
 **RGPD** (Reglamento General de Protección de Datos)  
 La ley europea de privacidad de datos. Obliga a proteger los datos personales, especialmente los de menores. En este proyecto: los exámenes se anonimizan antes de enviarse a la IA (campo `alumno_id`), y OpenAI/Anthropic tienen contratos de Zero Data Retention.
 
