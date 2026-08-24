@@ -568,19 +568,22 @@
 
 **Objetivo:** El servidor puede recibir múltiples exámenes simultáneamente sin bloquearse. El profesor recibe una notificación cuando cada corrección termina.
 
+> [!WARNING]
+> **Pivote Arquitectónico (YAGNI):** La planificación original de este hito contemplaba el despliegue de infraestructura compleja (Redis y Celery). Se decidió pivotar hacia `FastAPI BackgroundTasks` (MVP) para evitar *over-engineering* y mantener la agilidad del prototipado. Los tickets relacionados con Celery se han tachado y marcado explícitamente como Cancelados o Aplazados para preservar la coherencia histórica de las decisiones del proyecto.
+
 ---
 
-### [v0.4-001] Configuración de Redis y Celery
+### ~~[v0.4-001] Configuración de Redis y Celery~~ [CANCELADO]
 
 **Como** desarrolladora,  
 **quiero** configurar Redis como broker de mensajes y Celery como sistema de workers  
 **para** poder procesar correcciones en segundo plano.
 
-**Criterios de aceptación:**
-- [ ] Redis añadido a Docker Compose
-- [ ] Celery configurado con Redis como broker y result backend
-- [ ] Worker arranca con `celery -A app.worker worker --loglevel=info`
-- [ ] Tarea de prueba `ping` ejecutada correctamente desde FastAPI
+**Criterios de aceptación (Cancelados por pivote a BackgroundTasks):**
+- [-] Redis añadido a Docker Compose
+- [-] Celery configurado con Redis como broker y result backend
+- [-] Worker arranca con `celery -A app.worker worker --loglevel=info`
+- [-] Tarea de prueba `ping` ejecutada correctamente desde FastAPI
 
 **Etiquetas:** `v0.4` `backend` `infra`
 
@@ -603,33 +606,33 @@
 
 ---
 
-### [v0.4-003] Notificación al cliente (Server-Sent Events)
+### ~~[v0.4-003] Notificación al cliente (Server-Sent Events)~~ [APLAZADO]
 
 **Como** profesora,  
 **quiero** que el panel web me avise automáticamente cuando la corrección esté lista  
 **para** no tener que recargar la página manualmente.
 
-**Criterios de aceptación:**
-- [ ] `GET /api/v1/submissions/{id}/events` abre un stream SSE
-- [ ] El cliente recibe evento `{ "type": "STATUS_UPDATE", "status": "GRADED" }` cuando termina el worker
-- [ ] La conexión SSE se cierra automáticamente tras recibir el evento `GRADED`
-- [ ] Si el cliente se desconecta, el servidor cierra el stream limpiamente
+**Criterios de aceptación (Aplazados para futuras versiones):**
+- [-] `GET /api/v1/submissions/{id}/events` abre un stream SSE
+- [-] El cliente recibe evento `{ "type": "STATUS_UPDATE", "status": "GRADED" }` cuando termina el worker
+- [-] La conexión SSE se cierra automáticamente tras recibir el evento `GRADED`
+- [-] Si el cliente se desconecta, el servidor cierra el stream limpiamente
 
 **Etiquetas:** `v0.4` `backend`
 
 ---
 
-### [v0.4-004] Prueba de carga — 5 exámenes simultáneos
+### ~~[v0.4-004] Prueba de carga — 5 exámenes simultáneos~~ [APLAZADO]
 
 **Como** desarrolladora,  
 **quiero** verificar que el servidor no colapsa con varias correcciones a la vez  
 **para** poder afirmar con confianza que la arquitectura es robusta.
 
-**Criterios de aceptación:**
-- [ ] 5 peticiones simultáneas de corrección procesadas sin errores 500
-- [ ] El servidor responde a todas en menos de 1 segundo con `202 Accepted`
-- [ ] Todas las correcciones completan en menos de 3 minutos
-- [ ] Los logs muestran las 5 tareas ejecutándose en workers distintos
+**Criterios de aceptación (Dependientes de infraestructura Celery):**
+- [-] 5 peticiones simultáneas de corrección procesadas sin errores 500
+- [-] El servidor responde a todas en menos de 1 segundo con `202 Accepted`
+- [-] Todas las correcciones completan en menos de 3 minutos
+- [-] Los logs muestran las 5 tareas ejecutándose en workers distintos
 
 > [!NOTE]
 > **Implementación MVP:** Se usa `FastAPI BackgroundTasks` como implementación real en v0.4. El README documenta que en producción a escala se reemplazaría por Celery + Redis Worker dedicado. Esto demuestra conocimiento arquitectónico sin bloquear el desarrollo con la complejidad de configuración de Celery en WSL. Celery queda documentado como mejora futura en `## Roadmap`.
@@ -651,12 +654,12 @@
 **para** que funcione en cualquier dispositivo sin necesidad de instalación desde tienda.
 
 **Criterios de aceptación:**
-- [ ] Carpeta `frontend/` con React + Vite configurado
-- [ ] `vite-plugin-pwa` instalado y configurado con `manifest.json`
-- [ ] La app es instalable desde el navegador en móvil mediante `manifest.json` ("Añadir a pantalla de inicio" sin pasar por tienda [D-007])
-- [ ] Configuración de HTTPS local en Vite (`vite-plugin-mkcert` o túnel) para habilitar pruebas de cámara en dispositivos de la red Wi-Fi
-- [ ] Service worker registrado y estructura preparada para redimensión en cliente [D-020] y recorte de cabeceras pre-nube [D-022]
-- [ ] Diseño responsive desde móvil (360px) hasta pantalla grande (1440px)
+- [x] Carpeta `frontend/` con React + Vite configurado
+- [x] `vite-plugin-pwa` instalado y configurado con `manifest.json`
+- [x] La app es instalable desde el navegador en móvil mediante `manifest.json` ("Añadir a pantalla de inicio" sin pasar por tienda [D-007])
+- [x] Configuración de HTTPS local en Vite (`@vitejs/plugin-basic-ssl`) para habilitar pruebas de cámara en dispositivos de la red Wi-Fi
+- [x] Service worker registrado y estructura preparada para redimensión en cliente [D-020] y recorte de cabeceras pre-nube [D-022]
+- [x] Diseño responsive desde móvil (360px) hasta pantalla grande (1440px)
 
 **Etiquetas:** `v0.5` `frontend`
 
@@ -692,6 +695,7 @@
 **Criterios de aceptación:**
 - [ ] Panel izquierdo: visualizador paginado del examen (`archivos_urls`) con zoom y selector de folio
 - [ ] Panel derecho: análisis IA (nota, desglose por rúbrica, análisis formativo y cualitativo)
+- [ ] **`[D-057]` Panel de Declaración de Residuo Pedagógico:** Cabecera destacada que explicita las dudas e incertidumbres que la IA transfiere al docente para evitar aprobaciones en piloto automático: ítems con `confidence_score < 0.7`, exenciones por adaptaciones NEAE (`errores_excluidos_por_adaptacion`) y brechas detectadas en la Auditoría Curricular.
 - [ ] Las mejoras inmediatas aparecen en rojo, las de medio plazo en naranja
 - [ ] Las fortalezas aparecen en verde
 - [ ] En móvil: paneles apilados verticalmente (imagen arriba, análisis abajo)
@@ -927,6 +931,27 @@
 
 ---
 
+### [Roadmap-006] Orquestación Agéntica basada en Skills (Agent Skills Framework)
+**Como** arquitecta de software,  
+**quiero** evaluar la viabilidad de adoptar un marco de Skills agénticas modulares  
+**para** desacoplar las capacidades especializadas del motor (transcripción OCR, auditoría curricular, redacción de feed-forward) en módulos autónomos y reusables.
+
+* **Inspirado por / Recomendación:** Miguel Ángel (Altia) — propuesta de explorar la arquitectura basada en Agent Skills para orquestación agéntica.
+* **Estado:** ⏳ Pendiente de evaluación de viabilidad (Roadmap).
+
+---
+
+### [Roadmap-007] Integración de CLI Disensor (`disensor.dev`) en CI/CD de GitHub Actions
+**Como** desarrolladora,  
+**quiero** integrar la herramienta de CLI `disensor` (`pip install disensor`) en la tubería de Integración Continua (`.github/workflows/ci.yml`)  
+**para** bloquear automáticamente cualquier Pull Request cuyo residuo de desarrollo no haya sido explícitamente verificado y firmado en un archivo versionado.
+
+* **Inspirado por / Herramienta:** Nicolás Rocchia (`disensor.dev` / Open Source Python).
+* **Dependencias:** `[v1.0-002]` (Pipeline CI/CD en GitHub Actions).
+* **Estado:** ⏳ Planificado para la fase de automatización de CI/CD (Roadmap).
+
+---
+
 ## 🩺 Notas de Deuda Técnica Activa
 
 - **Tests sin validación de migraciones (v0.3-002):** Tests sin validación de migraciones (v0.3-002+): Los tests unitarios utilizan SQLite en memoria llamando a metadata.create_all() en lugar de aplicar revisiones Alembic, por lo que no validan si las migraciones coinciden con los modelos reales. Esta es una limitación técnica conocida que obliga a validar las nuevas columnas (como estado_feed_forward) manualmente contra Postgres.
@@ -938,6 +963,14 @@ Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificad
   3. **Seguridad de Secretos:** Revisar el historial de Git para garantizar que nunca se ha subido una API Key real en el pasado (usar BFG Repo-Cleaner si fuera necesario).
   4. **Licenciamiento:** Añadir un archivo `LICENSE` (ej. MIT License) en la raíz del proyecto.
   5. **README Onboarding:** Añadir una sección de "Getting Started" o "Instalación Local" clara para que un evaluador externo sepa cómo levantar la API en 2 minutos.
+  6. **Notificación a la Comunidad y Mentores:** Enviar mensaje privado en LinkedIn a los contactos clave de la comunidad y mentores que siguieron el proyecto:
+     - **Nicolás Rocchia (Pelatech):** Notificar la implementación de la Declaración de Residuo (`[D-057]`) e invitación a revisar el repo.
+     - **Igor Laburu (CEO @ Gako AI):** Notificar la apertura del repositorio con la implementación del RAG Determinista (`[D-054]`) e inyección de rúbricas docentes.
+     - **Miguel Ángel:** Notificar la apertura del repositorio con las fichas de Roadmap para el Servidor MCP (`[Roadmap-003]`) y el marco agéntico basado en Skills (`[Roadmap-006]`).
+     - **Equipo Quantia (Jorge, Andrés, Fernando, Francisco Carmona y Carlos):** Notificar el lanzamiento público del repositorio v1.0 como demostración de la arquitectura desarrollada tras la etapa de prácticas. Agradecer a Fernando su recomendación del principio de la "Prueba de los 6 Meses" incorporado en la Regla 8 de `AGENTS.md`.
+     - **Roberto:** Enviar enlace del repositorio v1.0 y post de lanzamiento para difusión inmediata y amplificación de red.
+     - **Compañeros de curso y prácticas (Andressa, Joserra y Sara):** Notificar el lanzamiento del repositorio (interacción recíproca, apoyo mutuo y comunidad de antiguos alumnos).
+     - **Venancio Salcines y Dirección EFBS / Cesuga (Hija de Salcines, Ivanna, Miguel Ángel, Alfonso, Lumey, Gala y Rita):** Notificar el lanzamiento del proyecto como demostración institucional de innovación educativa con IA en Galicia (impulso de visibilidad institucional y oportunidades profesionales).
 
 ---
 

@@ -694,10 +694,44 @@ Principio universal de ingeniería y diseño de sistemas por el cual no existe u
 **XADE (`Xestión Administrativa da Educación`)**  
 Aplicación informática oficial de la Xunta de Galicia (Consellería de Educación) para todos los centros docentes gallegos. Es donde las secretarías y equipos docentes matriculan al alumnado e introducen las notas numéricas por materia y cualitativas por competencias clave para cerrar actas e imprimir boletines en cada junta de evaluación. api-correccion-formativa-ia-galicia asiste y calcula el día a día para que el trasvase final de datos de corrección a XADE sea rápido, seguro y 100% auditable.
 
-**YAGNI** (You Aren't Gonna Need It — No lo vas a necesitar)  
-Principio de desarrollo: no escribas código para funcionalidades que no necesitas ahora mismo. Evita sobre-ingeniería.
+**Batching (Procesamiento por Lotes / Agrupación de Tareas)**  
+Técnica de optimización utilizada tanto en arquitectura de software como en gestión de productividad:
+- **En backend y bases de datos**: Consiste en agrupar múltiples peticiones, inserciones o llamadas I/O pequeñas en un único lote de procesamiento (ej. inserciones masivas en SQL o evaluación en lote de folios de un examen) para reducir la sobrecarga de red (*overhead*), el número de transacciones abiertas y optimizar el rendimiento.
+- **En metodología y gestión del tiempo**: Práctica de agrupar tareas homogéneas (como responder comentarios de LinkedIn, revisar Pull Requests o redactar documentación) en bloques de tiempo fijos y delimitados del día, evitando la fragmentación de la atención por interrupciones continuas y garantizando un ritmo de trabajo sostenible.
+
+**Atomic Commits (Commits Atómicos y Granularidad de Commits)**  
+Práctica fundamental de control de versiones por la cual cada commit en Git representa una única unidad lógica de trabajo completa, independiente y con sentido propio (ej. la implementación de un endpoint asíncrono o la resolución de un fallo). Evita tanto los *mega-commits* que mezclan características inconexas como los *micro-commits* ruidosos que ensucian el historial con cambios insignificantes. Las pequeñas adiciones de soporte o glosario se empaquetan de forma natural dentro del commit funcional correspondiente.
+
+**Agile Product Backlog Management (Gestión Ágil del Backlog de Producto)**  
+Práctica de metodologías ágiles (Scrum/Kanban) consistente en recopilar, priorizar y categorizar continuamente todas las historias de usuario, funcionalidades deseables, refactorizaciones y deuda técnica en un documento o lista viva (*Product Backlog*). Permite aplicar estrictamente el principio YAGNI y controlar el alcance (*Scope Creep*) en el sprint actual: en lugar de implementar ideas tentadoras al vuelo (*"ya que estoy..."*), se registran ordenadamente en el backlog asignadas a iteraciones o versiones futuras (`v0.5`, `v0.8`, `Roadmap`), protegiendo el foco presente sin perder ideas de valor.
+
+**Scope Creep (Crecimiento Incontrolado del Alcance / Desviación del Alcance)**  
+Fenómeno en gestión de proyectos de software por el cual los requisitos y funcionalidades de un proyecto aumentan de manera continua, sutil e incontrolada durante el desarrollo (*"ya que estoy, añado esto también"*), sin reajustar los plazos, el presupuesto o los recursos. Si no se frena mediante el principio YAGNI y una gestión rigurosa del backlog (*Product Backlog Management*), el Scope Creep provoca retrasos sistemáticos, agotamiento (*burnout*) y el abandono del proyecto antes de llegar a producción.
+
+**Scaffolding (Andamiaje Cognitivo / Andamio Mental)**  
+Concepto procedente de la psicología educativa (Vygotsky / Bruner) e integrado en la ingeniería de software: consiste en la creación de estructuras de soporte temporales o guías deliberadas (como registros de decisiones de arquitectura ADRs, listas de comprobación o reglas de orquestación en `AGENTS.md`) que permiten a un desarrollador abordar tareas complejas y tomar decisiones de diseño rigurosas mientras desarrolla y consolida su dominio técnico.
+
+**Architectural Integrity (Integridad Arquitectónica / Coherencia del Sistema)**  
+Grado de fidelidad y consistencia con el que la arquitectura de un sistema de software respeta sus principios de diseño originales (como YAGNI, el flujo Human-in-the-Loop o la Privacidad por Diseño) a lo largo del tiempo. Previene que el código se degrade con parches improvisados a medida que el proyecto crece o evoluciona entre distintas versiones.
+
+**Desacuerdo Controlado (Adversarial Multi-LLM Review)**  
+Metodología de auditoría de código y diseño creada por Nicolás Rocchia (Pelatech / `disensor.dev`) basada en utilizar dos asistentes de IA de proveedores distintos de forma explícitamente adversarial: un modelo A genera el plan o la implementación, y un modelo B (de otro proveedor) ataca buscando agujeros de seguridad, concurrencia o edge cases. La revisión nunca se cierra por consenso automático, sino por verificación explícita de evidencia o por transferencia del hallazgo como residuo/deuda al desarrollador humano (*Human-in-the-Loop*).
+
+**Declaración de Residuo (Residue Declaration / Audit Residue)**  
+Registro versionado, explícito y auditable de aquellas incertidumbres, ambigüedades o casos de borde de una evaluación/revisión que la IA no puede o no debe resolver de forma autónoma. En lugar de forzar una decisión automatizada ficticia o mostrar un aprobado en piloto automático, el sistema encapsula estos puntos en un "residuo" formal que se transfiere a la firma y responsabilidad consciente del profesional humano (*Human-in-the-Loop*).
+
+**Prueba de los 6 Meses (6-Month Maintainability Rule)**  
+Principio de gobernanza y mantenibilidad de software recomendado por Fernando (Quantia): establece que toda decisión de arquitectura, mensaje de commit e historial de issue debe documentarse con tal nivel de claridad y contexto que cualquier desarrollador —o tu propio "yo del futuro"— seis meses después comprenda exactamente la razón de ser del código y mantenga el 100% de la fidelidad a la filosofía del proyecto sin degradarlo.
+
+**Métricas Cosméticas (Vanity Metrics / Badges Cosméticos)**  
+Indicadores de rendimiento o cobertura que lucen positivos en un panel de control (como un badge verde de 100% de revisión o métricas de aprobados masivos sin aserciones profundas), pero que enmascaran fallos de lógica, alucinaciones o falta de responsabilidad real en la toma de decisiones.
 
 **Code Freeze (Congelación de Código)**  
+
+
+
+
+
 Periodo de bloqueo temporal en el que no está permitido añadir código nuevo al repositorio ni iniciar nuevas funcionalidades, con el objetivo de garantizar la estabilidad del sistema antes de un evento crítico (demo, auditoría, lanzamiento, reunión de revisión). Solo están permitidas correcciones de errores graves y actualizaciones de documentación. En este proyecto: el code freeze arranca el sábado 25/07/2026 y se mantiene hasta después de la revisión técnica del lunes 27/07.
 
 **CI/CD (Continuous Integration / Continuous Deployment — Integración y Despliegue Continuos)**  
@@ -851,8 +885,104 @@ Métrica que mide la calidad de la interacción de una audiencia con el contenid
 **Algoritmo de LinkedIn**
 Sistema automatizado que decide qué publicaciones ve cada usuario en su feed. Prioriza contenido que genera engagement temprano (primeros 60-90 minutos), publicaciones de contactos de primer y segundo grado, y posts que retienen al usuario en la plataforma (sin URLs externas en el cuerpo del post). Penaliza publicaciones muy cortas sin sustancia o posts con muchos hashtags irrelevantes.
 
-**Calendario Editorial**
-Planificación anticipada de las fechas, horarios y contenidos de publicación en redes sociales. Permite mantener una cadencia consistente sin agotarse. En este proyecto: alternancia entre semanas de 2 posts (martes 8:00 + jueves 12:30) y semanas de 1 post (miércoles 9:00), adaptando el ritmo al avance real del desarrollo sin inventar hitos técnicos.
+**Impresiones (Impressions)**  
+Número total de veces que una publicación es proyectada en la pantalla del dispositivo (móvil o PC) de un usuario mientras navega por su feed de noticias. Si un mismo usuario visualiza la publicación dos veces en momentos diferentes, contabiliza como dos impresiones.
+
+**Miembros Alcanzados (Reach / Unique Members)**  
+Número de usuarios reales e individuales que han visualizado la publicación en su pantalla al menos una vez. Representa el indicador de alcance único real, diferenciándose de las impresiones acumuladas.
+
+**Alcance fuera de red (Out-of-Network Reach)**  
+Proporción de usuarios alcanzados por una publicación que no forman parte de los contactos directos (1er grado) ni seguidores del autor. Un porcentaje elevado de alcance fuera de red indica que el algoritmo de la plataforma ha recomendado activamente el contenido debido a interacciones de alta autoridad (comentarios de perfiles sénior o relevantes en el sector).
+
+**Consumo Pasivo (Lurking / Silent Engagement)**  
+Fenómeno de comportamiento en redes profesionales donde aproximadamente el 90% de los usuarios (especialmente perfiles directivos, reclutadores e ingenieros sénior) consumen, leen y evalúan el contenido técnico sin realizar interacciones explícitas (likes o comentarios), influyendo de forma silenciosa en la reputación y posicionamiento del desarrollador.
+
+**React**  
+Librería de JavaScript (mantenida por Meta) para construir interfaces de usuario de forma declarativa y eficiente. Su filosofía se basa en dividir la interfaz en múltiples "Componentes" independientes y gestionar las actualizaciones de pantalla mediante un Virtual DOM, minimizando las recargas y mejorando el rendimiento.
+
+**Vite**  
+Herramienta de empaquetado (Bundler) y servidor de desarrollo moderno para proyectos web. Destaca por su extrema velocidad de arranque y actualización de módulos en caliente (*Hot Module Replacement*), logrando que cualquier cambio en el código se refleje instantáneamente en el navegador sin recargar la página.
+
+**PWA (Progressive Web App)**  
+Aplicación web que utiliza capacidades web modernas (como Service Workers y un `manifest.json`) para ofrecer una experiencia similar a una aplicación móvil nativa. Permite ser instalada directamente desde el navegador en la pantalla de inicio del teléfono, eludiendo las tiendas de aplicaciones tradicionales (App Store / Google Play).
+
+**Service Worker**  
+Script (archivo de código) que el navegador ejecuta en un hilo en segundo plano, separado de la página web principal. Actúa como un proxy de red, permitiendo interceptar peticiones, gestionar el almacenamiento en caché para funcionar sin conexión a internet y recibir notificaciones push.
+
+**Canvas API**  
+Interfaz de programación nativa de HTML5 que proporciona un medio para dibujar gráficos 2D dinámicamente mediante JavaScript. En este proyecto (`[D-034]`), se emplea como barrera de privacidad (*Client-Side Blackout Tool*) para que el usuario pueda tachar o manipular los píxeles de una fotografía localmente en la memoria de su navegador antes de transmitirla a los servidores.
+
+**Componente (UI)**  
+En arquitecturas como React, es una pieza de código independiente, aislada y reutilizable que representa una parte visual de la interfaz (ej: un botón, un menú lateral o un formulario). Los componentes encapsulan su propia estructura (HTML), estilo (CSS) y lógica (JavaScript).
+
+**Virtual DOM**  
+Representación en memoria (una copia ligera) del DOM (Document Object Model) real del navegador. Cuando los datos de una aplicación cambian, React primero actualiza este DOM virtual, calcula la diferencia exacta (*diffing*) con la versión anterior, y luego aplica únicamente esos cambios específicos en la pantalla real, logrando transiciones extremadamente rápidas.
+
+**Script**  
+Archivo de texto que contiene una secuencia de comandos o instrucciones escritas en un lenguaje de programación (como JavaScript o Python) que un motor de ejecución o navegador interpreta y ejecuta paso a paso.
+
+**Empaquetador (Bundler)**  
+Herramienta de desarrollo (como Vite o Webpack) que toma cientos de archivos individuales de código fuente (JavaScript, CSS, imágenes) y sus dependencias, y los combina, minimiza y optimiza en unos pocos archivos estáticos listos para ser servidos de forma eficiente en un entorno de producción.
+
+**Servidor (Server)**  
+Programa informático (o máquina física/virtual que lo ejecuta) diseñado para escuchar peticiones a través de una red, procesarlas y devolver una respuesta. En desarrollo Frontend, el "servidor de desarrollo" (ej: el que levanta Vite) aloja la página web localmente para que el programador pueda ver los cambios en tiempo real en `http://localhost`.
+
+**Linter (ej. ESLint)**  
+Herramienta de análisis estático de código que escanea el texto del programa en busca de errores de sintaxis, vulnerabilidades o violaciones de las convenciones de estilo del equipo. Actúa como un corrector ortográfico y gramatical para programadores. En el ecosistema React, ESLint es el estándar absoluto de la industria.
+
+**Gestor de Paquetes / Package Manager (ej. npm)**  
+Herramienta (como `npm`, `yarn` o `pnpm`) que automatiza la instalación, actualización y gestión de las librerías de terceros (dependencias) de las que depende un proyecto. En Node.js, `npm` (Node Package Manager) lee el archivo `package.json` y descarga todo lo necesario en la carpeta `node_modules`.
+
+**Vanilla CSS**  
+Escribir hojas de estilo en cascada de forma nativa y pura, apoyándose directamente en los estándares de la web (W3C), sin utilizar librerías o *frameworks* de terceros (como Tailwind CSS o Bootstrap) para abstraer el diseño.
+
+**Glassmorphism**  
+Tendencia estética en el diseño de interfaces de usuario (UI) que emula el aspecto del cristal esmerilado translúcido. Técnicamente se consigue aplicando desenfoques de fondo (con la propiedad `backdrop-filter: blur()`) sobre elementos semitransparentes, generando sensación de profundidad y jerarquía visual.
+
+**Hot Module Replacement (HMR)**  
+Mecanismo de las herramientas de empaquetado modernas (como Vite) que permite reemplazar, añadir o eliminar módulos de código en el navegador web en tiempo real, mientras la aplicación se está ejecutando, sin necesidad de recargar la página completa ni perder el estado actual de la sesión.
+
+**Interfaz (de Usuario / UI)**  
+Espacio de interacción, visual y táctil, mediante el cual un usuario humano se comunica con un sistema informático o software (en nuestro proyecto, la PWA visible en el navegador).
+
+**Framework (Marco de Trabajo)**  
+Entorno que proporciona una estructura de código predefinida y un conjunto de reglas estandarizadas para desarrollar software más rápido (ej: React en el frontend, FastAPI en el backend). A diferencia de una simple librería, un framework suele dictar la arquitectura general de la aplicación (*inversión de control*).
+
+**Propiedades CSS (Variables / Custom Properties)**  
+Entidades definidas por el desarrollador en hojas de estilo (ej: `--bg-primary`) que contienen valores específicos (como un código de color) y pueden reutilizarse en todo el documento. Son el pilar técnico para implementar "Sistemas de Diseño" y "Modos Oscuros" de forma eficiente y centralizada.
+
+**Plugin**  
+Módulo o extensión de software que se añade a un programa principal (como Vite o el navegador) para dotarlo de una función específica adicional sin necesidad de alterar su código base. Por ejemplo, `vite-plugin-pwa` inyecta automáticamente toda la lógica de aplicaciones progresivas en Vite.
+
+**Certificado (SSL/HTTPS Autofirmado)**  
+Archivo criptográfico digital que vincula una clave segura a la identidad de un servidor, permitiendo que la conexión entre el navegador y el sistema esté encriptada (HTTPS). En entornos de desarrollo local, se "autofirman" (el propio desarrollador los genera, como hace `@vitejs/plugin-basic-ssl`), lo que provoca que el navegador emita una advertencia por no estar avalados por una entidad certificadora pública externa, aunque la conexión sigue estando 100% cifrada.
+
+**PII (Personally Identifiable Information)**  
+Información de Identificación Personal. En el contexto del RGPD (GDPR) y la educación, abarca cualquier dato que pueda usarse para distinguir o rastrear la identidad de un individuo (nombres, DNI, rostros, firmas). En este proyecto, la eliminación de PII en origen (*Client-Side Redaction*) es obligatoria antes de procesar exámenes con IA.
+
+**Metodologías Agile (Ej. Scrum, Kanban)**  
+Conjunto de marcos de trabajo para el desarrollo de software basados en la adaptabilidad, la entrega continua y el desarrollo iterativo. Fomentan respuestas rápidas a los cambios (pivotes) por encima de seguir un plan rígido. En Agile, el historial de un *backlog* no se borra ni se reescribe para "ocultar" los cambios de rumbo, sino que se documenta (cancelando o aplazando tickets) para mantener la trazabilidad de las decisiones del equipo a lo largo del tiempo.
+
+**Client-Side Redaction (Censura en el Cliente)**  
+Técnica de ciberseguridad y privacidad donde la ocultación o eliminación de datos sensibles (PII) se realiza directamente en el dispositivo del usuario (el navegador web o app), antes de que la información sea transmitida a cualquier servidor externo. Garantiza que la información sensible nunca viaja por la red.
+
+**Zero Data Retention (Retención de Datos Cero)**  
+Política estricta de cumplimiento normativo (fundamental en IA y manejo de datos médicos/menores) que asegura que un sistema no almacena ni guarda en disco ningún dato procesado una vez finalizada la transacción o inferencia. En nuestra arquitectura, se aplica combinando *Client-Side Redaction* con un procesamiento efímero en RAM por parte del LLM.
+
+**Canvas API (HTML5)**  
+Interfaz de programación de los navegadores web modernos que proporciona un medio para dibujar gráficos, manipular fotografías o renderizar animaciones usando JavaScript y el elemento HTML `<canvas>`. En nuestro proyecto, es la barrera cripto-visual que permite tachar/censurar los nombres de los alumnos en el cliente sin que lleguen al backend (Zero Data Retention).
+
+**DOM (Document Object Model)**  
+Interfaz de programación estándar (API) que los navegadores web utilizan para representar un documento HTML. Transforma el código HTML estático en una estructura de árbol en vivo (nodos) donde cada etiqueta (como un `<div>` o un `<h1>`) es un objeto que puede ser modificado matemáticamente usando JavaScript.
+
+**Virtual DOM**  
+Representación en memoria (ligera y rápida) del Document Object Model (DOM) real de una página web. Frameworks como React utilizan el Virtual DOM para calcular eficientemente qué partes exactas de la interfaz han cambiado, actualizando en la pantalla real únicamente esas piezas (componentes) en lugar de recargar toda la página entera.
+
+**Vitest (y JSDOM)**  
+Framework de pruebas unitarias ultrarrápido creado para el ecosistema Vite. Permite verificar que el código frontend funciona sin necesidad de arrancar la aplicación completa. Para poder simular que el código se ejecuta en un navegador real, Vitest se apoya en **JSDOM**, una librería de Node que emula matemáticamente objetos como `window` o `document`.
+
+**Vendor Prefix (Prefijos de proveedor CSS)**  
+Extensiones de sintaxis (como `-webkit-`, `-moz-` o `-ms-`) que los navegadores web añaden a las propiedades CSS que aún están en fase experimental o no han sido estandarizadas formalmente por la W3C. La buena práctica dicta usarlas como respaldo y acompañarlas de la propiedad estándar equivalente.
 
 ---
 
@@ -861,5 +991,6 @@ Planificación anticipada de las fechas, horarios y contenidos de publicación e
 *Actualizado el 10/08/2026 — Añadidos TrOCR y PaddleOCR como candidatos Capa 1 PII pre-nube (`[Roadmap-002]`), contrastados con la decisión de Groq Vision para v0.3.*  
 *Actualizado el 11/08/2026 — Añadido Workload Routing al glosario tras el pivote D-051.*  
 *Actualizado el 12/08/2026 — Añadidos conceptos de IA moderna: AI-Augmented Engineering, Agentic Coding y SOTA.*  
+*Actualizado el 21/08/2026 — Añadidos conceptos de analítica de posicionamiento técnico: Impresiones, Miembros Alcanzados, Alcance fuera de red y Consumo Pasivo (Lurking).*
 *Actualizado el 19/08/2026 — Añadida sección 13 (Marca Personal y Comunicación Digital) con conceptos de ghostwriting, hook, CTA, Build in Public, engagement y algoritmo de LinkedIn.*
 

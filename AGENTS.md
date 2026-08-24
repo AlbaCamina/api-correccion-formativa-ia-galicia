@@ -6,9 +6,10 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
 
 ## 🎯 Reglas de Codificación "PonyTail" (YAGNI & Simplicidad)
 
-1. **Principio YAGNI (*You Aren't Gonna Need It*):** 
+1. **Principio YAGNI (*You Aren't Gonna Need It*) & Gestión del Alcance (*Scope Management*):** 
    * Escribe el código estrictamente necesario para cumplir con los criterios de aceptación del backlog actual.
    * Evita abstraer para el futuro, herencias complejas o "patrones de diseño por si acaso".
+   * **Control de Alcance (*Scope Creep*):** Cualquier idea o funcionalidad tentadora no imprescindible para el hito presente (ej. generación de exámenes o modelos de prueba) **se aparca inmediatamente en `backlog.md` para versiones futuras**, protegiendo el foco del sprint actual.
 2. **Modularidad Plana:**
    * Prioriza la legibilidad directa del flujo sobre la fragmentación en micro-funciones o micro-archivos redundantes.
    * Estructura del backend en 4 carpetas: `models/` (esquemas y BBDD), `routers/` (endpoints y routing), `services/` (lógica y prompts de LLM) y `main.py` (inicio y middleware).
@@ -39,13 +40,14 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
      3. ¿El contenido contradice alguna decisión ya adoptada en `decisiones.md`? Si es así, aplicar el Protocolo de Pausa Arquitectónica (D-029) en lugar de entregar el texto contradictorio.
      4. ¿El texto final dice exactamente lo que se pretendía, sin restos del proceso de razonamiento intermedio?
    * **Consecuencias:** Esta regla añade una pausa deliberada de calidad antes de la entrega, igual que D-029 la añade antes de parchear código. No sustituye la revisión humana final, pero reduce la probabilidad de que lleguen a ella errores mecánicos evitables.
-8. **Estandarización de Commits y Trazabilidad:**
+8. **Estandarización de Commits, Trazabilidad y Mantenibilidad a 6 Meses:**
    * Todos los commits deben seguir estrictamente el formato *Conventional Commits* (`feat:`, `fix:`, `docs:`, `style:`, `test:`) incluyendo el contexto de la modificación entre paréntesis (scope).
-   * Es **obligatorio** incluir en el mensaje del commit la referencia cruzada al registro arquitectónico (ej. `[D-035]`) o a la tarea del backlog (ej. `[v0.2-009]`) que motiva el cambio, garantizando la trazabilidad probatoria del portfolio.
+   * Es **obligatorio** incluir en el mensaje del commit la referencia cruzada al registro arquitectónico (ej. `[D-035]`) o a la tarea del backlog (ej. `[v0.2-009]`) que motiva el cambio.
+   * **Brújula de Coherencia Arquitectónica (Recomendación de Fernando - Quantia):** Toda documentación (ADRs, Issues y Commits) se diseña para superar la *"Prueba de los 6 Meses"*: garantizar que cualquier desarrollador o tu "yo del futuro" entienda la razón de ser del código y mantenga 100% la fidelidad a la filosofía del proyecto.
 9. **Defensa contra Context Overflow y Lost in the Middle:**
    * El agente debe estructurar grandes bloques de texto usando delimitadores `<xml>` para facilitar la atención del modelo.
    * Al construir prompts en el backend (`prompt_builder.py`), el agente aplicará **Prompt Anchoring**, repitiendo las reglas inquebrantables (como el retorno estricto de JSON o la Simetría Lingüística del alumno) estrictamente al final del prompt.
-   * En sesiones de desarrollo prolongadas, si el orquestador humano exige un *"Context Reset"*, el agente generará un resumen de cierre para iniciar una sesión nueva en limpio.
+   * En sesiones de desarrollo prolongadas, si el orquestador humano exige un *"Context Reset"`, el agente generará un resumen de cierre para iniciar una sesión nueva en limpio.
 
 ---
 

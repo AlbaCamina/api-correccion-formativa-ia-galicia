@@ -65,6 +65,8 @@
 | [D-052](#d-052) | Asignación determinista de la cualitativa ESO en el backend (umbral de suelo); la regla de redondeo al entero de boletín es configuración de centro | Ago 2026 | ✅ Adoptada |
 | [D-053](#d-053) | Unificación del motor LLM en OpenAI (`gpt-4o-mini`) para texto e imagen tras deprecación de `llama-3.3-70b-versatile` en Groq y fallo de Qwen con JSON complejo | Ago 2026 | ✅ Adoptada |
 | [D-054](#d-054) | Limitación conocida del RAG Determinista v1: ausencia de materiales didácticos del docente como contexto evaluativo | Ago 2026 | ✅ Adoptada |
+| [D-058](#d-058) | Stack Frontend: React + Vite + PWA como elección canónica para la interfaz del profesor | Ago 2026 | ✅ Adoptada |
+| [D-059](#d-059) | Estrategia de diseño UI: Glassmorphism oscuro + tokens CSS como sistema de diseño del frontend | Ago 2026 | ✅ Adoptada |
 
 ---
 
@@ -1196,6 +1198,86 @@ Se formaliza la Estrategia Dual de Testing. En la v0.5 (`[v0.5-007]`), se config
 
 ---
 
+### D-057
+## Panel de Declaración de Residuo Pedagógico en la UI Human-in-the-Loop (Frontend v0.5)
+
+**Fecha:** Agosto 2026 (21/08/2026)  
+**Estado:** ✅ Adoptada  
+**Inspirado por / Agradecimientos:** Nicolás Rocchia (`disensor.dev` / Pelatech) por el concepto de *Declaración de Residuo* y crítica a las métricas cosméticas.
+
+**Contexto:**  
+En la evaluación asistida por IA, mostrar un aviso genérico de "Pendiente de aprobación" puede inducir al docente a validar la nota en piloto automático (falsa seguridad por *métricas cosméticas*). Inspirado en el concepto de *Declaración de Residuo* (`disensor.dev`, Nicolás Rocchia), el sistema debe exponer explícitamente qué puntos de la corrección contienen incertidumbre o requieren inspección humana consciente.
+
+**Opciones consideradas:**
+1. **Aviso genérico de revisión HitL:** Mostrar únicamente el botón de "Aprobar" sin desglose de incertidumbres. *Descartada:* Riesgo de aprobación desatenta por el docente.
+2. **Re-evaluación adversarial multi-LLM obligatoria:** Ejecutar dos llamadas a distintos modelos (ej. OpenAI + Claude) por cada examen. *Descartada por YAGNI:* Duplica costes, tiempo de latencia y riesgo de alucinaciones en el modelo revisor.
+3. **Panel de Declaración de Residuo Pedagógico en la UI HitL (v0.5):** Agrupar y presentar explícitamente en la cabecera del panel de revisión del docente la información que el backend ya calcula (`confidence_score < 0.7`, adaptaciones NEAE aplicadas en `errores_excluidos_por_adaptacion` y brechas en `teacherSummary`), exigiendo una validación consciente antes de la firma. *Elegida.*
+
+**Decisión:**  
+Se adopta la Declaración de Residuo Pedagógico para la interfaz de la v0.5 (`[v0.5-003]`). Sin modificar el contrato ni añadir endpoints adicionales al backend, la PWA del profesor destacará de forma transparente los ítems con incertidumbre de lectura o exenciones normativas para guiar su atención en 5 segundos.
+
+**Consecuencias:**  
+1. Cero incremento de latencia o costes en el motor backend.
+2. Aumento significativo del valor pedagógico y de compliance (transparencia y trazabilidad del HitL).
+3. Eliminación del riesgo de aprobación por piloto automático en la interfaz.
+
+---
+
+### D-058
+## Stack Frontend: React + Vite + PWA como elección canónica
+
+**Fecha:** Agosto 2026 (24/08/2026)  
+**Estado:** ✅ Adoptada
+
+**Contexto:**  
+El hito `v0.5` requiere una interfaz visual que funcione en el móvil del profesor (para captura de exámenes con la cámara), en tablet y en escritorio (para revisar y aprobar correcciones). La interfaz debe poder instalarse como aplicación nativa desde el navegador, sin pasar por ninguna tienda de aplicaciones, para facilitar la distribución en centros educativos.
+
+**Decisión:**  
+Se adopta **React + Vite** como framework y bundler del frontend, configurado como **Progressive Web App (PWA)** mediante `vite-plugin-pwa`. Para el HTTPS local (imprescindible para activar la API de cámara del navegador en dispositivos reales durante el desarrollo), se adopta **`@vitejs/plugin-basic-ssl`** en lugar de `vite-plugin-mkcert`, ya que en Windows `mkcert` requiere permisos de Administrador que pueden fallar silenciosamente y no está disponible en los entornos de CI sin configuración adicional.
+
+**Alternativas descartadas:**
+- **Next.js:** Introduce routing complejo (App Router) y SSR que no son necesarios para esta SPA de panel de trabajo. YAGNI.
+- **SvelteKit:** Menor ecosistema de componentes y menor familiaridad del equipo para el portfolio.
+- **`vite-plugin-mkcert`:** Falló en el entorno Windows del proyecto por restricciones de permisos del sistema operativo. Descartado en favor del plugin básico oficial de Vite.
+
+**Consecuencias:**
+- La rama `v0.5-frontend-pwa` contiene el scaffold inicial en la carpeta `frontend/`.
+- El HTTPS estricto en producción se gestionará mediante el certificado del servidor de despliegue (Render, Fly.io, etc.), no mediante el plugin de desarrollo.
+- En dispositivos reales conectados al Wi-Fi local, se accede mediante `https://<IP-local>:5173` aceptando la excepción de seguridad del certificado autofirmado.
+
+**Referencia cruzada:** D-007 (PWA estrategia móvil), D-008 (Stack general), `[v0.5-001]`.
+
+---
+
+### D-059
+## Estrategia de diseño UI: Sistema de tokens CSS + Glassmorphism oscuro
+
+**Fecha:** Agosto 2026 (24/08/2026)  
+**Estado:** ✅ Adoptada
+
+**Contexto:**  
+El panel de trabajo del profesor es un entorno de uso prolongado y concentrado. Se requiere una interfaz que reduzca la fatiga visual, transmita seriedad profesional (contexto educativo e institucional gallego) y sea funcional tanto en condiciones de buena iluminación (aula con proyector) como en condiciones de luz variable (corrección en casa).
+
+**Decisión:**  
+Se adopta un **sistema de diseño basado en Vanilla CSS con variables (Custom Properties)** como único mecanismo de estilo, sin frameworks CSS externos (no Tailwind, no Bootstrap). El sistema utiliza:
+- **Modo oscuro profundo** (`--bg-primary: #0f111a`) como base para reducir la fatiga visual en sesiones largas de corrección.
+- **Glassmorphism controlado** (`backdrop-filter: blur`) para los paneles de trabajo, creando jerarquía visual sin sobrecarga cognitiva.
+- **Tipografía Outfit** (Google Fonts) como fuente principal, que combina legibilidad funcional con personalidad técnica.
+- **Tokens de color semánticos** (`--color-success`, `--color-warning`, `--color-error`) mapeados a los estados del flujo HitL (ANALYZING, REVIEW, GRADED).
+
+**Alternativas descartadas:**
+- **TailwindCSS:** Introduce dependencia de compilación y curva de aprendizaje. Para un único desarrollador con control total del diseño, Vanilla CSS es más predecible y directo. YAGNI.
+- **Modo claro:** Descartado como default por mayor fatiga visual en uso prolongado. Podría añadirse como preferencia de sistema (`prefers-color-scheme`) en versiones futuras.
+
+**Consecuencias:**
+- Todas las variables del sistema de diseño están centralizadas en `frontend/src/index.css`.
+- Cualquier componente nuevo debe usar las variables existentes en lugar de valores hardcoded de color o tipografía.
+- La accesibilidad (contraste WCAG AA) debe verificarse en sprint `v0.5` antes del despliegue público.
+
+**Referencia cruzada:** D-007 (PWA), D-034 (Blackout Tool en Canvas), `[v0.5-001]`.
+
+---
+
 *Documento creado el 08/07/2026 — Alba Camiña García con la ayuda de Antigravity AI*  
 *Actualizado el 28/07/2026 — añadida D-050*  
 *Actualizado el 11/08/2026 — añadida D-051 (Pivote arquitectónico a OpenAI para Visión manteniendo Groq para Texto).*  
@@ -1204,5 +1286,8 @@ Se formaliza la Estrategia Dual de Testing. En la v0.5 (`[v0.5-007]`), se config
 *Actualizado el 18/08/2026 — añadida D-054 (Limitación conocida del RAG Determinista v1 y planificación de RAG Semántico con materiales docentes como Roadmap-005).*  
 *Actualizado el 20/08/2026 — añadida D-055 (Arquitectura de evaluación asíncrona mediante FastAPI BackgroundTasks).*  
 *Actualizado el 20/08/2026 — añadida D-056 (Estrategia dual de testing: SQLite en RAM para TDD local y PostgreSQL en Docker para CI/CD).*  
-*Total de decisiones registradas: 56*
+*Actualizado el 21/08/2026 — añadida D-057 (Panel de Declaración de Residuo Pedagógico en la UI Human-in-the-Loop).*  
+*Actualizado el 24/08/2026 — añadidas D-058 (Stack Frontend React+Vite+PWA) y D-059 (Sistema de diseño UI Glassmorphism).*  
+*Total de decisiones registradas: 59*
+
 

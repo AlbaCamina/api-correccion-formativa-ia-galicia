@@ -1,0 +1,131 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+/* =========================================
+   Sistema de Diseño (Tokens)
+   ========================================= */
+:root {
+  /* Paleta de Colores - Dark Mode por defecto (Premium) */
+  --bg-primary: #0f111a;
+  --bg-secondary: #1a1d2d;
+  --bg-glass: rgba(26, 29, 45, 0.7);
+
+  --text-primary: #f8f9fa;
+  --text-secondary: #a0a4b8;
+
+  /* Acentos vibrantes */
+  --accent-primary: #6366f1;
+  /* Indigo */
+  --accent-hover: #4f46e5;
+  --accent-glow: rgba(99, 102, 241, 0.3);
+
+  /* Semántica de Evaluación */
+  --color-success: #10b981;
+  /* Fortalezas */
+  --color-warning: #f59e0b;
+  /* Mejoras medio plazo */
+  --color-danger: #ef4444;
+  /* Errores inmediatos */
+
+  /* Tipografía */
+  --font-family: 'Outfit', system-ui, sans-serif;
+
+  /* Sombras y Bordes */
+  --shadow-glass: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  --border-glass: 1px solid rgba(255, 255, 255, 0.08);
+  --radius-md: 12px;
+  --radius-lg: 16px;
+}
+
+/* =========================================
+   Reset y Estilos Base
+   ========================================= */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-family);
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.6;
+  min-height: 100vh;
+  /* Fondo sutilmente radial para dar profundidad */
+  background-image: radial-gradient(circle at top right, #1f2235, transparent 40%);
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+/* =========================================
+   Layout Principal
+   ========================================= */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 2rem;
+  max-width: 1440px;
+  margin: 0 auto;
+}
+
+.app-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.app-header h1 {
+  font-size: 2.5rem;
+  background: linear-gradient(to right, #a5b4fc, #6366f1);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 0.5rem;
+}
+
+.app-header p {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+/* =========================================
+   Componentes de Diseño (Glassmorphism)
+   ========================================= */
+.glass-panel {
+  background: var(--bg-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: var(--border-glass);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: var(--shadow-glass);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.glass-panel:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.45);
+}
+
+.glass-panel h2 {
+  margin-bottom: 1rem;
+  color: #fff;
+}
+
+/* =========================================
+   Responsive
+   ========================================= */
+@media (max-width: 768px) {
+  .app-container {
+    padding: 1rem;
+  }
+
+  .app-header h1 {
+    font-size: 2rem;
+  }
+}
