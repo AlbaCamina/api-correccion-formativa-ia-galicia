@@ -15,6 +15,7 @@ API de Corrección Formativa con IA diseñada para asistir al profesorado de Fil
 *   **Alineamiento Curricular Gallego:** Diseñada específicamente sobre las competencias clave, competencias específicas y criterios de evaluación de la materia de Filosofía de Bachillerato definidos por la Xunta de Galicia (`[D-027] Modo Dual de Rúbrica`).
 *   **Deslinde Formativo vs Sumativo (HitL):** El sistema no califica de forma fría ni automática; realiza un desglose cualitativo por rúbricas pedagógicas, devuelve un **Siguiente Paso Accionable (Feed Forward)** y un **Índice de Confianza IA** para evitar alucinaciones. El docente siempre conserva la soberanía y firma la nota (`[D-002]`).
 *   **Blindaje de Privacidad y Seguridad (Stealth/Phase Ninja):** Seudonimización estricta del alumnado en la nube (`alumno_id = "A-14"`) sin cifrado de columnas frágil (`[D-031]`). La libreta de equivalencia con la identidad real del menor reside en exclusiva en el cuaderno local de la profesora, y la autenticación docente se resguarda con hacheo unidireccional irreversible `bcrypt` + sesiones `JWT`.
+*   **Zero Data Retention (Client-Side Redaction):** Antes de enviar ninguna fotografía al backend, la aplicación web progresiva (PWA) permite censurar los nombres manuscritos directamente en el navegador del docente usando la Canvas API (`[D-034]`). Los píxeles originales se destruyen en la memoria RAM local; la PII jamás viaja por la red ni toca los servidores de IA.
 *   **Resiliencia y Optimización FinOps:** Unificación del motor en OpenAI (`gpt-4o-mini`) para texto y visión (`[D-053]`), garantizando *Structured Outputs* nativos para el 100% de cumplimiento del esquema `EvaluacionIA` tras la deprecación de los modelos compatibles en Groq. La cualitativa ESO se asigna de forma determinista en el backend (`[D-052]`), sin depender del criterio del LLM.
 
 ---
@@ -73,10 +74,25 @@ uvicorn backend.main:app --reload --host 127.0.0.1 --port 8000
 
 El servidor estará accesible en `http://127.0.0.1:8000`. Puedes consultar la documentación interactiva Swagger UI en `http://127.0.0.1:8000/docs`.
 
-### 6. Ejecutar la Suite de Pruebas
+### 6. Ejecutar la Suite de Pruebas (Backend)
 
 ```bash
 venv/bin/pytest backend/tests/ -v
+```
+
+### 7. Ejecutar el Frontend (React PWA)
+
+La interfaz gráfica del profesor está desarrollada en React + Vite y se ejecuta de forma independiente. Incorpora HTTPS local para poder usar la cámara desde el móvil en la misma red Wi-Fi (`[D-058]`).
+
+```bash
+cd frontend
+npm install
+npm run dev -- --host
+```
+
+La interfaz estará disponible en `https://localhost:5173`. Para testear los componentes visuales:
+```bash
+npx vitest run
 ```
 
 ---

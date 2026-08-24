@@ -672,11 +672,11 @@
 **para** enviar el examen al sistema sin importar qué dispositivo use.
 
 **Criterios de aceptación:**
-- [ ] En móvil/tablet: botón para capturar uno o múltiples folios con la cámara trasera
-- [ ] En PC: input de subida de archivos múltiples (JPG, PNG) o documento PDF multi-página
-- [ ] Compresión y redimensión en cliente [D-020]: las imágenes se reducen automáticamente a ~2048px en su lado largo (~800 KB) antes del envío
+- [x] En móvil/tablet: botón para capturar uno o múltiples folios con la cámara trasera
+- [x] En PC: input de subida de archivos (JPG, PNG) 
+- [x] Compresión y redimensión en cliente [D-020]: las imágenes se reducen automáticamente a ~2048px en su lado largo (~800 KB) antes del envío
 - [ ] Seudonimización en cliente [`D-022`]: recorte automático de la cabecera superior (primeros 3 cm) sobre el Canvas
-- [ ] **`[D-034]` Herramienta de Tampón/Blackout Box:** vista previa pre-subida donde el docente puede arrastrar recuadros negros adicionales con el dedo o ratón sobre cualquier nombre desplazado al pie, lateral o centro del folio. Los píxeles se destruyen en el navegador antes del `fetch` a la nube
+- [x] **`[D-034]` Herramienta de Tampón/Blackout Box:** vista previa pre-subida donde el docente puede arrastrar recuadros negros adicionales con el dedo o ratón sobre cualquier nombre desplazado al pie, lateral o centro del folio. Los píxeles se destruyen en el navegador antes del `fetch` a la nube
 - [ ] Vista previa y reordenación de folios antes de confirmar
 - [ ] **Selector obligatorio de `etapa` (ESO/BACH):** La interfaz bloquea el envío y exige seleccionar la etapa educativa, alineándose con el *Breaking Change* de backend (`[D-041]`) para prevenir errores HTTP 422.
 - [ ] Botón de envío que transmite el array y datos a `POST /api/v1/submissions`

@@ -984,6 +984,18 @@ Framework de pruebas unitarias ultrarrápido creado para el ecosistema Vite. Per
 **Vendor Prefix (Prefijos de proveedor CSS)**  
 Extensiones de sintaxis (como `-webkit-`, `-moz-` o `-ms-`) que los navegadores web añaden a las propiedades CSS que aún están en fase experimental o no han sido estandarizadas formalmente por la W3C. La buena práctica dicta usarlas como respaldo y acompañarlas de la propiedad estándar equivalente.
 
+**Condición de Carrera (Race Condition)**  
+Un tipo de error o vulnerabilidad en sistemas concurrentes o asíncronos que ocurre cuando el comportamiento del software depende de la secuencia o el tiempo en que se ejecutan los eventos. En React, ocurre típicamente cuando intentamos manipular un elemento del DOM (como inyectar un vídeo) *antes* de que el motor de renderizado haya terminado de dibujarlo en la pantalla.
+
+**React Hooks (`useEffect` / `useRef`)**  
+Funciones especiales introducidas en React 16.8 que permiten "engancharse" al estado y al ciclo de vida de los componentes funcionales. `useRef` permite mantener una referencia directa a un elemento físico del DOM (como la etiqueta `<video>`), mientras que `useEffect` permite ejecutar código "después" de que React haya renderizado la pantalla, siendo el lugar seguro y correcto para interactuar con APIs externas o hardware.
+
+**Fallback (Graceful Degradation)**  
+Estrategia de diseño de software (Degradación Elegante) que asegura que un sistema siga funcionando, aunque sea con capacidades limitadas o una interfaz más básica, cuando falla una característica principal o el dispositivo no la soporta. Por ejemplo: intentar abrir la "cámara trasera" del móvil y, si falla porque estamos en un PC, hacer un *fallback* encendiendo la cámara web frontal.
+
+**WebRTC / MediaDevices API (`getUserMedia`)**  
+Interfaz de programación nativa de los navegadores web modernos que permite a las aplicaciones acceder al hardware multimedia del dispositivo (micrófono, cámara web o pantalla compartida) tras obtener el consentimiento explícito del usuario. Por motivos de seguridad y privacidad, los navegadores bloquean terminantemente esta API si la página no se sirve bajo protocolo seguro HTTPS o desde `localhost`.
+
 ---
 
 *Glosario creado el 09/07/2026 — Antigravity para Alba Camiña García*  

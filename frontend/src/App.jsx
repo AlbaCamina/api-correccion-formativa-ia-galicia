@@ -1,5 +1,5 @@
 import './index.css';
-
+import CameraCapture from './components/CameraCapture';
 function App() {
   return (
     <div className="app-container">
@@ -10,8 +10,7 @@ function App() {
       
       <main className="app-main">
         <div className="glass-panel">
-          <h2>Panel de Trabajo</h2>
-          <p>El lienzo está en blanco y listo para construir la interfaz v0.5.</p>
+          <CameraCapture />
         </div>
       </main>
     </div>
