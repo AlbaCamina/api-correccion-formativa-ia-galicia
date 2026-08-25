@@ -27,12 +27,12 @@
 | [D-010](#d-010) | Fase Ninja — no alta de autónomos durante el desarrollo | Jul 2026 | ✅ Adoptada |
 | [D-011](#d-011) | Claims legales: "alineado con principios", no "cumple" | Jul 2026 | ✅ Adoptada |
 | [D-012](#d-012) | Entorno de ejecución: WSL (Ubuntu) en Windows | Jul 2026 | ✅ Adoptada |
-| [D-013](#d-013) | Stack de agentes: Antigravity (arquitectura) + OpenCode (implementación) | Jul 2026 | ✅ Adoptada |
+| [D-013](#d-013) | Stack de agentes: Antigravity Multimodelo (Gemini Advanced + Claude) + Perplexity | Jul 2026 | ✅ Adoptada |
 | [D-014](#d-014) | Workspace único con subcarpeta `backend/` + `AGENTS.md` | Jul 2026 | ✅ Adoptada |
 | [D-015](#d-015) | Narrativa portfolio: arquitecta/orquestadora, no usuaria de IA | Jul 2026 | ✅ Adoptada |
 | [D-016](#d-016) | Smoke test del contrato LLM como prerequisito de v0.1 | Jul 2026 | ✅ Adoptada |
 | [D-017](#d-017) | Sección Compliance solo en README de v1.0, no de v0.1 | Jul 2026 | ✅ Adoptada |
-| [D-018](#d-018) | Modelos LLM en OpenCode: Gemini Flash (default) + Groq | Jul 2026 | ✅ Adoptada |
+| [D-018](#d-018) | Pivote desde OpenCode a IDE unificado por fricción de tokens en CLI | Jul 2026 | ✅ Adoptada |
 | [D-019](#d-019) | Primer commit y push a GitHub con la documentación antes del código | Jul 2026 | ✅ Adoptada |
 | [D-020](#d-020) | Compresión y redimensión en cliente antes de subir exámenes al servidor | Jul 2026 | ✅ Adoptada |
 | [D-021](#d-021) | Custodia legal en Cold Storage de nube y purga por ciclo de vida RGPD | Jul 2026 | ✅ Adoptada |
@@ -67,6 +67,8 @@
 | [D-054](#d-054) | Limitación conocida del RAG Determinista v1: ausencia de materiales didácticos del docente como contexto evaluativo | Ago 2026 | ✅ Adoptada |
 | [D-058](#d-058) | Stack Frontend: React + Vite + PWA como elección canónica para la interfaz del profesor | Ago 2026 | ✅ Adoptada |
 | [D-059](#d-059) | Estrategia de diseño UI: Glassmorphism oscuro + tokens CSS como sistema de diseño del frontend | Ago 2026 | ✅ Adoptada |
+| [D-060](#d-060) | Modelo de Licencia Propietaria ("Todos los Derechos Reservados") como protección de negocio SaaS | Ago 2026 | ✅ Adoptada |
+| [D-061](#d-061) | Política de Cuarentena de Dependencias (Zero-GPL) para blindaje comercial | Ago 2026 | ✅ Adoptada |
 
 ---
 
@@ -322,24 +324,24 @@ El desarrollo se realiza en un equipo Windows. Python, FastAPI, Docker y las her
 ---
 
 ### D-013
-## Stack de agentes: Antigravity (arquitectura) + OpenCode (implementación)
+## Stack de agentes: Antigravity Multimodelo (Gemini Advanced + Claude) + Perplexity
 
-**Fecha:** Julio 2026 (08/07/2026)  
+**Fecha:** Julio 2026 (Actualizada Ago 2026)  
 **Estado:** ✅ Adoptada
 
 **Contexto:**  
-La cuota de Claude Sonnet en Antigravity es limitada. Usar Antigravity para todas las tareas — incluyendo código rutinario — agotaría la cuota rápidamente y bloquearía el desarrollo.
+Inicialmente se planteó un modelo dual dividiendo tareas entre Antigravity (para arquitectura) y OpenCode (para terminal/código rutinario). En la práctica, la gestión de tokens gratuitos en herramientas de CLI (OpenCode) y la fricción de cambiar de entorno rompía el "estado de flujo" (flow state).
 
 **Opciones consideradas:**
-- Solo Antigravity — agota cuota rápido, bloquea el desarrollo
-- Solo OpenCode — pierde la capacidad de revisión y arquitectura de Claude
-- Antigravity + OpenCode con roles diferenciados — maximiza recursos gratuitos
+- Mantener la separación Antigravity / OpenCode — fricción constante por cuotas y contexto dividido.
+- Centralizar todo en Antigravity combinando modelos (Gemini + Claude) — unifica el contexto, elimina fricción y aprovecha la suscripción de Google One.
 
-**Decisión:** Dos agentes con roles complementarios:
-- **Antigravity/Claude Sonnet:** arquitectura, decisiones complejas, revisiones críticas, documentación
-- **OpenCode/Gemini+Groq:** código rutinario, boilerplate, estructura de archivos, tests, edición en terminal
+**Decisión:** Todo el desarrollo (arquitectura e implementación) se centraliza en **Antigravity**. 
+- Se usa **Gemini (Google One)** como motor principal inagotable para el 90% del desarrollo continuo, refactorización y boilerplate.
+- Se pivota a **Claude** dentro de Antigravity exclusivamente cuando se requiere resolver problemas arquitectónicos críticos, maximizando su cuota limitada.
+- Se utiliza **Perplexity** de forma externa (fuera del IDE) como motor de búsqueda y research puro (ej. documentación de librerías actualizadas).
 
-**Consecuencias:** Hay que gestionar conscientemente qué tarea va a qué agente. La regla: si la tarea requiere criterio y decisión → Antigravity. Si la tarea es implementación de algo ya decidido → OpenCode.
+**Consecuencias:** Desarrollo fluido sin bloqueos por cuotas. OpenCode queda descartado de la arquitectura de trabajo.
 
 ---
 
@@ -424,22 +426,21 @@ El README de v0.1 incluye una sección `## AI Development Methodology`. Si en es
 ---
 
 ### D-018
-## Modelos LLM en OpenCode: Gemini Flash (default) + Groq
+## Pivote desde OpenCode a IDE unificado por fricción de tokens en CLI
 
-**Fecha:** Julio 2026 (08/07/2026)  
+**Fecha:** Julio 2026 (Actualizada Ago 2026)  
 **Estado:** ✅ Adoptada
 
 **Contexto:**  
-OpenCode necesita modelos de LLM para funcionar. Gemini 2.5 Pro tiene cuota 0 en el tier gratuito de AI Studio. Se necesita una segunda capa gratuita y potente para tareas de código complejo.
+La estrategia original dictaba usar OpenCode en la terminal WSL con Gemini Flash y Groq para no gastar la cuota de Claude. Sin embargo, la terminal presentaba bloqueos continuos para usar los tokens gratuitos, generando una barrera operativa inasumible.
 
 **Opciones consideradas:**
-- Solo Gemini Flash — funciona pero un único modelo puede quedarse corto en tareas complejas
-- Gemini Flash + Gemini Pro — Pro tiene cuota 0 en tier gratuito, no viable sin billing
-- Gemini Flash + Groq — Groq ofrece Llama 3.3 70B, Qwen3 32B y GPT-OSS 120B gratis
+- Pelear con la configuración de la terminal y las API keys — pérdida de tiempo, YAGNI.
+- Abandonar OpenCode y absorber la carga en el IDE nativo con Antigravity — solución pragmática.
 
-**Decisión:** Gemini 2.5 Flash como modelo default (1.500 req/día) + Groq como segunda capa para código complejo y tareas de razonamiento (llama-3.3-70b-versatile, qwen3-32b, gpt-oss-120b).
+**Decisión:** Se abandona el uso de OpenCode en terminal. Toda la carga de implementación que iba a recaer en él se traslada a Antigravity usando el modelo Gemini de Google One, que no presenta los problemas de cuota de la terminal y mantiene el contexto del proyecto de forma nativa.
 
-**Consecuencias:** Las keys se almacenan en `.bashrc` de WSL como variables de entorno (`GEMINI_API_KEY`, `GROQ_API_KEY`). El cambio de modelo en la TUI se hace con `Ctrl+X` → `M` o `F2`.
+**Consecuencias:** Simplificación drástica del flujo de trabajo. Un solo agente (Antigravity), una sola interfaz, pero con enrutamiento inteligente de modelos por debajo.
 
 ---
 
@@ -1278,7 +1279,68 @@ Se adopta un **sistema de diseño basado en Vanilla CSS con variables (Custom Pr
 
 ---
 
-*Documento creado el 08/07/2026 — Alba Camiña García con la ayuda de Antigravity AI*  
+### D-060
+## Modelo de Licencia Propietaria ("Todos los Derechos Reservados") como protección de negocio SaaS
+
+**Fecha:** Agosto 2026 (25/08/2026)  
+**Estado:** ✅ Adoptada
+
+**Contexto:**  
+En el marco de la estrategia de marca personal *Build in Public*, el código del proyecto se expone abiertamente en GitHub. No obstante, al perfilarse un modelo de negocio SaaS (Software as a Service) a futuro, surge el riesgo de que competidores clonen el repositorio y lo comercialicen sin autorización, aprovechándose de una falsa asunción de que "todo repositorio público es Open Source".
+
+**Decisión:**  
+Se adopta formalmente una postura legal de **Todos los Derechos Reservados**. El archivo `LICENSE` existente blinda explícitamente el código contra la copia, modificación y uso comercial o distribución. Se actualiza el `README.md` para reflejar esta decisión, previniendo usos indebidos.
+
+**Alternativas descartadas:**  
+- **Licencia Open Source (MIT/Apache):** Permitiría la competencia desleal y el robo del modelo de negocio por terceros.
+- **Licencia SaaS Defensiva (AGPLv3):** Aunque protege contra competidores de código cerrado, se considera prematura hasta que el plan de negocio final esté al 100% definido.
+
+**Consecuencias:**  
+Garantiza el blindaje jurídico absoluto del proyecto, manteniendo abiertas todas las opciones futuras de monetización o pivote hacia licencias más permisivas si la estrategia cambia.
+
+---
+
+### D-061
+## Política de Cuarentena de Dependencias (Zero-GPL) para blindaje comercial
+
+**Fecha:** Agosto 2026 (25/08/2026)  
+**Estado:** ✅ Adoptada
+
+**Contexto:**  
+Al haber consolidado el proyecto bajo un modelo comercial propietario "Todos los Derechos Reservados" (`[D-060]`), el ecosistema de dependencias (NPM y PyPI) representa un vector de riesgo legal. La inclusión de una sola librería con licencia de "copyleft fuerte" (GPL o AGPL) obligaría, por el efecto herencia/contagio, a liberar todo el código fuente del proyecto bajo esa misma licencia, invalidando la estrategia SaaS.
+
+**Decisión:**  
+Se adopta la regla estricta **Zero-GPL (Cuarentena de Dependencias)**:
+- Toda nueva dependencia (`pip install` o `npm install`) debe ser auditada manualmente antes de su integración.
+- Solo se admiten licencias permisivas comercialmente seguras: **MIT, Apache 2.0, BSD, ISC, HPND**.
+- Quedan estrictamente prohibidas: **GPL, LGPL (sin aislamiento comprobado) y AGPL**.
+
+**Consecuencias:**  
+El `requirements.txt` y `package.json` mantienen una higiene legal absoluta, garantizando que el producto pueda ser comercializado o licenciado a instituciones (B2B) sin requerimientos de liberación de código. También se implementa un archivo `CONTRIBUTING.md` con un acuerdo CLA que exige la cesión de derechos de autor para blindar las contribuciones externas.
+
+---
+
+### D-062
+## Patrón Showcase y Protección de Propiedad Intelectual
+
+**Fecha:** Agosto 2026 (25/08/2026)  
+**Estado:** ✅ Adoptada
+
+**Contexto:**  
+En preparación para la publicación del repositorio bajo la filosofía *Build in Public*, se identificó que el código fuente exponía el *core* del modelo de negocio pedagógico: los algoritmos de *Prompt Engineering* y los esquemas de validación de *Structured Outputs*. Dejarlos públicos permitiría la clonación inmediata del producto y comprometería su viabilidad comercial como SaaS.
+
+**Decisión:**  
+Se adopta el patrón **Open Core / Showcase Repository**:
+1. Se excluyen del control de versiones (`git rm --cached`) y se ignoran (`.gitignore`) los siguientes módulos críticos: `prompt_builder.py`, `evaluation.py`, `llm_client.py` y los scripts de prueba/Mocks (`seed_db.py`, `smoke_test_*.py`).
+2. El repositorio público sirve exclusivamente como escaparate arquitectónico (mostrando la gobernanza HitL, seguridad JWT y diseño relacional), asumiendo que el código no será ejecutable por terceros (*missing imports*).
+3. Se añade una cláusula de Transparencia Algorítmica y Propiedad Intelectual en el `README.md` documentando esta decisión.
+
+**Consecuencias:**  
+El portfolio técnico mantiene su altísimo valor para reclutadores (demostrando madurez en gobernanza técnica y arquitectura), pero el "Secret Sauce" comercial queda blindado en el entorno local/privado de la autora.
+
+---
+
+*Decisiones técnicas tomadas y documentadas por Alba Camiña García. Redacción asistida por Antigravity (IA Copilot).*  
 *Actualizado el 28/07/2026 — añadida D-050*  
 *Actualizado el 11/08/2026 — añadida D-051 (Pivote arquitectónico a OpenAI para Visión manteniendo Groq para Texto).*  
 *Actualizado el 12/08/2026 — añadida D-052 (Asignación determinista de cualitativa ESO y gobernanza del redondeo).*  
@@ -1288,6 +1350,9 @@ Se adopta un **sistema de diseño basado en Vanilla CSS con variables (Custom Pr
 *Actualizado el 20/08/2026 — añadida D-056 (Estrategia dual de testing: SQLite en RAM para TDD local y PostgreSQL en Docker para CI/CD).*  
 *Actualizado el 21/08/2026 — añadida D-057 (Panel de Declaración de Residuo Pedagógico en la UI Human-in-the-Loop).*  
 *Actualizado el 24/08/2026 — añadidas D-058 (Stack Frontend React+Vite+PWA) y D-059 (Sistema de diseño UI Glassmorphism).*  
-*Total de decisiones registradas: 59*
+*Actualizado el 25/08/2026 — añadida D-060 (Modelo de Licencia Propietaria para protección SaaS).*  
+*Actualizado el 25/08/2026 — añadida D-061 (Política Zero-GPL de dependencias y CLA).*  
+*Actualizado el 25/08/2026 — añadida D-062 (Patrón Showcase y Protección de Propiedad Intelectual).*  
+*Total de decisiones registradas: 62*
 
 

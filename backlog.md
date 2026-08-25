@@ -90,19 +90,7 @@
 
 **Etiquetas:** `v0.0` `ia` `legal` `docs`
 
----
 
-### [v0.0-005] Plan estratégico de empleabilidad, incubación y financiación en Galicia
-**Como** programadora junior en búsqueda activa de empleo e incubación,  
-**quiero** estructurar un plan de negocio y portfolio dual (`Fase Ninja` sin alta vs. `Fase Comercialización`)  
-**para** maximizar mis opciones de inserción y acceso a ayudas en el ecosistema gallego y estatal [D-006, D-009, D-010].
-
-**Criterios de aceptación:**
-- [x] Documentadas las convocatorias y redes pre-alta en Galicia (`Red de Polos de Emprendemento de la Xunta en A Coruña`, `Explorer UDC A Coruña`, `Talento 45+ Cámara de A Coruña`, `Generación SAVIA`, `PAEM MicroBank hasta 30.000€`)
-- [x] Identificado el contacto e itinerario para presentar el MVP funcional en el hub **Ciudad de las TIC / Auditoría de A Coruña** (`[v1.0-005]`)
-- [x] Planificadas las ayudas de inicio de actividad en Galicia (`Emprego Autónomo >45 años de 4.000€ a 7.000€ + Cuota Cero`), `Activa Startups Galicia (hasta 40.000€)` y `ENISA Emprendedoras Digitales` para la fase de comercialización futura
-
-**Etiquetas:** `v0.0` `docs`
 
 ---
 
@@ -122,14 +110,14 @@
 > Esta historia se ejecuta antes que cualquier otra. Si el contrato falla, se rediseña el prompt antes de escribir una sola línea de FastAPI.
 
 **Criterios de aceptación:**
-- [ ] Script standalone `smoke_test_llm.py` en la raíz del proyecto que llama directamente a la API de OpenAI o Anthropic (sin FastAPI)
-- [ ] El prompt usado es el mismo que se usará en `services/prompt_builder.py`
-- [ ] La respuesta contiene los campos: `transcription`, `rubricBreakdown`, `visualMarkers`, `qualitativeAnalysis`
-- [ ] `qualitativeAnalysis` incluye: `strengths[]`, `improvementNeeds.immediate[]`, `improvementNeeds.mediumLongTerm[]`, `teacherSummary`
-- [ ] Probado con al menos 1 respuesta de alumno de ejemplo (buena, regular o mala)
-- [ ] El script imprime el JSON recibido con formato legible (`json.dumps(..., indent=2)`)
-- [ ] La respuesta incluye `calificacion_cualitativa` (valor IN/SU/**BE**/NT/SB), `siguiente_paso_accionable` (string no vacío) y `confidence_score` (float 0.0–1.0) según [D-024, D-042]
-- [ ] Si `confidence_score < 0.75`, el script imprime una advertencia ("⚠️ Revisión manual recomendada")
+- [x] Script standalone de validación del contrato que llama directamente a la API del LLM (sin FastAPI) *(módulo excluido del repo público por PI, ver `[D-062]`)*
+- [x] El prompt usado es el mismo que se usará en `services/prompt_builder.py`
+- [x] La respuesta contiene los campos: `transcription`, `rubricBreakdown`, `visualMarkers`, `qualitativeAnalysis`
+- [x] `qualitativeAnalysis` incluye: `strengths[]`, `improvementNeeds.immediate[]`, `improvementNeeds.mediumLongTerm[]`, `teacherSummary`
+- [x] Probado con al menos 1 respuesta de alumno de ejemplo (buena, regular o mala)
+- [x] El script imprime el JSON recibido con formato legible (`json.dumps(..., indent=2)`)
+- [x] La respuesta incluye `calificacion_cualitativa` (valor IN/SU/**BE**/NT/SB), `siguiente_paso_accionable` (string no vacío) y `confidence_score` (float 0.0–1.0) según [D-024, D-042]
+- [x] Si `confidence_score < 0.75`, el script imprime una advertencia ("⚠️ Revisión manual recomendada")
 
 **Etiquetas:** `v0.1` `backend`
 
@@ -840,23 +828,7 @@
 
 ---
 
-### [v1.0-005] Aplicación a Programas de Incubación y Portfolio
 
-**Como** desarrolladora junior y creadora del proyecto,  
-**quiero** utilizar la Versión 1.0 como llave para mejorar mi empleabilidad y red de contactos  
-**para** conseguir apoyo técnico, mentoría o un empleo cualificado sin poner en riesgo mi situación actual.
-
-**Criterios de aceptación:**
-- [ ] Portfolio actualizado con el enlace al repositorio y a la URL de producción
-- [ ] Solicitud de asesoramiento y tutoría enviada al **Polo de Emprendemento de Galicia** en A Coruña (Xunta)
-- [ ] Solicitud enviada al programa **Talento 45+** (Cámara de Comercio de A Coruña + SEPE)
-- [ ] Registro completado en la plataforma **Generación SAVIA** (Fundación Endesa)
-- [ ] Candidatura valorada para programas de incubación y ayudas en A Coruña (**Explorer UDC / Activa Startups / PAEM Galicia / IGAPE**)
-- [ ] Reunión agendada con el contacto de la **Auditoría en A Coruña (Ciudad de las TIC)** para presentarle el sistema funcional
-
-**Etiquetas:** `v1.0` `docs`
-
----
 
 ## 🔮 Roadmap — Mejoras a Futuro
 
@@ -877,6 +849,8 @@
 **Como** administradora de ciberseguridad del sistema,  
 **quiero** que el backend local pase la imagen por un micro-motor OCR offline en RAM antes de conectar con la nube exterior  
 **para** detectar y bloquear automáticamente cualquier nombre o rastro de PII del alumnado que haya escapado al recorte manual de cabecera (`[D-034]`).
+
+
 
 * **Dependencias:** `[v0.3-002]` (Recorte pre-nube Pillow), `pytesseract` / `presidio-image-redactor`.
 * **Candidatos de motor OCR offline (a evaluar en implementación):**
@@ -963,18 +937,10 @@ Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificad
   3. **Seguridad de Secretos:** Revisar el historial de Git para garantizar que nunca se ha subido una API Key real en el pasado (usar BFG Repo-Cleaner si fuera necesario).
   4. **Licenciamiento:** Añadir un archivo `LICENSE` (ej. MIT License) en la raíz del proyecto.
   5. **README Onboarding:** Añadir una sección de "Getting Started" o "Instalación Local" clara para que un evaluador externo sepa cómo levantar la API en 2 minutos.
-  6. **Notificación a la Comunidad y Mentores:** Enviar mensaje privado en LinkedIn a los contactos clave de la comunidad y mentores que siguieron el proyecto:
-     - **Nicolás Rocchia (Pelatech):** Notificar la implementación de la Declaración de Residuo (`[D-057]`) e invitación a revisar el repo.
-     - **Igor Laburu (CEO @ Gako AI):** Notificar la apertura del repositorio con la implementación del RAG Determinista (`[D-054]`) e inyección de rúbricas docentes.
-     - **Miguel Ángel:** Notificar la apertura del repositorio con las fichas de Roadmap para el Servidor MCP (`[Roadmap-003]`) y el marco agéntico basado en Skills (`[Roadmap-006]`).
-     - **Equipo Quantia (Jorge, Andrés, Fernando, Francisco Carmona y Carlos):** Notificar el lanzamiento público del repositorio v1.0 como demostración de la arquitectura desarrollada tras la etapa de prácticas. Agradecer a Fernando su recomendación del principio de la "Prueba de los 6 Meses" incorporado en la Regla 8 de `AGENTS.md`.
-     - **Roberto:** Enviar enlace del repositorio v1.0 y post de lanzamiento para difusión inmediata y amplificación de red.
-     - **Compañeros de curso y prácticas (Andressa, Joserra y Sara):** Notificar el lanzamiento del repositorio (interacción recíproca, apoyo mutuo y comunidad de antiguos alumnos).
-     - **Venancio Salcines y Dirección EFBS / Cesuga (Hija de Salcines, Ivanna, Miguel Ángel, Alfonso, Lumey, Gala y Rita):** Notificar el lanzamiento del proyecto como demostración institucional de innovación educativa con IA en Galicia (impulso de visibilidad institucional y oportunidades profesionales).
 
 ---
 
-*Backlog generado el 07/07/2026 — Antigravity para Alba Camiña García*  
+*Arquitectura y Criterios de Aceptación diseñados por Alba Camiña García. Formateo y revisión asistidos por Antigravity (IA Copilot).*  
 *Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] e incorporadas historias de cierre v0.2 y demo HitL pre-auditoría (`[v0.2-008]`, `[v0.2-009]`, `[v0.2-010]`).*  
 *Total de historias: 34 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 3*  
 *Actualizado el 20/07/2026 — Auditoría normativa LOMLOE (D-040–D-045): etapa obligatoria ESO/BACH, escala BE/NA, media ponderada en backend (issue #10, PR #11).*  

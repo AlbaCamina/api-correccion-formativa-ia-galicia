@@ -1,6 +1,6 @@
 # 🏛️ Marco Normativo de Evaluación y Adaptaciones Curriculares (NEAE / NEE)
 **Proyecto:** API de Corrección Formativa con IA (`api-correccion-formativa-ia-galicia`)  
-**Fecha:** Julio 2026  
+**Fecha de origen:** Julio 2026 (Última revisión: Agosto 2026)  
 **Ámbito Normativo Principal:** Galicia (Xunta de Galicia — Consellería de Educación) + LOMLOE / AI Act
 
 ---
@@ -224,5 +224,5 @@ Al integrar la legislación gallega (`Decretos 156/157/2022` y `Decreto 229/2011
 
 ---
 
-*Documento consolidado el 10/07/2026 — Antigravity para Alba Camiña García*  
+*Investigación y síntesis normativa dirigida por Alba Camiña García. Estructuración asistida por Antigravity (IA Copilot).*  
 *Referencia de Decisiones de Arquitectura: [D-023] y [D-024] en `decisiones.md`*

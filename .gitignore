@@ -66,3 +66,15 @@ Thumbs.db
 *.groq.json
 scratch/
 sesion_*.md
+docs/negocio/
+skills/
+
+# ------------------------------------------------------------------------------
+# 7. Propiedad Intelectual y Secretos Comerciales (Patrón Showcase)
+# ------------------------------------------------------------------------------
+backend/services/prompt_builder.py
+backend/models/evaluation.py
+backend/services/llm_client.py
+smoke_test_llm.py
+smoke_test_vision.py
+seed_db.py

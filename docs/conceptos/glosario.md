@@ -10,26 +10,11 @@
 
 ## 1. Conceptos generales de desarrollo web
 
-**API** (Application Programming Interface — Interfaz de Programación de Aplicaciones)  
-Canal estandarizado por el que dos programas se comunican. En este proyecto, la API es el backend de FastAPI: recibe peticiones (exámenes) y devuelve respuestas (correcciones JSON).
-
-**Backend**  
-La parte del sistema que no ve el usuario. Procesa los datos, llama a la IA, guarda en la base de datos. En este proyecto: Python + FastAPI corriendo en el servidor.
-
-**Boilerplate**  
-Código repetitivo y estructural que hay que escribir en casi todo proyecto aunque no hace nada específico del negocio (imports, configuración inicial, estructura de carpetas). Los agentes de IA lo generan bien.
-
 **Breaking Change**  
 Cambio que rompe la compatibilidad hacia atrás. Ejemplo arquitectónico (`[D-041]`): hacer obligatorio el campo `etapa` en `EvaluationRequest`, de manera que los clientes antiguos que no lo envíen recibirán un error `422 Unprocessable Entity`.
 
 **CORS** (Cross-Origin Resource Sharing — Intercambio de Recursos de Origen Cruzado)  
 Mecanismo de seguridad de los navegadores web que restringe las peticiones HTTP realizadas desde un dominio o puerto (ej. `http://localhost:5173` en Vite) hacia otro diferente (`http://127.0.0.1:8000` en FastAPI). Por especificación oficial, cuando se permite el envío de credenciales o tokens Bearer (`allow_credentials=True`), está prohibido usar un comodín (`allow_origins=["*"]`) por riesgo de seguridad; se exige declarar explícitamente los orígenes confiables.
-
-**Debug / Debugging**  
-Proceso de encontrar y corregir errores en el código. Literalmente "quitar los bichos".
-
-**Deploy / Despliegue**  
-Publicar el código en un servidor accesible desde internet. Antes solo funciona en tu máquina local; tras el deploy, cualquiera puede usarlo.
 
 **Deprecado / Deprecation (`Deprecated`)**  
 Estado o cualidad de un método, función o tecnología que sigue funcionando temporalmente por motivos de compatibilidad con código antiguo, pero cuyo uso oficial ha sido desaconsejado o declarado obsoleto por sus creadores (generalmente porque existe una alternativa superior, más segura o moderna, o porque será eliminado definitivamente en una futura versión). En este proyecto: el reemplazo de `datetime.utcnow()` (deprecado en Python 3.12+ por no incluir zona horaria explícita) por `datetime.now(timezone.utc)` y callables `utcnow()` para evitar advertencias (`DeprecationWarning`) de SQLAlchemy/Pytest y garantizar timestamps precisos en UTC sin riesgo de ruptura en futuras actualizaciones del lenguaje.
@@ -78,29 +63,6 @@ Plan B o mecanismo de respaldo automático que se activa cuando el sistema princ
 
 En api-correccion-formativa-ia-galicia este patrón fue considerado pero **descartado por YAGNI** al implementar la v0.3 (`[D-051]`): añadir un fallback real entre OpenAI (Vision) y Groq no es trivial, porque Groq no tiene *Structured Outputs* nativos para esquemas JSON complejos — exactamente el problema que originó la migración a OpenAI. Un fallback hacia Groq en visión reproduciría el error 400 que se quería evitar. En su lugar se optó por *Workload Routing* estático (decisión de proveedor fija por tipo de carga) y 2 reintentos al mismo proveedor como resiliencia suficiente para el MVP.
 
-**Frontend**  
-La parte del sistema que ve el usuario: botones, pantallas, formularios. En este proyecto: React + Vite (se implementa en v0.5).
-
-**Full-stack**  
-Desarrolladora que trabaja tanto en frontend como en backend. Es el perfil de este proyecto.
-
-**Health check**  
-Endpoint mínimo (`GET /health`) que devuelve `{ "status": "ok" }` para comprobar que el servidor está vivo. Es lo primero que se crea.
-
-**HTTP** (HyperText Transfer Protocol — Protocolo de Transferencia de Hipertexto)  
-El protocolo que usa internet para enviar y recibir datos. Define los códigos de respuesta:
-- `200 OK` — todo bien
-- `202 Accepted` — recibido, procesando
-- `400 Bad Request` — la petición está mal formada
-- `422 Unprocessable Entity` — los datos no pasan validación Pydantic
-- `500 Internal Server Error` — algo falló en el servidor
-
-**HTTPS** (HyperText Transfer Protocol Secure — Protocolo HTTP Seguro)  
-Versión segura y cifrada de HTTP (el candado en el navegador). Es un requisito estricto en dispositivos móviles para permitir instalar una PWA y para autorizar el acceso a la cámara o micrófono.
-
-**JSON** (JavaScript Object Notation — Notación de Objetos de JavaScript)  
-Formato estándar para intercambiar datos entre sistemas. Parece un diccionario de Python con llaves y valores. Es el formato que devuelve la IA con la corrección del examen.
-
 **Librería / Framework (Biblioteca de código)**  
 Una **librería** es un conjunto de código ya escrito y empaquetado que resuelve un problema concreto y que puedes reutilizar en tu proyecto sin escribirlo desde cero. Un **framework** es similar, pero con una diferencia clave: la librería tú la llamas cuando quieres; el framework llama a tu código según sus propias reglas (él manda la estructura).
 
@@ -148,17 +110,8 @@ Mecanismo de comunicación en tiempo real en una sola dirección (servidor $\rig
 **Scaffolding** (Andamiaje o Estructura Inicial de Código)  
 Generación automática o manual del esqueleto básico de un proyecto antes de empezar a escribir la lógica interna de negocio. Consiste en crear la jerarquía de carpetas principales, archivos de configuración (como `package.json`, `.env.example`, `main.py` o `docker-compose.yml`) y plantillas estructurales vacías. Proporciona los cimientos ordenados sobre los que evoluciona el código.
 
-**Servidor**  
-Ordenador (o proceso en un ordenador) que está siempre encendido y escuchando peticiones de otros programas. Cuando una profesora pulsa «Corregir» en la PWA, su navegador envía una petición HTTP al servidor, que la procesa y devuelve la respuesta. En este proyecto el servidor es el proceso Uvicorn que ejecuta FastAPI dentro de WSL — en local corre en `http://127.0.0.1:8000` y en producción se desplegará en Railway. El servidor no hace nada hasta que recibe una petición; cuando la recibe, la atiende y vuelve a esperar.
-
 **Stateless vs. Stateful** (Sin Estado vs. con Estado / Transaccional)  
 Un sistema es **Stateless** cuando el servidor no conserva memoria ni registro de las peticiones previas (como nuestra API v0.1: evaluaba un texto y olvidaba al usuario instantáneamente). Un sistema es **Stateful o Transaccional** cuando mantiene un estado coherente y persistente en el tiempo (como nuestra API v0.2: autentica al docente con JWT, verifica la propiedad de la rúbrica en base de datos, almacena la entrega en la tabla `Submission` y audita cada acción en un `ChangeLog` inmutable).
-
-**Refactor**  
-Reescribir código para que sea más limpio o eficiente sin cambiar lo que hace. Como reordenar una habitación sin tirar nada.
-
-**README**  
-Archivo de texto en la raíz del repositorio que explica qué es el proyecto, cómo instalarlo y cómo usarlo. Es lo primero que ve cualquier persona que visita el repositorio en GitHub.
 
 **REST** (Representational State Transfer — Transferencia de Estado Representacional) **/ Arquitectura REST (`RESTful`)**  
 Estilo arquitectónico que define cómo deben comunicarse los sistemas en internet mediante HTTP. No es un protocolo ni una librería — es un conjunto de principios de diseño que, si se cumplen, la API se denomina "RESTful". Los principios clave que aplica api-correccion-formativa-ia-galicia son:
@@ -167,9 +120,6 @@ Estilo arquitectónico que define cómo deben comunicarse los sistemas en intern
 - **Interfaz Uniforme:** Las URLs nombran *recursos* y los verbos HTTP nombran *acciones* (`POST /rubricas` crea, `GET /rubricas` lista, `DELETE /rubricas/{id}` elimina). Una API no REST pondría el verbo en la URL: `POST /deleteRubrica`.
 - **Sistema en Capas:** El docente llama a FastAPI; FastAPI llama a Groq y PostgreSQL internamente sin que la PWA lo sepa.
 - **Recursos Identificables:** Cada entidad tiene su propia URL única (`/api/v1/evaluaciones/f47ac10b` identifica una sola evaluación).
-
-**Stack tecnológico**  
-El conjunto de tecnologías que usa un proyecto. En api-correccion-formativa-ia-galicia: Python + FastAPI + PostgreSQL + React + Vite + Redis + Celery.
 
 **Swagger / OpenAPI**  
 Dos conceptos relacionados pero distintos que trabajan juntos:
@@ -543,6 +493,9 @@ Medidas de modificación o ajuste pedagógico reguladas por la legislación (LOM
 **AI Act** (Reglamento Europeo de Inteligencia Artificial)  
 La primera ley de la Unión Europea que regula los sistemas de IA. Clasifica los sistemas por nivel de riesgo. api-correccion-formativa-ia-galicia entra en la categoría de alto riesgo (afecta a educación de menores y procesa variables de necesidades específicas), por lo que requiere Human-in-the-Loop y trazabilidad completa.
 
+**Compliance (Cumplimiento Normativo)**  
+Es la disciplina que garantiza que una empresa o software opera respetando estrictamente el marco legal y regulatorio de su sector. En ingeniería de software, aplicar *Compliance* significa que el código está diseñado para cumplir la ley por defecto (por ejemplo, implementar la técnica *Zero Data Retention* para cumplir con el RGPD y la *AI Act*, o codificar fórmulas matemáticas que respeten la LOMLOE).
+
 **DUA** (Diseño Universal de Aprendizaje)  
 Enfoque pedagógico recogido por la LOMLOE y la normativa gallega que busca minimizar las barreras en el aprendizaje, ofreciendo múltiples formas de representación, expresión e implicación en la evaluación.
 
@@ -557,6 +510,9 @@ La ley educativa estatal actualmente vigente en España (2020). Define competenc
 
 **LOPDGDD** (Ley Orgánica de Protección de Datos y Garantía de los Derechos Digitales)  
 La ley española que desarrolla el RGPD. Su artículo 7 regula el consentimiento y protección integral en el tratamiento de datos de menores. En api-correccion-formativa-ia-galicia es crítico porque la información sobre adaptaciones por dislexia, TDAH o TEA constituye un dato de salud del menor (especialmente protegido), motivo por el cual la IA jamás diagnostica y el dato solo se asocia al identificador seudonimizado `alumno_id` ([D-023]).
+
+**Legal Ops (Legal Operations / Operaciones Legales)**  
+Campo interdisciplinar híbrido entre el derecho, la tecnología y la ingeniería de procesos. Su objetivo es aplicar metodologías del desarrollo de software (estandarización, flujos medibles, automatización y métricas) a los departamentos o problemas legales. Busca transformar los requisitos normativos en sistemas controlados, medibles y escalables dentro de la operativa, garantizando gobernanza técnica sin frenar el crecimiento o despliegue del proyecto.
 
 **NEAE / NEE** (Necesidades Específicas de Apoyo Educativo / Necesidades Educativas Especiales)  
 Clasificación legal en España para el alumnado que requiere una atención educativa diferente a la ordinaria por presentar dificultades específicas de aprendizaje (DEA como dislexia), TDAH, altas capacidades o discapacidad (NEE). api-correccion-formativa-ia-galicia adapta su motor formativo para que estos perfiles sean evaluados con justicia sin penalizar errores derivados de su condición ([D-023]).
@@ -829,8 +785,22 @@ Sector de empresas que desarrollan productos tecnológicos para la educación. S
 Modelo de negocio con una versión gratuita (con límites) y una versión de pago (sin límites o con funcionalidades extra).
 
 **SaaS** (Software as a Service — Software como Servicio)  
-Modelo en el que el software se ofrece como servicio por suscripción, sin que el usuario tenga que instalarlo. La PWA de api-correccion-formativa-ia-galicia es un SaaS.
+Modelo de negocio en el que el software se ofrece como servicio (generalmente por suscripción o pago por uso) alojado en la nube, sin que el cliente tenga que instalarlo ni mantener la infraestructura. En estrategias *Build in Public*, obliga a proteger el repositorio (mediante licencia Propietaria o AGPLv3 "SaaS defensivo") para evitar que competidores clonen la plataforma y la comercialicen libremente. La PWA de api-correccion-formativa-ia-galicia se proyecta como un SaaS donde tú controlas la infraestructura y los colegios acceden al servicio.
 
+**GPL (General Public License) / Copyleft Fuerte**  
+Tipo de licencia de software libre de naturaleza "vírica". Obliga legalmente a que cualquier software que utilice o se enlace con un componente GPL sea distribuido, a su vez, bajo la misma licencia abierta. Su uso está estrictamente prohibido en el ecosistema de este proyecto (`Zero-GPL`) para proteger la viabilidad comercial y el modelo cerrado del SaaS.
+
+**AGPL (Affero General Public License)**  
+Variante aún más estricta de la GPL diseñada específicamente para aplicaciones web y servicios en la nube (SaaS). Exige que cualquier persona que ofrezca el software como un servicio a través de una red (sin siquiera distribuirlo físicamente) debe facilitar el código fuente completo a los usuarios de dicho servicio. Suele usarse por empresas comerciales como licencia "SaaS defensiva" para obligar a competidores a pagar por licencias privadas.
+
+**LGPL (Lesser General Public License)**  
+Variante de la GPL más "débil" que permite enlazar dinámicamente el código en aplicaciones propietarias sin obligar a abrir el código fuente del programa principal. Aunque técnicamente es segura para uso comercial, en este proyecto se audita manualmente o se evita por extrema precaución.
+
+**Licencias Permisivas (MIT, Apache 2.0, BSD, ISC)**  
+Familias de licencias de código abierto que permiten a los desarrolladores usar, modificar, distribuir y comercializar el software, incluso en productos cerrados o propietarios, sin obligarles a liberar su propio código fuente. Son las únicas dependencias autorizadas por defecto en este proyecto.
+
+**CLA (Contributor License Agreement)**  
+Acuerdo de Licencia de Colaborador. Documento legal que un desarrollador externo debe aceptar al enviar código (*Pull Request*) a un repositorio. Garantiza que el creador transfiere los derechos comerciales y de propiedad intelectual a la titular principal, blindando legalmente el repositorio frente a futuras demandas por derechos de autor.
 **Pytest**  
 Framework de automatización de pruebas para el lenguaje Python. Permite escribir pequeños programas (tests o pruebas unitarias) que comprueban automáticamente si el resto del código del proyecto funciona correctamente. En este proyecto se utiliza ejecutando `pytest -v` para certificar que ningún cambio arquitectónico rompa las reglas de negocio, garantizando siempre que los tests estén "en verde" (pasados) antes de cerrar una funcionalidad.
 
@@ -998,11 +968,11 @@ Interfaz de programación nativa de los navegadores web modernos que permite a l
 
 ---
 
-*Glosario creado el 09/07/2026 — Antigravity para Alba Camiña García*  
+*Términos y definiciones establecidos por Alba Camiña García. Redacción asistida por Antigravity (IA Copilot).*  
 *Documento vivo — se actualiza con cada término nuevo que aparezca en el proyecto*  
 *Actualizado el 10/08/2026 — Añadidos TrOCR y PaddleOCR como candidatos Capa 1 PII pre-nube (`[Roadmap-002]`), contrastados con la decisión de Groq Vision para v0.3.*  
 *Actualizado el 11/08/2026 — Añadido Workload Routing al glosario tras el pivote D-051.*  
 *Actualizado el 12/08/2026 — Añadidos conceptos de IA moderna: AI-Augmented Engineering, Agentic Coding y SOTA.*  
 *Actualizado el 21/08/2026 — Añadidos conceptos de analítica de posicionamiento técnico: Impresiones, Miembros Alcanzados, Alcance fuera de red y Consumo Pasivo (Lurking).*
 *Actualizado el 19/08/2026 — Añadida sección 13 (Marca Personal y Comunicación Digital) con conceptos de ghostwriting, hook, CTA, Build in Public, engagement y algoritmo de LinkedIn.*
-
+*Actualizado el 25/08/2026 — Añadidos conceptos de gobernanza legal: Compliance y Legal Ops.*

@@ -56,7 +56,7 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
 * **[D-002] Human-in-the-Loop (HitL):** El motor LLM asiste y calcula, pero el profesor siempre valida y firma la nota final (`REVIEW` -> `GRADED`). El backend debe dar soporte a este flujo de estados.
 * **[D-024] Contrato JSON Estructurado:** El motor debe retornar el esquema `EvaluacionIA` que contiene `transcription`, `rubricBreakdown`, `visualMarkers`, `qualitativeAnalysis`, `calificacion_cualitativa`, `siguiente_paso_accionable` y `confidence_score`.
 * **[D-027] Modo Dual de Rúbrica:** Peticiones de corrección aceptan el campo `modo_evaluacion` que puede ser `COMBINADO` (rúbrica + saberes Xunta) o `AUDITORIA_CURRICULAR` (la IA además evalúa la coherencia pedagógica de la rúbrica docente contra la ley).
-* **[D-028] Groq LPU Primario:** El backend por defecto utiliza `llama-3.3-70b-versatile` a través del cliente de Groq (aprovechando compatibilidad con el SDK de OpenAI), controlable mediante la variable `LLM_PROVIDER` del `.env`.
+* **[D-028 → D-053] OpenAI Unificado:** El backend utiliza `gpt-4o-mini` a través del SDK de OpenAI con *Structured Outputs* nativos para garantizar el 100% de cumplimiento del esquema `EvaluacionIA`, controlable mediante la variable `LLM_PROVIDER` del `.env`.
 
 ---
 
@@ -67,13 +67,10 @@ api-correccion/
 ├── backend/
 │   ├── main.py                  # Punto de entrada de FastAPI y middleware
 │   ├── models/                  # Esquemas Pydantic y modelos SQLAlchemy
-│   │   └── __init__.py
 │   ├── routers/                 # Enrutadores y endpoints de FastAPI
-│   │   └── __init__.py
-│   └── services/                # Prompt builders, cliente LLM e integraciones
-│       └── __init__.py
-├── smoke_test_llm.py            # Test standalone del contrato JSON
-├── decisiones.md                # Registro de decisiones de arquitectura
+│   └── services/                # Cliente LLM e integraciones (PI excluida, D-062)
+├── frontend/                    # React + Vite PWA (v0.5)
+├── decisiones.md                # Registro de decisiones de arquitectura (62 ADRs)
 └── backlog.md                   # Historias de usuario y criterios de aceptación
 ```
 

@@ -3,7 +3,7 @@
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
 [![Python 3.14+](https://img.shields.io/badge/Python-3.14%2B-blue?style=flat&logo=python)](https://www.python.org/)
 [![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16--Alpine-316192?style=flat&logo=postgresql)](https://www.postgresql.org/)
-[![Groq](https://img.shields.io/badge/LLM-Groq%20%2F%20OpenAI-orange?style=flat)](https://groq.com/)
+[![OpenAI](https://img.shields.io/badge/LLM-OpenAI%20gpt--4o--mini-orange?style=flat)](https://openai.com/)
 [![Decretos 156/2022 e 157/2022](https://img.shields.io/badge/Normativa-Decretos%20156%2F2022%20e%20157%2F2022%20Galicia-lightblue?style=flat)](#)
 [![Version](https://img.shields.io/badge/Version-v0.4-brightgreen?style=flat)](#)
 
@@ -103,21 +103,21 @@ npx vitest run
 
 | Endpoint | Verbo | Auth | Descripción |
 | :--- | :---: | :---: | :--- |
-| `/health` | `GET` | ❌ Pública | Estado del servidor |
-| `/api/v1/auth/register` | `POST` | ❌ Pública | Registro de profesora |
-| `/api/v1/auth/login` | `POST` | ❌ Pública | Login → devuelve JWT Bearer |
-| `/api/v1/auth/login-json` | `POST` | ❌ Pública | Login en JSON (compatible Swagger) |
-| `/api/v1/auth/me` | `GET` | ✅ JWT | Verificar sesión activa |
-| `/api/v1/marcos` | `GET` | ✅ JWT | Listar marcos normativos (Xunta) |
-| `/api/v1/rubricas` | `POST / GET` | ✅ JWT | Crear y listar rúbricas del docente |
-| `/api/v1/evaluate` | `POST` | ✅ JWT | Corrección formativa con IA (`REVIEW`) |
-| `/api/v1/evaluaciones/{id}/approve` | `PATCH` | ✅ JWT | Aprobación HitL docente (`REVIEW → GRADED`), `[v0.2-009]` |
-| `/api/v1/submissions` | `GET` | ✅ JWT | Lista de entregas del profesor autenticado, `[v0.2-010]` |
-| `/api/v1/evaluaciones/{submission_id}` | `GET` | ✅ JWT | Detalle evaluativo estructurado (`EvaluacionIA`), `[v0.2-010]` |
-| `/api/v1/submissions/{id}/feed-forward/realizado` | `PATCH` | ✅ JWT | Transición formativa a `REALIZADO_ALUMNO`, `[D-026]` |
-| `/api/v1/submissions/{id}/feed-forward/verificado` | `PATCH` | ✅ JWT | Transición formativa a `VERIFICADO_EN_PRUEBA_SIGUIENTE`, `[D-026]` |
-| `/api/v1/submissions/upload` | `POST` | ✅ JWT | Subida de imagen/PDF del examen (multipart), `[v0.3-001]` |
-| `/api/v1/submissions/upload-and-evaluate` | `POST` | ✅ JWT | Pipeline asíncrono unificado (`202 Accepted` + `BackgroundTasks`), `[v0.4-002]`, `[D-055]` |
+| `/health` | `GET` | 🔓 Pública | Estado del servidor |
+| `/api/v1/auth/register` | `POST` | 🔓 Pública | Registro de profesora |
+| `/api/v1/auth/login` | `POST` | 🔓 Pública | Login → devuelve JWT Bearer |
+| `/api/v1/auth/login-json` | `POST` | 🔓 Pública | Login en JSON (compatible Swagger) |
+| `/api/v1/auth/me` | `GET` | 🔒 JWT | Verificar sesión activa |
+| `/api/v1/marcos` | `GET` | 🔒 JWT | Listar marcos normativos (Xunta) |
+| `/api/v1/rubricas` | `POST / GET` | 🔒 JWT | Crear y listar rúbricas del docente |
+| `/api/v1/evaluate` | `POST` | 🔒 JWT | Corrección formativa con IA (`REVIEW`) |
+| `/api/v1/evaluaciones/{id}/approve` | `PATCH` | 🔒 JWT | Aprobación HitL docente (`REVIEW → GRADED`), `[v0.2-009]` |
+| `/api/v1/submissions` | `GET` | 🔒 JWT | Lista de entregas del profesor autenticado, `[v0.2-010]` |
+| `/api/v1/evaluaciones/{submission_id}` | `GET` | 🔒 JWT | Detalle evaluativo estructurado (`EvaluacionIA`), `[v0.2-010]` |
+| `/api/v1/submissions/{id}/feed-forward/realizado` | `PATCH` | 🔒 JWT | Transición formativa a `REALIZADO_ALUMNO`, `[D-026]` |
+| `/api/v1/submissions/{id}/feed-forward/verificado` | `PATCH` | 🔒 JWT | Transición formativa a `VERIFICADO_EN_PRUEBA_SIGUIENTE`, `[D-026]` |
+| `/api/v1/submissions/upload` | `POST` | 🔒 JWT | Subida de imagen/PDF del examen (multipart), `[v0.3-001]` |
+| `/api/v1/submissions/upload-and-evaluate` | `POST` | 🔒 JWT | Pipeline asíncrono unificado (`202 Accepted` + `BackgroundTasks`), `[v0.4-002]`, `[D-055]` |
 
 
 ### Próximos (Roadmap)
@@ -127,7 +127,7 @@ npx vitest run
 | `/api/v1/submissions/{id}/events` | `GET SSE` | 🔜 v0.4 | Notificación en tiempo real al finalizar corrección |
 | `/api/v1/submissions/{id}/changelog` | `GET` | 🔜 v1.0 | Historial inmutable de auditoría AI Act |
 
-> ✅ **Pipeline Multimodal validado (12/08/2026):** El motor de visión (`gpt-4o-mini` vía OpenAI *Structured Outputs*) ha sido verificado con `smoke_test_vision.py` devolviendo el contrato `EvaluacionIA` completo y sin errores. La asignación de la cualitativa ESO es determinista en el backend. Ver [`[D-051]`](decisiones.md#d-051) y [`[D-052]`](decisiones.md#d-052).
+> ✅ **Pipeline Multimodal validado (12/08/2026):** El motor de visión (`gpt-4o-mini` vía OpenAI *Structured Outputs*) ha sido verificado mediante pruebas de integración aisladas, devolviendo el contrato `EvaluacionIA` completo y sin errores. La asignación de la cualitativa ESO es determinista en el backend. Ver [`[D-051]`](decisiones.md#d-051) y [`[D-052]`](decisiones.md#d-052).
 
 > La documentación interactiva completa (Swagger UI) está disponible en `http://127.0.0.1:8000/docs` al ejecutar el servidor en local.
 
@@ -346,12 +346,44 @@ El backend gestiona el seguimiento formativo del **Siguiente Paso Accionable (`e
 
 ---
 
-## 🧠 AI Development & Governance Methodology (`Phase Ninja`)
+## 🧠 AI-Augmented Engineering & Declaración de Transparencia (AI Act)
 
-Este proyecto sigue una rigurosa metodología de ingeniería de software acelerada y gobernada mediante colaboración humano-IA (`Human-in-the-Loop` y `PonyTail Coding`):
+Este proyecto aplica una rigurosa metodología de ingeniería acelerada mediante Inteligencia Artificial, operando siempre bajo un marco de estricta gobernanza (*Human-in-the-Loop*). En cumplimiento con los estándares de transparencia algorítmica y el **Art. 50 de la AI Act de la UE**, se declara lo siguiente:
+
+### 1. Gobernanza de Código (Orquestación de Agentes)
+El desarrollo técnico ha sido acelerado utilizando herramientas de *Agentic Coding* (orquestación de agentes autónomos). Sin embargo, la IA en este repositorio no opera libremente; está constreñida por un marco normativo estricto inyectado en su sistema (`AGENTS.md`), que obliga a cumplir:
+*   **Soberanía Arquitectónica:** El diseño del sistema, las reglas de negocio (LOMLOE) y la seguridad de los datos (Zero Data Retention) son 100% de autoría humana.
+*   **Freno Conductual (*Stop & Consult*):** La IA tiene terminantemente prohibido parchear el sistema estructuralmente sin autorización explícita. Ante un cruce de caminos arquitectónico, debe detenerse y presentar opciones.
+*   **PonyTail Coding (YAGNI):** La IA está bloqueada de realizar abstracciones prematuras o incluir dependencias redundantes.
+
+### 2. Implementación Histórica y Validación (*Fase Ninja*)
 
 1.  **Qué diseñé yo (Soberanía Arquitectónica y Prompting):** Diseñé el modelo pedagógico de evaluación educativa mediante Pydantic v2 (`EvaluacionIA`), estructuré el flujo del backend en FastAPI y definí el **Protocolo de Pausa Arquitectónica (*Stop & Consult*)** y el **Freno Conductual** (`Regla 5 de AGENTS.md`) que prohíbe ediciones no autorizadas. Asimismo, dirigí las decisiones de diseño arquitectónico (ADRs `[D-030]` y `[D-031]`), imponiendo la **Seudonimización Estricta (`alumno_id=A-14`)** para los menores en lugar de cifrados de columna con claves maestras frágiles en `.env`, blindando el sistema ante pérdidas catastróficas de datos y garantizando el cumplimiento normativo del **ENS y RGPD**.
 2.  **Qué ejecutaron los agentes (Generación de Código e Infraestructura):** El agente orquestado por IA generó los esquemas ORM y Pydantic agrupados en **Modularidad Plana (`backend/models/user.py`)** bajo el principio YAGNI con su respectivo *Scaling Trigger* documentado para el umbral de 8-10 tablas. Además, el agente configuró el contenedor Docker de PostgreSQL en el puerto exclusivo **`5433:5432`**, gestionó las dependencias de seguridad (`passlib[bcrypt]`, `pyjwt`, `pydantic[email]`) y generó de forma automática los scripts de versionado de esquema en `Alembic`.
-3.  **Cómo validé yo (Pruebas Unitarias, Terminal y Auditoría por Pares IA):** Validé el comportamiento transaccional ejecutando yo misma en consola WSL la activación de entornos virtuales (`source venv/bin/activate`), la aplicación de migraciones relacionales (`alembic upgrade head`) y los flujos de control de versiones con Git en *Modo Copiloto*. Para certificar el máximo nivel de excelencia y seguridad sin sesgos, sometí la arquitectura de autenticación e invariantes de Pydantic a una **Auditoría de Pares Multi-Motor (`Multi-Agent Peer Review` por Token Multiplexing en Perplexity Pro / ChatGPT / Claude)**, obteniendo una calificación unánime de **10/10 en seguridad práctica sin sobreingeniería**.
+3. **Cómo validé yo (Pruebas Unitarias, Terminal y Auditoría por Pares IA):** Validé el comportamiento transaccional ejecutando yo misma en consola WSL la activación de entornos virtuales (`source venv/bin/activate`), la aplicación de migraciones relacionales (`alembic upgrade head`) y los flujos de control de versiones con Git en *Modo Copiloto*. Para certificar el máximo nivel de excelencia y seguridad sin sesgos, sometí la arquitectura de autenticación e invariantes de Pydantic a una **Auditoría de Pares Multi-Motor (`Multi-Agent Peer Review` por Token Multiplexing en Perplexity Pro / ChatGPT / Claude)**, obteniendo una calificación unánime de **10/10 en seguridad práctica sin sobreingeniería**.
 4.  **Qué aprendí (Lecciones de FinOps y Gobernanza):** Aprendí que la verdadera maestría en el desarrollo asistido por IA no consiste en dejar que el modelo genere código abstracto sin control, sino en ejercer la dirección técnica mediante protocolos de pausa y revisión por pares entre distintos motores LLM. La modularidad plana combinada con hacheo unidireccional y seudonimización elimina por completo la deuda técnica de la criptografía ad-hoc, logrando un portfolio 100% autoinstalable, auditable y conforme a la ley gallega y europea.
 
+---
+
+## 🛡️ Patrón Showcase y Propiedad Intelectual
+
+Este repositorio sigue el patrón de diseño **Open Core / Showcase**. La infraestructura, seguridad, base de datos y gobernanza arquitectónica son públicas para permitir la auditoría técnica. Sin embargo, para proteger el núcleo del modelo de negocio, **los siguientes módulos han sido excluidos del control de versiones público**:
+*   Ingeniería de Prompts (`prompt_builder.py`).
+*   Esquemas de validación de OpenAI *Structured Outputs* (`evaluation.py`).
+*   Modelos de datos pedagógicos y Mocks de prueba (`seed_db.py`, `llm_client.py`).
+
+El sistema en producción carga estos módulos desde submódulos privados y repositorios aislados.
+
+---
+
+## ⚖️ Licencia y Condiciones de Uso
+
+**Copyright © 2026 Alba Camiña García. Todos los derechos reservados.**
+
+Este repositorio se expone de forma pública de manera intencionada como parte de una estrategia **Build in Public**, con el objetivo de demostrar la arquitectura técnica, someter el código a auditorías de seguridad y conformar un portfolio profesional. 
+
+Sin embargo, el código **NO es de libre uso ni de código abierto (Open Source)**. Queda estrictamente prohibida su copia, modificación, distribución o comercialización (incluyendo el despliegue como modelo SaaS, uso en entornos de producción o integración en plataformas EdTech de terceros) sin autorización previa, expresa y por escrito. Para más detalles, consulta el archivo [LICENSE](./LICENSE).
+
+### Cuarentena de Dependencias y Contribuciones (CLA)
+Para garantizar la viabilidad comercial del producto, este proyecto opera bajo una estricta política de **Zero-GPL** (`[D-061]`). Cualquier dependencia de terceros debe contar con una licencia permisiva (MIT, Apache 2.0, BSD). 
+Si deseas colaborar (reportar fallos o proponer código), ten en cuenta que operamos con un **Acuerdo de Licencia de Colaborador (CLA)** que exige la cesión irrevocable de los derechos comerciales a favor del autor original. Revisa el archivo [CONTRIBUTING.md](./CONTRIBUTING.md) antes de abrir un *Pull Request*.

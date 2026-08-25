@@ -17,7 +17,7 @@ from backend.models.user import Profesor
 # Configuración del algoritmo bcrypt (nativo, sin passlib)
 
 # Configuración de JWT
-SECRET_KEY = os.getenv("SECRET_KEY", "super-secret-key-galicia-2026-hitl-ninja")
+SECRET_KEY = os.getenv("SECRET_KEY", "CHANGE-ME-IN-PRODUCTION")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "1440")) # 24 horas
 
