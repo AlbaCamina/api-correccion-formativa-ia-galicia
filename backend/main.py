@@ -67,7 +67,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="API de Corrección Formativa con IA - Galicia",
     description="Backend oficial para el sistema de corrección formativa adaptada al Decreto 157/2022 de la Xunta de Galicia.",
-    version="0.3-001",
+    version="0.4.0",
     lifespan=lifespan,
 )
 
@@ -152,6 +152,6 @@ async def health_check():
     """
     return {
         "status": "ok",
-        "version": "0.3-001",
+        "version": "0.4.0",
         "service": "api-correccion-formativa-ia-galicia"
     }
