@@ -265,6 +265,12 @@ Funcionalidad de asistencia de api-correccion-formativa-ia-galicia (`Capa 4` rel
 **GPT-4o**  
 Modelo de lenguaje de OpenAI. A diferencia del antiguo GPT-4 (donde existía una variante separada llamada GPT-4V o GPT-4 Vision para procesar imágenes), **GPT-4o es multimodal de fábrica**: acepta texto, imagen y audio en el mismo modelo sin necesidad de especificar ninguna variante. Esto permite enviarle directamente la foto del examen para que lo lea y evalúe contra la rúbrica.
 
+**Guardarraíles Multinivel (*Multilayered Guardrails*)**  
+Mecanismos de seguridad y validación implementados en la arquitectura para evitar que el motor LLM alucine, vulnere normativas o tome decisiones autónomas. En api-correccion-formativa-ia-galicia se estructuran en tres capas:
+1. **Entrada (Input):** Enmascaramiento de PII en cliente y reglas de exclusión NEAE.
+2. **Salida (Output):** *Structured Outputs* validados por contratos estrictos de Pydantic.
+3. **Gobernanza (Behavioral):** Protocolo *Human-in-the-Loop* (la IA asiste, pero no firma la calificación definitiva).
+
 **Jerarquía Normativa en 5 Capas Relacionales (`JSONB`)**  
 Modelo arquitectónico multinivel de api-correccion-formativa-ia-galicia que desacopla y combina sin ambigüedad la legislación pública (`Capa 1: Decreto Xunta`), la programación anual del departamento (`Capa 2: Saberes y Criterios`), las normas comunes del colegio (`Capa 3: PEC/CCP`), la rúbrica de la prueba asistida (`Capa 4: El Profesor`) y las adaptaciones individuales de equidad (`Capa 5: NEAE/NEE en JSONB`).
 
