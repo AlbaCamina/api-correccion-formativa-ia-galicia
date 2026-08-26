@@ -428,6 +428,9 @@ Plataforma web donde se aloja el repositorio Git del proyecto. Es donde los empl
 **Blindaje de Privacidad y Carpeta `scratch/`**  
 Estrategia de gobernanza del repositorio por la que se aísla de forma estricta el código e historial público profesional (`models/`, `routers/`, `decisiones.md`) frente a documentación confidencial de trabajo intermedio del desarrollador (guiones de presentaciones en vídeo, notas preparatorias de entrevistas, listas de contactos y planes relacionales de networking). Estos documentos privados residen exclusivamente dentro del directorio local `scratch/`, el cual está bloqueado en el `.gitignore` para garantizar que jamás asciendan a la nube pública de GitHub ni dejen rastro en los commits.
 
+**Patrón Showcase (Showcase Pattern)**  
+Estrategia de gobernanza de repositorio (`[D-062]`) diseñada para proteger la propiedad intelectual o el "secreto comercial" de un proyecto (como los prompts de IA y configuraciones exclusivas) mientras se exhibe públicamente toda la infraestructura, arquitectura y base de código. Se implementa utilizando el `.gitignore` para cegar a Git ante los archivos críticos (ej. `prompt_builder.py`, `llm_client.py`), permitiendo que el resto del sistema (modelos relacionales, migraciones de base de datos, frontend PWA) sea visible para auditores y reclutadores, demostrando excelencia técnica ("Build in Public") sin regalar el negocio.
+
 **.gitignore**  
 
 Archivo que le dice a Git qué archivos ignorar y no incluir en el repositorio. Los archivos con claves de API (`.env`), dependencias (`venv/`) y cachés (`__pycache__/`) nunca deben subirse.
@@ -469,7 +472,6 @@ Proveedor de modelos de lenguaje con cuota gratuita muy generosa y velocidad de 
 
 **Jest / Vitest (Frameworks de Testing Frontend)**  
 Herramientas de testing unitario para JavaScript/TypeScript. **Jest** es el estándar clásico del ecosistema React (creado por Meta). **Vitest** es su alternativa moderna optimizada para proyectos con Vite, con sintaxis idéntica pero arranque mucho más rápido. En api-correccion-formativa-ia-galicia: los tests de la función `cropHeader()` (`[v0.3-001]`) se escribirán en Vitest por su integración nativa con el stack Vite + React de la PWA. Los tests de backend (Python) usan pytest; los tests de frontend (JS) usan Vitest — cada stack tiene su herramienta propia.
-
 
 **OpenCode**  
 Agente de IA que se ejecuta en la terminal de WSL. Lee y edita archivos directamente, ejecuta comandos, y trabaja dentro del mismo entorno donde corre Python/FastAPI. Se usa para código rutinario, boilerplate y edición de archivos.
@@ -734,6 +736,9 @@ Segunda capa de verificación y redacción en PWA (`[D-034]`). Además del recor
 **Hacheo Unidireccional (`bcrypt` / Password Hashing)**  
 Algoritmo criptográfico irreversible (de un solo sentido) utilizado en `backend/services/auth_service.py` para almacenar las contraseñas (`hashed_password`) en la tabla `profesores` (`[v0.2-002]`). A diferencia del cifrado simétrico, no requiere ni depende de ninguna clave maestra secreta en `.env` para funcionar; aplica un cálculo matemático complejo sobre la contraseña (`salt + hash`). Para validar un login, el motor aplica la misma fórmula al texto ingresado y compara los hashes resultantes, garantizando seguridad absoluta ante filtraciones y cero riesgo de pérdida por reinicios o migraciones de servidor.
 
+**Trust, but verify (Confía, pero verifica)**  
+Regla de oro fundamental en ciberseguridad, auditoría e ingeniería con Inteligencia Artificial. Consiste en el principio de no asumir nunca que un proceso automatizado (como un despliegue CI/CD, una integración de git, o la respuesta de un Agente IA autónomo) es correcto por defecto sin someterlo a comprobación empírica. Implica validar siempre mediante revisión de código, inspección del árbol de archivos o pruebas de caja blanca para garantizar la integridad y soberanía de los datos antes de pasar a producción.
+
 **.env**  
 Archivo de texto que contiene variables de entorno (claves de API, contraseñas, configuración sensible). Nunca se sube a GitHub — está en el `.gitignore`. El archivo `.env.example` muestra qué variables existen sin revelar sus valores.
 
@@ -976,3 +981,4 @@ Interfaz de programación nativa de los navegadores web modernos que permite a l
 *Actualizado el 21/08/2026 — Añadidos conceptos de analítica de posicionamiento técnico: Impresiones, Miembros Alcanzados, Alcance fuera de red y Consumo Pasivo (Lurking).*
 *Actualizado el 19/08/2026 — Añadida sección 13 (Marca Personal y Comunicación Digital) con conceptos de ghostwriting, hook, CTA, Build in Public, engagement y algoritmo de LinkedIn.*
 *Actualizado el 25/08/2026 — Añadidos conceptos de gobernanza legal: Compliance y Legal Ops.*
+*Actualizado el 26/08/2026 — Añadidos conceptos de la etapa SOTA: Trust, but verify, Patrón Showcase y el Síndrome del Impostor en IA.*
