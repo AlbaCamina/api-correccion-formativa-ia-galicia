@@ -48,6 +48,15 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
    * El agente debe estructurar grandes bloques de texto usando delimitadores `<xml>` para facilitar la atención del modelo.
    * Al construir prompts en el backend (`prompt_builder.py`), el agente aplicará **Prompt Anchoring**, repitiendo las reglas inquebrantables (como el retorno estricto de JSON o la Simetría Lingüística del alumno) estrictamente al final del prompt.
    * En sesiones de desarrollo prolongadas, si el orquestador humano exige un *"Context Reset"`, el agente generará un resumen de cierre para iniciar una sesión nueva en limpio.
+10. **Auditoría Pre-Publicación Obligatoria (*"Trust, but verify"*):**
+   * **Cuándo invocar la skill `skills/auditoria_pre_publicacion.md`:** El agente **DEBE** proponer activamente ejecutar esta auditoría ante cualquiera de los siguientes disparadores:
+     1. La desarrolladora menciona intención de hacer el repositorio `Public` en GitHub.
+     2. Se va a hacer merge de una rama de trabajo a `main`.
+     3. Se va a realizar una demo técnica, entrevista o presentación a un tercero (auditor, reclutador, cliente).
+     4. Han pasado más de 2 semanas desde la última auditoría y el proyecto ha tenido actividad intensa.
+   * **Qué verifica:** Rutas locales absolutas, datos personales en documentación pública, secretos en historial git, coherencia de versiones, `.gitignore` operativo y revisión visual en navegador.
+   * **Principio rector:** "Trust, but verify" — ningún resultado del agente se asume correcto sin comprobación empírica antes de exponerlo al mundo.
+
 
 ---
 
