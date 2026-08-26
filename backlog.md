@@ -69,7 +69,7 @@
 **para** que el alumnado con dificultades específicas sea evaluado con justicia según el `Decreto 229/2011` de la Xunta de Galicia y la `LOMLOE` [D-023].
 
 **Criterios de aceptación:**
-- [x] Elaborada taxonomía técnica en 4 niveles (Medidas ordinarias DEA, ACNS no significativas, ACS significativas y ACIS altas capacidades) documentada en [marco_normativo_y_adaptaciones.md](file:///c:/Users/34636/Desktop/api-correccion/marco_normativo_y_adaptaciones.md)
+- [x] Elaborada taxonomía técnica en 4 niveles (Medidas ordinarias DEA, ACNS no significativas, ACS significativas y ACIS altas capacidades) documentada en [marco_normativo_y_adaptaciones.md](./docs/conceptos/marco_normativo_y_adaptaciones.md)
 - [x] Diseñada la columna `adaptaciones_alumno (JSONB)` en `submissions` (`[v0.2-005]`) para inyectar reglas de exclusión ortográfica en el prompt sin que la IA diagnostique
 - [x] El contrato JSON clasifica faltas ortográficas en dislexia como marcadores neutros (`ortografia_excluida`) en gris, separándolos del cálculo de nota penalizadora
 
@@ -830,99 +830,19 @@
 
 
 
-## 🔮 Roadmap — Mejoras a Futuro
+## 🔮 Roadmap — Visión Estratégica
 
-### [Roadmap-001] Sincronización y Auditoría Automática de Vigencia Legislativa (DOG / BOE Tracker)
-**Como** administradora del sistema,  
-**quiero** que la plataforma verifique periódicamente si los decretos cargados en BBDD siguen vigentes  
-**para** evitar que la IA evalúe al alumnado con criterios obsoletos o derogados de forma involuntaria.
+> Las funcionalidades de roadmap están planificadas para versiones futuras y sujetas a validación de mercado. El detalle técnico completo se gestiona en documentación interna.
 
-* **Dependencias:** `[v0.2-003]` (Modelos base), `[v0.2-005]` (Changelog de auditoría), `feedparser` / `beautifulsoup4` (Scraping oficial).
-* **Criterios de aceptación:**
-  - Un worker en segundo plano realiza un rastreo periódico (mensual/trimestral) de los boletines oficiales buscando cambios en los decretos rectores.
-  - Si detecta un cambio de versión legal, marca el marco antiguo como histórico y el nuevo como borrador pendiente de revisión.
-  - Se registra el cambio de vigencia en el `changelog` con actor = "SYSTEM_UPDATE".
-
----
-
-### [Roadmap-002] Escáner Local Offline de Datos Personales Pre-Nube (`Automated Offline PII Shield`)
-**Como** administradora de ciberseguridad del sistema,  
-**quiero** que el backend local pase la imagen por un micro-motor OCR offline en RAM antes de conectar con la nube exterior  
-**para** detectar y bloquear automáticamente cualquier nombre o rastro de PII del alumnado que haya escapado al recorte manual de cabecera (`[D-034]`).
-
-
-
-* **Dependencias:** `[v0.3-002]` (Recorte pre-nube Pillow), `pytesseract` / `presidio-image-redactor`.
-* **Candidatos de motor OCR offline (a evaluar en implementación):**
-  - `Tesseract` — OCR clásico LSTM, óptimo para texto impreso (cabeceras, nombres tipografiados).
-  - `TrOCR` (`microsoft/trocr-base-handwritten`) — Transformer end-to-end, candidato preferido para caligrafía manuscrita escolar irregular (letra del alumno en el cuerpo del examen). Ver `glosario.md`.
-* **Criterios de aceptación:**
-  - Un middleware local en WSL/Docker inspecciona el buffer de la imagen en memoria antes de llamar al SDK de Cloudinary o al motor de Groq.
-  - Si detecta coincidencias con nombres del listado de la clase (`PII Confidence > 0.8`), aborta la subida y devuelve error HTTP `422` alertando al docente para redacción visual en la PWA.
-  - El intento bloqueado queda registrado en el `changelog` con `actor = "PII_SHIELD"` para trazabilidad AI Act.
-
----
-
-### [Roadmap-003] Servidor MCP para Integración Agéntica Externa (Model Context Protocol)
-**Como** arquitecta de software,  
-**quiero** exponer un servidor MCP (Model Context Protocol) sobre el backend  
-**para** que cualquier agente de IA externo (Claude Desktop, IDEs o asistentes de centro) pueda consultar rúbricas y ejecutar la evaluación formativa de forma estandarizada y segura.
-
-* **Dependencias:** `[v0.2-001]` (CRUD Rúbricas SQL), `[v0.2-004]` (Motor Evaluador FastAPI), SDK `mcp` en Python.
-* **Criterios de aceptación:**
-  - Un servidor MCP en Python (protocolo JSON-RPC) expone las herramientas: `obtener_rubrica_oficial`, `validar_contrato_evaluacion` y `ejecutar_evaluacion_formativa`.
-  - Los agentes externos interactúan con la API utilizando esquemas estrictos Pydantic sin necesidad de conectores ad-hoc.
-  - Se mantiene la garantía de privacidad por diseño (*Zero Data Retention*) exigida en el sistema.
-
----
-
-### [Roadmap-004] Generador de Pruebas y Exámenes Competenciales Dinámicos
-**Como** docente,  
-**quiero** que la API utilice el contexto normativo y las rúbricas almacenadas en la base de datos para generar modelos de examen aleatorios y competenciales  
-**para** evaluar a los alumnos con escenarios prácticos donde el uso de IAs generativas por parte del estudiante no invalide la prueba.
-
-* **Dependencias:** `[v0.2-003]` (Marcos Normativos), `[v0.2-004]` (Rúbricas Docentes).
-* **Criterios de aceptación:**
-  - Un nuevo endpoint `POST /api/v1/exams/generate` acepta un `marco_id` y `rubrica_id`.
-  - El LLM cruza los descriptores operativos de la ley con la rúbrica y devuelve un JSON estructurado con preguntas basadas en escenarios prácticos reales (no de memorización).
-* **Notas de diseño / Inspiración:**
-  - Inspirado en la arquitectura multi-agente de generación de contenidos de Miguel Egea. El diseño evaluará la viabilidad de utilizar plantillas deterministas orquestadas antes de la fase de generación LLM para asegurar la consistencia curricular.
-
----
-
-### [Roadmap-005] RAG Semántico con Materiales Didácticos del Docente
-**Como** docente,  
-**quiero** poder subir mis apuntes, fragmentos del libro de texto y criterios específicos del examen al sistema  
-**para** que la IA evalúe al alumno conforme a lo que yo he impartido en el aula, y no solo conforme al conocimiento general del modelo y la normativa oficial.
-
-* **Dependencias:** `[v0.2-004]` (Rúbricas Docentes), `[v0.3-001]` (Subida de archivos), vector store (Pinecone, Chroma o PGVector).
-* **Contexto:** Limitación conocida y documentada en `[D-054]`. El RAG actual es determinista (recuperación por ID exacto), lo que garantiza consistencia normativa pero impide que el modelo sepa qué temario concreto ha dado el docente hasta la prueba.
-* **Criterios de aceptación:**
-  - El docente puede subir documentos (PDF, TXT) como "materiales de aula" vinculados a una asignatura y período.
-  - El sistema los procesa mediante chunking + embeddings y los indexa en un vector store.
-  - En cada evaluación, antes de llamar al LLM, el sistema recupera los fragmentos más relevantes a la pregunta del alumno y los inyecta como contexto adicional en el prompt.
-  - Si no hay materiales cargados, el sistema evalúa en modo RAG Determinista actual con aviso en el panel docente.
-
----
-
-### [Roadmap-006] Orquestación Agéntica basada en Skills (Agent Skills Framework)
-**Como** arquitecta de software,  
-**quiero** evaluar la viabilidad de adoptar un marco de Skills agénticas modulares  
-**para** desacoplar las capacidades especializadas del motor (transcripción OCR, auditoría curricular, redacción de feed-forward) en módulos autónomos y reusables.
-
-* **Inspirado por / Recomendación:** Miguel Ángel (Altia) — propuesta de explorar la arquitectura basada en Agent Skills para orquestación agéntica.
-* **Estado:** ⏳ Pendiente de evaluación de viabilidad (Roadmap).
-
----
-
-### [Roadmap-007] Integración de CLI Disensor (`disensor.dev`) en CI/CD de GitHub Actions
-**Como** desarrolladora,  
-**quiero** integrar la herramienta de CLI `disensor` (`pip install disensor`) en la tubería de Integración Continua (`.github/workflows/ci.yml`)  
-**para** bloquear automáticamente cualquier Pull Request cuyo residuo de desarrollo no haya sido explícitamente verificado y firmado en un archivo versionado.
-
-* **Inspirado por / Herramienta:** Nicolás Rocchia (`disensor.dev` / Open Source Python).
-* **Dependencias:** `[v1.0-002]` (Pipeline CI/CD en GitHub Actions).
-* **Estado:** ⏳ Planificado para la fase de automatización de CI/CD (Roadmap).
+| ID | Funcionalidad | Estado |
+|---|---|---|
+| Roadmap-001 | Sincronización automática de vigencia legislativa (DOG/BOE Tracker) | 🔮 Roadmap |
+| Roadmap-002 | Escáner offline de PII pre-nube (`Automated Offline PII Shield`) | 🔮 Roadmap |
+| Roadmap-003 | Servidor MCP para integración agéntica externa | 🔮 Roadmap |
+| Roadmap-004 | Generador de pruebas y exámenes competenciales dinámicos | 🔮 Roadmap |
+| Roadmap-005 | RAG Semántico con materiales didácticos del docente | 🔮 Roadmap |
+| Roadmap-006 | Orquestación agéntica basada en Skills (Agent Skills Framework) | 🔮 Roadmap |
+| Roadmap-007 | Integración de CLI para auditoría de residuos de desarrollo en CI/CD | 🔮 Roadmap |
 
 ---
 
@@ -931,12 +851,12 @@
 - **Tests sin validación de migraciones (v0.3-002):** Tests sin validación de migraciones (v0.3-002+): Los tests unitarios utilizan SQLite en memoria llamando a metadata.create_all() en lugar de aplicar revisiones Alembic, por lo que no validan si las migraciones coinciden con los modelos reales. Esta es una limitación técnica conocida que obliga a validar las nuevas columnas (como estado_feed_forward) manualmente contra Postgres.
 Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificada como Parcial por este mismo motivo (evidencia indirecta, riesgo de falso "verde"). Cerrar esta deuda requiere una suite de tests de integración contra un contenedor Postgres real (no SQLite) que aplique alembic upgrade head antes de cada batería de pruebas.
 - **Advertencia de Dependencias (v0.5):** Los tests arrojan un `StarletteDeprecationWarning: Using 'httpx' with 'starlette.testclient' is deprecated; install 'httpx2' instead.` que debe resolverse actualizando la dependencia del cliente HTTP de pruebas.
-- **Revisión Pre-Publicación (Open Source):** Antes de cambiar la visibilidad del repositorio a público, se debe ejecutar el siguiente checklist:
-  1. **Auditoría de Markdown:** Asegurar que no hay rutas locales absolutas (ej. `C:\Users\...`), comentarios sobre estrategia personal, o planes de networking en `backlog.md`, `decisiones.md`, etc. El tono debe ser estrictamente técnico.
-  2. **Limpieza del repositorio:** Eliminar archivos basura, scripts temporales (scratchpads) y verificar que el `.gitignore` funciona correctamente (`__pycache__`, etc).
-  3. **Seguridad de Secretos:** Revisar el historial de Git para garantizar que nunca se ha subido una API Key real en el pasado (usar BFG Repo-Cleaner si fuera necesario).
-  4. **Licenciamiento:** Añadir un archivo `LICENSE` (ej. MIT License) en la raíz del proyecto.
-  5. **README Onboarding:** Añadir una sección de "Getting Started" o "Instalación Local" clara para que un evaluador externo sepa cómo levantar la API en 2 minutos.
+- **Revisión Pre-Publicación ✅ Completada (26/08/2026):** El repositorio ha superado el siguiente checklist antes de su publicación:
+  1. ✅ **Auditoría de Markdown:** Sin rutas locales absolutas ni referencias personales en documentación pública. Roadmap estratégico movido a documentación interna.
+  2. ✅ **Limpieza del repositorio:** `.gitignore` verificado. `scratch/`, `venv/`, `__pycache__`, prompts propietarios y smoke tests excluidos del historial público.
+  3. ✅ **Seguridad de Secretos:** Sin API Keys reales en el historial de Git. `.env` bloqueado por `.gitignore`.
+  4. ✅ **Licenciamiento:** Archivo `LICENSE` (Propietario — Todos los Derechos Reservados) presente en la raíz. Política Zero-GPL operativa (`[D-061]`).
+  5. ✅ **README Onboarding:** Sección de instalación local completa (Docker, Alembic, Uvicorn, PWA frontend).
 
 ---
 

@@ -64,7 +64,7 @@ Abre `.env` y configura tus API Keys reales de Groq/OpenAI, la cadena `DATABASE_
 alembic upgrade head
 ```
 
-> ⚠️ **Nota de deuda técnica:** Las migraciones se aplican correctamente en desarrollo, pero la suite de tests actual valida contra SQLite en memoria (`metadata.create_all()`), no contra un contenedor Postgres real con `alembic upgrade head`. Ver [AUDITORIA.md](file:///c:/Users/34636/Desktop/api-correccion/AUDITORIA.md), sección 4, fila "Alembic".
+> ⚠️ **Nota de deuda técnica:** Las migraciones se aplican correctamente en desarrollo, pero la suite de tests actual valida contra SQLite en memoria (`metadata.create_all()`), no contra un contenedor Postgres real con `alembic upgrade head`. Ver [AUDITORIA.md](./AUDITORIA.md), sección 4, fila "Alembic".
 
 ### 5. Ejecutar el Servidor FastAPI
 
