@@ -840,7 +840,7 @@
 | Roadmap-002 | Escáner offline de PII pre-nube (`Automated Offline PII Shield`) | 🔮 Roadmap |
 | Roadmap-003 | Servidor MCP para integración agéntica externa | 🔮 Roadmap |
 | Roadmap-004 | Generador de pruebas y exámenes competenciales dinámicos | 🔮 Roadmap |
-| Roadmap-005 | RAG Semántico con materiales didácticos del docente | 🔮 Roadmap |
+| Roadmap-005 | *Línea Base de Profundidad* (Apuntes Didácticos): Estudio arquitectónico pendiente para evaluar Long-Context Prompting bruto (ej. Gemini 1.5 Flash con Context Caching) vs LightRAG (Graph-Augmented Semantic RAG). La decisión final dependerá de pruebas empíricas de FinOps, latencia y precisión. | 🔮 Roadmap |
 | Roadmap-006 | Orquestación agéntica basada en Skills (Agent Skills Framework) | 🔮 Roadmap |
 | Roadmap-007 | Integración de CLI para auditoría de residuos de desarrollo en CI/CD | 🔮 Roadmap |
 
