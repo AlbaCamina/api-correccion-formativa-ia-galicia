@@ -295,9 +295,6 @@ Mecanismos de seguridad y validación implementados en la arquitectura para evit
 **Jerarquía Normativa en 5 Capas Relacionales (`JSONB`)**  
 Modelo arquitectónico multinivel de api-correccion-formativa-ia-galicia que desacopla y combina sin ambigüedad la legislación pública (`Capa 1: Decreto Xunta`), la programación anual del departamento (`Capa 2: Saberes y Criterios`), las normas comunes del colegio (`Capa 3: PEC/CCP`), la rúbrica de la prueba asistida (`Capa 4: El Profesor`) y las adaptaciones individuales de equidad (`Capa 5: NEAE/NEE en JSONB`).
 
-**LightRAG (Graph-Augmented Semantic RAG)**  
-Evolución del RAG semántico tradicional que, además de buscar similitudes de texto mediante vectores, construye un Grafo de Conocimiento (Knowledge Graph) mapeando las relaciones lógicas entre conceptos. En el roadmap del proyecto (`[Roadmap-005]`), se utilizará para procesar los apuntes del profesor, permitiendo a la IA comprender la estructura completa y el alcance real de lo impartido en clase para establecer una *Línea Base de Profundidad* justa y precisa.
-
 **LLM** (Large Language Model — Modelo de Lenguaje Grande)  
 Modelo de inteligencia artificial entrenado con enormes cantidades de texto. Es la IA que corrige los exámenes en este proyecto (GPT-4o o Claude).
 

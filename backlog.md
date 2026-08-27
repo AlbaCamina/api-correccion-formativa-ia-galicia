@@ -480,7 +480,7 @@
   - [x] Conservación de píxeles: `cabecera.alto + cuerpo.alto === original.alto`
   - [x] Caso borde `ratio = 0.0`: cuerpo === imagen completa
   - [x] Caso borde `ratio = 1.0`: cuerpo vacío
-- [ ] Nota histórica: el algoritmo fue validado matemáticamente en `scratch/pillow_crop_test.py` (PoC 24/07/2026, ignorado por git) antes de portarse a JS
+- [x] Nota histórica: el algoritmo fue validado matemáticamente en `scratch/pillow_crop_test.py` (PoC 24/07/2026, ignorado por git) antes de portarse a JS
 
 **Etiquetas:** `v0.3` `frontend` `legal` `rgpd`
 
@@ -660,15 +660,13 @@
 **para** enviar el examen al sistema sin importar qué dispositivo use.
 
 **Criterios de aceptación:**
-- [x] En móvil/tablet: botón para capturar uno o múltiples folios con la cámara trasera
+- [x] En móvil/tablet: botón para capturar un folio con la cámara trasera (MVP)
 - [x] En PC: input de subida de archivos (JPG, PNG) 
 - [x] Compresión y redimensión en cliente [D-020]: las imágenes se reducen automáticamente a ~2048px en su lado largo (~800 KB) antes del envío
-- [ ] Seudonimización en cliente [`D-022`]: recorte automático de la cabecera superior (primeros 3 cm) sobre el Canvas
-- [x] **`[D-034]` Herramienta de Tampón/Blackout Box:** vista previa pre-subida donde el docente puede arrastrar recuadros negros adicionales con el dedo o ratón sobre cualquier nombre desplazado al pie, lateral o centro del folio. Los píxeles se destruyen en el navegador antes del `fetch` a la nube
-- [ ] Vista previa y reordenación de folios antes de confirmar
-- [ ] **Selector obligatorio de `etapa` (ESO/BACH):** La interfaz bloquea el envío y exige seleccionar la etapa educativa, alineándose con el *Breaking Change* de backend (`[D-041]`) para prevenir errores HTTP 422.
-- [ ] Botón de envío que transmite el array y datos a `POST /api/v1/submissions`
-- [ ] Indicador de carga mientras el servidor encola la corrección asíncrona
+- [x] Seudonimización en cliente [`D-022`]: recorte automático de la cabecera superior (primeros 3 cm) sobre el Canvas
+- [x] **`[D-034]` Herramienta de Tampón/Blackout Box:** vista previa pre-subida donde el docente puede arrastrar recuadros negros adicionales (o usar el modo tachón manual PWA) sobre cualquier nombre desplazado al pie, lateral o centro del folio. Los píxeles se destruyen en el navegador antes del `fetch` a la nube
+
+> *Nota: La lógica de red (fetch), selectores de etapa y reordenación de folios se ha extraído a la issue `[v0.5-008]` para cerrar este MVP de captura.*
 
 **Etiquetas:** `v0.5` `frontend`
 
@@ -753,6 +751,23 @@
 - [ ] Mantener los tests rápidos con SQLite en memoria para desarrollo local ultrarrápido (`pytest -m unit`).
 
 **Etiquetas:** `v0.5` `testing` `docker` `alembic` `tech-debt`
+
+---
+
+### [v0.5-008] Conexión Backend: Subida y Gestión de Red (Deuda v0.5-002)
+
+**Como** profesora,  
+**quiero** poder enviar la imagen ya anonimizada a los servidores  
+**para** que inicie la corrección asíncrona.
+
+**Criterios de aceptación:**
+- [ ] Soporte para procesar múltiples folios por entrega (gestión de arrays de imágenes).
+- [ ] Vista previa y reordenación de folios antes de confirmar (opcional para v0.5).
+- [ ] **Selector obligatorio de `etapa` (ESO/BACH):** La interfaz bloquea el envío y exige seleccionar la etapa educativa, alineándose con el *Breaking Change* de backend (`[D-041]`) para prevenir errores HTTP 422.
+- [ ] Botón de envío que transmite el array de imágenes anonimizadas y datos a `POST /api/v1/submissions` mediante `fetch`.
+- [ ] Indicador de carga bloqueante (Spinner) mientras el servidor sube la imagen y encola la corrección asíncrona.
+
+**Etiquetas:** `v0.5` `frontend` `red`
 
 
 ---
@@ -840,9 +855,11 @@
 | Roadmap-002 | Escáner offline de PII pre-nube (`Automated Offline PII Shield`) | 🔮 Roadmap |
 | Roadmap-003 | Servidor MCP para integración agéntica externa | 🔮 Roadmap |
 | Roadmap-004 | Generador de pruebas y exámenes competenciales dinámicos | 🔮 Roadmap |
-| Roadmap-005 | *Línea Base de Profundidad* (Apuntes Didácticos): Estudio arquitectónico pendiente para evaluar Long-Context Prompting bruto (ej. Gemini 1.5 Flash con Context Caching) vs LightRAG (Graph-Augmented Semantic RAG). La decisión final dependerá de pruebas empíricas de FinOps, latencia y precisión. | 🔮 Roadmap |
+
 | Roadmap-006 | Orquestación agéntica basada en Skills (Agent Skills Framework) | 🔮 Roadmap |
 | Roadmap-007 | Integración de CLI para auditoría de residuos de desarrollo en CI/CD | 🔮 Roadmap |
+| Roadmap-008 | PWA UX: Refactorización de `imageCrop` hacia una librería avanzada (ej. `cropperjs`) con bounding box móvil e historial de estados (Undo/Redo). | 🔮 Roadmap |
+
 
 ---
 
