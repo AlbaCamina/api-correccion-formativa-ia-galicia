@@ -471,15 +471,15 @@
 > Arquitectura invariante: la función de recorte vive en `frontend/src/utils/imageCrop.js` (JavaScript/Canvas API). El backend Python **solo recibe el archivo ya recortado y seudonimizado** — jamás el original con PII.
 
 **Criterios de aceptación:**
-- [ ] Función pura `cropHeader(imageData, ratio = 0.20)` en `frontend/src/utils/imageCrop.js`
-- [ ] La función recibe un `HTMLCanvasElement` o `ImageBitmap` y devuelve el cuerpo evaluable (sin cabecera)
-- [ ] Separación estricta de lógica pura (cálculo de recorte) e I/O (upload del resultado)
-- [ ] Tests en **Vitest** cubriendo:
-  - [ ] Ratio estándar `0.20`: dado folio 794×1123px → cuerpo resultante 794×899px
-  - [ ] Ratio personalizado (`0.15`, `0.25`): verificar proporcionalidad
-  - [ ] Conservación de píxeles: `cabecera.alto + cuerpo.alto === original.alto`
-  - [ ] Caso borde `ratio = 0.0`: cuerpo === imagen completa
-  - [ ] Caso borde `ratio = 1.0`: cuerpo vacío
+- [x] Función pura `cropHeader(imageData, ratio = 0.20)` en `frontend/src/utils/imageCrop.js`
+- [x] La función recibe un `HTMLCanvasElement` o `ImageBitmap` y devuelve el cuerpo evaluable (sin cabecera)
+- [x] Separación estricta de lógica pura (cálculo de recorte) e I/O (upload del resultado)
+- [x] Tests en **Vitest** cubriendo:
+  - [x] Ratio estándar `0.20`: dado folio 794×1123px → cuerpo resultante 794×899px
+  - [x] Ratio personalizado (`0.15`, `0.25`): verificar proporcionalidad
+  - [x] Conservación de píxeles: `cabecera.alto + cuerpo.alto === original.alto`
+  - [x] Caso borde `ratio = 0.0`: cuerpo === imagen completa
+  - [x] Caso borde `ratio = 1.0`: cuerpo vacío
 - [ ] Nota histórica: el algoritmo fue validado matemáticamente en `scratch/pillow_crop_test.py` (PoC 24/07/2026, ignorado por git) antes de portarse a JS
 
 **Etiquetas:** `v0.3` `frontend` `legal` `rgpd`
