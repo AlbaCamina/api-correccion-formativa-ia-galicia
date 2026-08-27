@@ -366,6 +366,12 @@ El desarrollo técnico ha sido acelerado utilizando herramientas de *Agentic Cod
 
 ---
 
+## 🙏 Agradecimientos Especiales
+
+Quiero hacer una mención especial al equipo de ingeniería de **Quantia**, y en particular a **Andrés**, por las valiosas conversaciones técnicas y el *sparring* arquitectónico durante la evolución de este proyecto. Su exigencia y sus preguntas sobre el estado del arte de la IA (específicamente sobre la adopción de **LightRAG** para resolver las regresiones semánticas) han sido fundamentales para elevar el rigor técnico del *Roadmap* de esta API a estándares de nivel *Enterprise*.
+
+---
+
 ## 🛡️ Patrón Showcase y Propiedad Intelectual
 
 Este repositorio sigue el patrón de diseño **Open Core / Showcase**. La infraestructura, seguridad, base de datos y gobernanza arquitectónica son públicas para permitir la auditoría técnica. Sin embargo, para proteger el núcleo del modelo de negocio, **los siguientes módulos han sido excluidos del control de versiones público**:
