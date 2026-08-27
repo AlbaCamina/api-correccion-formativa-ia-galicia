@@ -1,4 +1,5 @@
 import React, { useRef, useState, useEffect } from 'react';
+import { cropHeader } from '../utils/imageCrop';
 
 const CameraCapture = () => {
   const videoRef = useRef(null);
@@ -7,6 +8,8 @@ const CameraCapture = () => {
   const [imageCaptured, setImageCaptured] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
+  const [censorshipMode, setCensorshipMode] = useState(false);
+  const originalImageRef = useRef(null); // MVP: Guarda la foto intacta para poder deshacer
 
   // Detener la cámara al desmontar el componente
   useEffect(() => {
@@ -62,6 +65,9 @@ const CameraCapture = () => {
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
     
+    // Guardar copia de seguridad intacta para restaurar (MVP Undo)
+    originalImageRef.current = canvas.toDataURL('image/jpeg', 1.0);
+    
     stopCamera();
     setImageCaptured(true);
   };
@@ -92,6 +98,9 @@ const CameraCapture = () => {
       const ctx = canvas.getContext('2d');
       ctx.drawImage(img, 0, 0, width, height);
       
+      // Guardar copia de seguridad intacta para restaurar (MVP Undo)
+      originalImageRef.current = canvas.toDataURL('image/jpeg', 1.0);
+      
       stopCamera();
       setImageCaptured(true);
     };
@@ -100,6 +109,7 @@ const CameraCapture = () => {
 
   const resetCapture = () => {
     setImageCaptured(false);
+    setCensorshipMode(false);
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -129,15 +139,15 @@ const CameraCapture = () => {
   };
 
   const startDrawing = (e) => {
+    if (!imageCaptured || !censorshipMode) return;
     e.preventDefault();
-    if (!imageCaptured) return;
     setIsDrawing(true);
     setLastPos(getCoordinates(e));
   };
 
   const draw = (e) => {
+    if (!isDrawing || !imageCaptured || !censorshipMode) return;
     e.preventDefault();
-    if (!isDrawing || !imageCaptured) return;
     
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -157,6 +167,40 @@ const CameraCapture = () => {
 
   const stopDrawing = () => {
     setIsDrawing(false);
+  };
+
+  const handleAutoCrop = () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    try {
+      const croppedCanvas = cropHeader(canvas, canvas.width, canvas.height, 0.20);
+      
+      // Actualizamos las dimensiones del lienzo original para reflejar el recorte
+      canvas.width = croppedCanvas.width;
+      canvas.height = croppedCanvas.height;
+      
+      const ctx = canvas.getContext('2d');
+      // Dibujamos el resultado sobre el lienzo que ve el usuario
+      ctx.drawImage(croppedCanvas, 0, 0);
+    } catch (err) {
+      console.error("Error recortando cabecera:", err);
+      alert("Error al recortar la imagen.");
+    }
+  };
+
+  const handleRestoreOriginal = () => {
+    if (!originalImageRef.current || !canvasRef.current) return;
+    
+    const img = new Image();
+    img.onload = () => {
+      const canvas = canvasRef.current;
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+      ctx.drawImage(img, 0, 0);
+    };
+    img.src = originalImageRef.current;
   };
 
   const handleSubmit = () => {
@@ -207,7 +251,25 @@ const CameraCapture = () => {
 
       {/* Contenedor del Canvas (Imagen Capturada) */}
       <div className="canvas-wrapper" style={{ display: imageCaptured ? 'flex' : 'none', flexDirection: 'column', alignItems: 'center', gap: '1rem' }}>
-        <p style={{ color: 'var(--color-warning)' }}>⚠️ Pasa el dedo o ratón por encima para censurar el nombre del alumno.</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#222', padding: '0.3rem 0.8rem', borderRadius: '8px' }}>
+          <span style={{ fontSize: '0.8rem', color: '#ccc' }}>Tachón Manual:</span>
+          <button 
+            onClick={() => setCensorshipMode(!censorshipMode)}
+            style={{ 
+              background: censorshipMode ? 'var(--color-danger)' : '#444', 
+              color: 'white',
+              padding: '0.3rem 0.6rem',
+              fontSize: '0.8rem',
+              border: 'none',
+              borderRadius: '4px',
+              fontWeight: 'bold'
+            }}
+          >
+            {censorshipMode ? 'ON' : 'OFF'}
+          </button>
+        </div>
+        
+        {censorshipMode && <p style={{ color: 'var(--color-warning)', fontSize: '0.85rem' }}>⚠️ Pasa el dedo o ratón por encima para censurar el nombre.</p>}
         
         <canvas
           ref={canvasRef}
@@ -218,13 +280,20 @@ const CameraCapture = () => {
           onTouchStart={startDrawing}
           onTouchMove={draw}
           onTouchEnd={stopDrawing}
-          style={{ maxWidth: '100%', border: '2px solid var(--accent-primary)', cursor: 'crosshair', touchAction: 'none' }}
+          style={{ 
+            maxWidth: '100%', 
+            border: censorshipMode ? '2px solid var(--color-danger)' : '2px solid var(--accent-primary)', 
+            cursor: censorshipMode ? 'crosshair' : 'default', 
+            touchAction: censorshipMode ? 'none' : 'auto' 
+          }}
         />
         
-        <div className="action-buttons" style={{ display: 'flex', gap: '1rem' }}>
-          <button onClick={resetCapture} style={{ background: '#555' }}>Descartar</button>
-          <button onClick={handleSubmit} style={{ background: 'var(--color-success)', color: 'black', fontWeight: 'bold' }}>
-            Confirmar y Enviar
+        <div className="action-buttons" style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap', justifyContent: 'center', width: '100%', padding: '1rem 0' }}>
+          <button onClick={handleRestoreOriginal} style={{ background: '#f59e0b', color: 'black', padding: '1rem', fontSize: '1rem', borderRadius: '8px', flex: '1 1 40%' }}>🔄 Restaurar</button>
+          <button onClick={handleAutoCrop} style={{ background: '#3b82f6', color: 'white', padding: '1rem', fontSize: '1rem', borderRadius: '8px', flex: '1 1 40%' }}>✂️ Recorte Cabecera</button>
+          <button onClick={resetCapture} style={{ background: '#555', color: 'white', padding: '1rem', fontSize: '1rem', borderRadius: '8px', flex: '1 1 40%' }}>❌ Descartar</button>
+          <button onClick={handleSubmit} style={{ background: 'var(--color-success)', color: 'black', fontWeight: 'bold', padding: '1.2rem', fontSize: '1.2rem', borderRadius: '8px', flex: '1 1 100%' }}>
+            ✅ Confirmar y Enviar
           </button>
         </div>
       </div>
