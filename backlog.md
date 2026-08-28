@@ -856,9 +856,11 @@
 | Roadmap-003 | Servidor MCP para integración agéntica externa | 🔮 Roadmap |
 | Roadmap-004 | Generador de pruebas y exámenes competenciales dinámicos | 🔮 Roadmap |
 
-| Roadmap-006 | Orquestación agéntica basada en Skills (Agent Skills Framework) | 🔮 Roadmap |
+| Roadmap-006 | Orquestación agéntica basada en Skills (Agent Skills Framework / Inspiración: Miguel Egea Gómez) | 🔮 Roadmap |
 | Roadmap-007 | Integración de CLI para auditoría de residuos de desarrollo en CI/CD | 🔮 Roadmap |
 | Roadmap-008 | PWA UX: Refactorización de `imageCrop` hacia una librería avanzada (ej. `cropperjs`) con bounding box móvil e historial de estados (Undo/Redo). | 🔮 Roadmap |
+| Roadmap-009 | Compuerta Adversarial para Módulos Sensibles (D-035): Desacuerdo Controlado (Multi-LLM) restringido a cambios de alto riesgo para optimizar costes. (Candidato: Disensor CLI v1.0+ / Metodología: Nicolás Rocchia). | 🔮 Roadmap |
+| Roadmap-010 | Motor Híbrido *Light RAG* para inyección legal y normativa sin sobrecarga de tokens (Inspiración: Andrés de Quantia). | 🔮 Roadmap |
 
 
 ---

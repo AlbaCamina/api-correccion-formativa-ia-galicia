@@ -56,6 +56,9 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
      4. Han pasado más de 2 semanas desde la última auditoría y el proyecto ha tenido actividad intensa.
    * **Qué verifica:** Rutas locales absolutas, datos personales en documentación pública, secretos en historial git, coherencia de versiones, `.gitignore` operativo y revisión visual en navegador.
    * **Principio rector:** "Trust, but verify" — ningún resultado del agente se asume correcto sin comprobación empírica antes de exponerlo al mundo.
+11. **Trazabilidad de la Propiedad Intelectual (Acreditación):**
+    * Todo cambio arquitectónico, regla de diseño o concepto estratégico que haya sido inspirado o sugerido por un experto externo debe ser obligatoriamente acreditado.
+    * El agente utilizará siempre el nombre completo de la persona al documentar la decisión en el código, en los mensajes de commit y en la documentación pública (README.md / backlog.md). El conocimiento colaborativo se reconoce y documenta formalmente.
 
 
 ---

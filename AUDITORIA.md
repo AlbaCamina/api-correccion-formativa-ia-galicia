@@ -56,6 +56,7 @@ Este documento existe para dar una visión rápida del estado global de auditor�
 | Scaffold Frontend React + Vite + PWA (`[v0.5-001]`)                  | ✅ D-058 / D-007 / D-008         | ✅ rama v0.5-frontend-pwa         | ✅ `app.test.jsx` en verde       | ✅ backlog `[v0.5-001]` cerrado | 🟢 Auditado | HTTPS local con `@vitejs/plugin-basic-ssl`. Service Worker generado. Verificado en PC y móvil. Vitest configurado. |
 | Sistema de diseño UI (Glassmorphism + tokens CSS)                     | ✅ D-059                         | ✅ `frontend/src/index.css`       | ❌ sin tests visuales/WCAG       | ✅ glosario + D-059             | Parcial     | Variables CSS centralizadas. Contraste WCAG AA pendiente de verificación antes de despliegue público. |
 | Evidencias para auditoría externa (AI Act/Auditoría)                      | ❌ no definida                   | ⚠ logs básicos                    | ❌ sin ensayos formales           | ⚠ docs centradas en lo técnico | No iniciado | Requiere checklist específico si se busca auditoría externa formal.                                                       |
+| Compuertas Adversariales y Declaración de Residuo                     | ✅ D-057 / Roadmap               | ⚠ Parcial (Solo PWA)              | N/A                              | ✅ README actualizado             | En Roadmap  | Residuo Pedagógico implementado vía `confidence_score`. Revisión adversarial de CI/CD planificada en `[Roadmap-009]`.     |
 
 ---
 

@@ -408,6 +408,9 @@ El desarrollo técnico ha sido acelerado utilizando herramientas de *Agentic Cod
 *   **Soberanía Arquitectónica:** El diseño del sistema, las reglas de negocio (LOMLOE) y la seguridad de los datos (Zero Data Retention) son 100% de autoría humana.
 *   **Freno Conductual (*Stop & Consult*):** La IA tiene terminantemente prohibido parchear el sistema estructuralmente sin autorización explícita. Ante un cruce de caminos arquitectónico, debe detenerse y presentar opciones.
 *   **PonyTail Coding (YAGNI):** La IA está bloqueada de realizar abstracciones prematuras o incluir dependencias redundantes.
+*   **Declaración de Residuo y Desacuerdo Controlado:** Apoyándose en la investigación metodológica de Nicolás Rocchia (Ingeniería Adversarial y Residuos Declarados) y el marco sociotécnico de Raquel Garrido Arranz (prevención del *Sedentarismo Operativo* y *Espejismo de la Eficiencia*), la arquitectura bloquea activamente los consensos automatizados engañosos. Tanto en el flujo evaluativo PWA (*Residuo Pedagógico*) como en el orquestador (*Freno Inteligente*), el sistema transfiere de forma obligatoria la incertidumbre (el "residuo") a la profesora o desarrolladora, siendo la autoridad humana la única capaz de cerrar el evento.
+*   **Brújula de Coherencia Arquitectónica:** Adoptando la recomendación de Fernando Parra Conde ("Prueba de los 6 meses"), toda la documentación (ADRs, Issues y Commits) se diseña para garantizar que el historial mantenga una fidelidad del 100% a la filosofía original del proyecto con el paso del tiempo.
+*   **Motor Híbrido *Light RAG*:** Inspirado en la arquitectura de Andrés Corbal Debén, el sistema inyecta la normativa en la base de datos como esquema rígido (JSONB) en lugar de saturar el contexto del prompt, logrando un compliance determinista sin sobrecarga de tokens.
 
 ### 2. Implementación Histórica y Validación (*Fase Ninja*)
 
@@ -433,7 +436,7 @@ El sistema en producción carga estos módulos desde submódulos privados y repo
 
 **Copyright © 2026 Alba Camiña García. Todos los derechos reservados.**
 
-Este repositorio se expone de forma pública de manera intencionada como parte de una estrategia **Build in Public**, con el objetivo de demostrar la arquitectura técnica, someter el código a auditorías de seguridad y conformar un portfolio profesional. 
+Este repositorio se expone de forma pública de manera intencionada como parte de una estrategia **Build in Public** (en línea con la filosofía de ecosistema abierto y talento de Jorge Veiga Fachal), con el objetivo de demostrar la arquitectura técnica, someter el código a auditorías de seguridad y conformar un portfolio profesional. 
 
 Sin embargo, el código **NO es de libre uso ni de código abierto (Open Source)**. Queda estrictamente prohibida su copia, modificación, distribución o comercialización (incluyendo el despliegue como modelo SaaS, uso en entornos de producción o integración en plataformas EdTech de terceros) sin autorización previa, expresa y por escrito. Para más detalles, consulta el archivo [LICENSE](./LICENSE).
 
