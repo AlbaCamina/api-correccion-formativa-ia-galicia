@@ -5,18 +5,71 @@
 [![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16--Alpine-316192?style=flat&logo=postgresql)](https://www.postgresql.org/)
 [![OpenAI](https://img.shields.io/badge/LLM-OpenAI%20gpt--4o--mini-orange?style=flat)](https://openai.com/)
 [![Decretos 156/2022 e 157/2022](https://img.shields.io/badge/Normativa-Decretos%20156%2F2022%20e%20157%2F2022%20Galicia-lightblue?style=flat)](#)
-[![Version](https://img.shields.io/badge/Version-v0.4-brightgreen?style=flat)](#)
+[![Version](https://img.shields.io/badge/Version-v0.5-brightgreen?style=flat)](#)
 
-API de Corrección Formativa con IA diseñada para asistir al profesorado de Filosofía de Bachillerato en la Comunidad Autónoma de Galicia. Estructurada bajo el marco pedagógico oficial de la LOMLOE, los Decretos 156/2022 y 157/2022 (Xunta de Galicia) (garantizando el blindaje estricto de la etapa educativa ESO/BACH), y las directrices de privacidad de la Unión Europea (RGPD / AI Act / ENS).
+API de Corrección Formativa con IA diseñada para asistir al profesorado de cualquier materia de ESO y Bachillerato en la Comunidad Autónoma de Galicia (iniciando con Filosofía como módulo piloto). Estructurada bajo el marco pedagógico oficial de la LOMLOE, los Decretos 156/2022 y 157/2022 (Xunta de Galicia) (garantizando el blindaje estricto de la etapa educativa ESO/BACH), y las directrices de privacidad de la Unión Europea (RGPD / AI Act / ENS).
 
 
 ## 🌟 Propuesta de Valor Diferencial
 
-*   **Alineamiento Curricular Gallego:** Diseñada específicamente sobre las competencias clave, competencias específicas y criterios de evaluación de la materia de Filosofía de Bachillerato definidos por la Xunta de Galicia (`[D-027] Modo Dual de Rúbrica`).
+*   **Alineamiento Curricular Gallego:** Capacidad de integrar de forma paramétrica las competencias clave, específicas y criterios de evaluación de cualquier materia de ESO y Bachillerato definidos por la Xunta de Galicia (`[D-027] Modo Dual de Rúbrica`).
 *   **Deslinde Formativo vs Sumativo (HitL):** El sistema no califica de forma fría ni automática; realiza un desglose cualitativo por rúbricas pedagógicas, devuelve un **Siguiente Paso Accionable (Feed Forward)** y un **Índice de Confianza IA** para evitar alucinaciones. El docente siempre conserva la soberanía y firma la nota (`[D-002]`).
+*   **AI Safety & Guardrails:** Arquitectura multinivel (*Multilayered Guardrails*) para prevenir alucinaciones mediante contratos JSON estrictos (`Pydantic`), reglas de exclusión NEAE y ofuscación de PII. Transforma el LLM probabilístico en un evaluador determinista (`[D-063]`).
 *   **Blindaje de Privacidad y Seguridad (Stealth/Phase Ninja):** Seudonimización estricta del alumnado en la nube (`alumno_id = "A-14"`) sin cifrado de columnas frágil (`[D-031]`). La libreta de equivalencia con la identidad real del menor reside en exclusiva en el cuaderno local de la profesora, y la autenticación docente se resguarda con hacheo unidireccional irreversible `bcrypt` + sesiones `JWT`.
 *   **Zero Data Retention (Client-Side Redaction):** Antes de enviar ninguna fotografía al backend, la aplicación web progresiva (PWA) permite censurar los nombres manuscritos directamente en el navegador del docente usando la Canvas API (`[D-034]`). Los píxeles originales se destruyen en la memoria RAM local; la PII jamás viaja por la red ni toca los servidores de IA.
 *   **Resiliencia y Optimización FinOps:** Unificación del motor en OpenAI (`gpt-4o-mini`) para texto y visión (`[D-053]`), garantizando *Structured Outputs* nativos para el 100% de cumplimiento del esquema `EvaluacionIA` tras la deprecación de los modelos compatibles en Groq. La cualitativa ESO se asigna de forma determinista en el backend (`[D-052]`), sin depender del criterio del LLM.
+
+---
+
+## 🏗️ Arquitectura y Flujo de Ejecución
+
+```mermaid
+graph TD
+    %% Frontend Stack
+    subgraph Frontend [1. PWA: React + Vite]
+        Profesor[Pantalla del Profesor]
+        Cam[Cámara Móvil]
+        Canvas[Canvas: Borrado PII]
+        Profesor ~~~ Cam
+    end
+
+    %% Backend Stack
+    subgraph Backend [2. Backend: FastAPI]
+        Auth[Validador JWT]
+        Router[API REST]
+        PBuilder[Prompt Builder<br>RAG Determinista]
+        Pydantic[Pydantic v2]
+    end
+
+    %% Inteligencia Artificial
+    subgraph IA [4. IA: OpenAI]
+        LLM[GPT-4o-mini]
+        Struct[Structured<br>Outputs]
+    end
+
+    %% Base de Datos
+    subgraph Base_Datos [3. BBDD: PostgreSQL]
+        Normas[(Capa 1-3:<br>Ley y Centro)]
+        Rubrica[(Capa 4:<br>Rúbrica)]
+        Adaptaciones[(Capa 5:<br>NEAE)]
+        Auditoria[(ChangeLog)]
+    end
+
+    %% Conexiones (Flujo de Ejecución)
+    Cam -- "1. Foto" --> Canvas
+    Canvas -- "2. Zero Data" --> Router
+    Router -- "3. Sesión" --> Auth
+    Router -- "4. Extrae Ley" --> Normas
+    Router -- "4. Extrae Rúbrica" --> Rubrica
+    Router -- "4. Extrae NEAE" --> Adaptaciones
+    Normas & Rubrica & Adaptaciones -- "5. Contexto" --> PBuilder
+    PBuilder -- "6. Prompt" --> LLM
+    LLM -- "7. Inferencia" --> Struct
+    Struct -- "8. JSON String" --> Pydantic
+    Pydantic -- "9. Python Object" --> Router
+    Router -- "10. Envía Propuesta" --> Profesor
+    Profesor -- "11. Revisa y Firma" --> Auditoria
+```
 
 ---
 
@@ -80,9 +133,9 @@ El servidor estará accesible en `http://127.0.0.1:8000`. Puedes consultar la do
 venv/bin/pytest backend/tests/ -v
 ```
 
-### 7. Ejecutar el Frontend (React PWA)
+### 7. Ejecutar el Frontend (React PWA - v0.5)
 
-La interfaz gráfica del profesor está desarrollada en React + Vite y se ejecuta de forma independiente. Incorpora HTTPS local para poder usar la cámara desde el móvil en la misma red Wi-Fi (`[D-058]`).
+La interfaz gráfica del profesor está desarrollada en React + Vite y se ejecuta de forma independiente. Incorpora HTTPS local para poder usar la cámara desde el móvil en la misma red Wi-Fi (`[D-058]`). Cuenta con un componente crítico de **Zero Data Retention** (`CameraCapture.jsx`): permite recortar y tachar manualmente el nombre del alumno en el propio navegador, destruyendo los píxeles antes de enviarlos a la nube.
 
 ```bash
 cd frontend
@@ -124,7 +177,7 @@ npx vitest run
 
 | Endpoint | Verbo | Versión | Descripción |
 | :--- | :---: | :---: | :--- |
-| `/api/v1/submissions/{id}/events` | `GET SSE` | 🔜 v0.4 | Notificación en tiempo real al finalizar corrección |
+| `/api/v1/submissions/{id}/events` | `GET SSE` | 🔜 v0.6 | Notificación en tiempo real al finalizar corrección |
 | `/api/v1/submissions/{id}/changelog` | `GET` | 🔜 v1.0 | Historial inmutable de auditoría AI Act |
 
 > ✅ **Pipeline Multimodal validado (12/08/2026):** El motor de visión (`gpt-4o-mini` vía OpenAI *Structured Outputs*) ha sido verificado mediante pruebas de integración aisladas, devolviendo el contrato `EvaluacionIA` completo y sin errores. La asignación de la cualitativa ESO es determinista en el backend. Ver [`[D-051]`](decisiones.md#d-051) y [`[D-052]`](decisiones.md#d-052).
@@ -355,6 +408,9 @@ El desarrollo técnico ha sido acelerado utilizando herramientas de *Agentic Cod
 *   **Soberanía Arquitectónica:** El diseño del sistema, las reglas de negocio (LOMLOE) y la seguridad de los datos (Zero Data Retention) son 100% de autoría humana.
 *   **Freno Conductual (*Stop & Consult*):** La IA tiene terminantemente prohibido parchear el sistema estructuralmente sin autorización explícita. Ante un cruce de caminos arquitectónico, debe detenerse y presentar opciones.
 *   **PonyTail Coding (YAGNI):** La IA está bloqueada de realizar abstracciones prematuras o incluir dependencias redundantes.
+*   **Declaración de Residuo y Desacuerdo Controlado:** Apoyándose en la investigación metodológica de Nicolás Rocchia (Ingeniería Adversarial y Residuos Declarados) y el marco sociotécnico de Raquel Garrido Arranz (prevención del *Sedentarismo Operativo* y *Espejismo de la Eficiencia*), la arquitectura bloquea activamente los consensos automatizados engañosos. Tanto en el flujo evaluativo PWA (*Residuo Pedagógico*) como en el orquestador (*Freno Inteligente*), el sistema transfiere de forma obligatoria la incertidumbre (el "residuo") a la profesora o desarrolladora, siendo la autoridad humana la única capaz de cerrar el evento.
+*   **Brújula de Coherencia Arquitectónica:** Adoptando la recomendación de Fernando Parra Conde ("Prueba de los 6 meses"), toda la documentación (ADRs, Issues y Commits) se diseña para garantizar que el historial mantenga una fidelidad del 100% a la filosofía original del proyecto con el paso del tiempo.
+*   **Motor Híbrido *Light RAG*:** Inspirado en la arquitectura de Andrés Corbal Debén, el sistema inyecta la normativa en la base de datos como esquema rígido (JSONB) en lugar de saturar el contexto del prompt, logrando un compliance determinista sin sobrecarga de tokens.
 
 ### 2. Implementación Histórica y Validación (*Fase Ninja*)
 
@@ -380,7 +436,7 @@ El sistema en producción carga estos módulos desde submódulos privados y repo
 
 **Copyright © 2026 Alba Camiña García. Todos los derechos reservados.**
 
-Este repositorio se expone de forma pública de manera intencionada como parte de una estrategia **Build in Public**, con el objetivo de demostrar la arquitectura técnica, someter el código a auditorías de seguridad y conformar un portfolio profesional. 
+Este repositorio se expone de forma pública de manera intencionada como parte de una estrategia **Build in Public** (en línea con la filosofía de ecosistema abierto y talento de Jorge Veiga Fachal), con el objetivo de demostrar la arquitectura técnica, someter el código a auditorías de seguridad y conformar un portfolio profesional. 
 
 Sin embargo, el código **NO es de libre uso ni de código abierto (Open Source)**. Queda estrictamente prohibida su copia, modificación, distribución o comercialización (incluyendo el despliegue como modelo SaaS, uso en entornos de producción o integración en plataformas EdTech de terceros) sin autorización previa, expresa y por escrito. Para más detalles, consulta el archivo [LICENSE](./LICENSE).
 

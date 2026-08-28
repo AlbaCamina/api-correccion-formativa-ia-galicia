@@ -16,6 +16,9 @@ Cambio que rompe la compatibilidad hacia atrás. Ejemplo arquitectónico (`[D-04
 **CORS** (Cross-Origin Resource Sharing — Intercambio de Recursos de Origen Cruzado)  
 Mecanismo de seguridad de los navegadores web que restringe las peticiones HTTP realizadas desde un dominio o puerto (ej. `http://localhost:5173` en Vite) hacia otro diferente (`http://127.0.0.1:8000` en FastAPI). Por especificación oficial, cuando se permite el envío de credenciales o tokens Bearer (`allow_credentials=True`), está prohibido usar un comodín (`allow_origins=["*"]`) por riesgo de seguridad; se exige declarar explícitamente los orígenes confiables.
 
+**Core vs. Periferia (Núcleo vs. Satélites)**  
+En ingeniería de producto, el **Core (Núcleo o MVP Crítico)** es el conjunto de funcionalidades mínimas e irrenunciables sin las cuales el producto pierde su sentido y valor fundamental (es el motor del sistema). La **Periferia (Satélites o *Nice-to-haves*)** son aquellas características que mejoran la experiencia, automatizan pasos manuales o escalan el producto, pero que no son estrictamente necesarias para resolver el problema principal. En `api-correccion-formativa-ia-galicia`, el Core innegociable es el **RAG Determinista (Leyes + BBDD)**, el **Pipeline Multimodal (OpenAI)**, la **Validación Pydantic** y el **Human-in-the-Loop**. Todo lo demás (como el algoritmo de recorte automático en Canvas, los avatares de usuario o la exportación a PDF) es Periferia que debe enviarse al `backlog.md` aplicando YAGNI para evitar el *Scope Creep*.
+
 **Deprecado / Deprecation (`Deprecated`)**  
 Estado o cualidad de un método, función o tecnología que sigue funcionando temporalmente por motivos de compatibilidad con código antiguo, pero cuyo uso oficial ha sido desaconsejado o declarado obsoleto por sus creadores (generalmente porque existe una alternativa superior, más segura o moderna, o porque será eliminado definitivamente en una futura versión). En este proyecto: el reemplazo de `datetime.utcnow()` (deprecado en Python 3.12+ por no incluir zona horaria explícita) por `datetime.now(timezone.utc)` y callables `utcnow()` para evitar advertencias (`DeprecationWarning`) de SQLAlchemy/Pytest y garantizar timestamps precisos en UTC sin riesgo de ruptura en futuras actualizaciones del lenguaje.
 
@@ -81,6 +84,9 @@ Librerías y frameworks clave de api-correccion-formativa-ia-galicia:
 | `pytesseract` | Librería | *(c0.8)* OCR offline para el escáner de PII pre-nube (`[D-034]`) |
 | `react` | Librería | Construye la interfaz de usuario de la PWA del docente |
 
+**Mermaid / Diagrams as Code**  
+Herramienta y lenguaje de marcado que permite renderizar gráficos y diagramas de arquitectura dinámicos a partir de texto plano directamente en archivos Markdown. Sustituye a las imágenes estáticas (`.png`/`.jpg`) en la documentación técnica para aplicar la filosofía *Docs-as-Code* (Documentación como Código). Permite que la arquitectura visual del proyecto sea versionable, rastreable mediante Git, y fácil de actualizar sin depender de software de diseño externo.
+
 **Mojibake**  
 Texto ilegible o corrupto resultante de decodificar datos de texto utilizando una codificación de caracteres incorrecta (como interpretar UTF-8 como ISO-8859-1). Ejemplo: caracteres extraños en `backlog.md` antes de forzar explícitamente el `encoding="utf-8"` en el script de reparación.
 
@@ -106,6 +112,9 @@ Técnica cliente-servidor en la que la aplicación (PWA) realiza peticiones HTTP
 **Server-Sent Events (SSE — Eventos Enviados por el Servidor)**  
 Mecanismo de comunicación en tiempo real en una sola dirección (servidor $\rightarrow$ cliente) basado en el protocolo HTTP (`text/event-stream`). Permite que el backend notifique automáticamente a la PWA del docente en cuanto la IA termina la evaluación en segundo plano (`STATUS_UPDATE: REVIEW`), sin necesidad de recargar la página ni realizar peticiones repetidas (*polling*). Si el cliente cierra el navegador, el servidor detecta el cierre del canal y destruye el stream de forma limpia mientras la tarea de fondo continúa su ejecución en BBDD.
 
+
+**SDK (Software Development Kit)**  
+Conjunto de herramientas, librerías y documentación que proporciona el creador de un servicio (como OpenAI o AWS) para que los desarrolladores puedan integrar dicho servicio en sus propias aplicaciones de forma más sencilla. En el contexto de la API, utilizamos el SDK oficial de OpenAI para Python. En lugar de hacer peticiones web crudas (`requests`), el SDK nos proporciona métodos nativos (`client.beta.chat.completions.parse`) que se integran de forma transparente con Pydantic para garantizar salidas estructuradas (*Structured Outputs*).
 
 **Scaffolding** (Andamiaje o Estructura Inicial de Código)  
 Generación automática o manual del esqueleto básico de un proyecto antes de empezar a escribir la lógica interna de negocio. Consiste en crear la jerarquía de carpetas principales, archivos de configuración (como `package.json`, `.env.example`, `main.py` o `docker-compose.yml`) y plantillas estructurales vacías. Proporciona los cimientos ordenados sobre los que evoluciona el código.
@@ -141,6 +150,9 @@ Herramienta oficial de migraciones transaccionales para SQLAlchemy. Funciona com
 Herramienta nativa de FastAPI que permite desencadenar funciones asíncronas de ejecución prolongada inmediatamente después de enviar la respuesta HTTP al cliente. En nuestra arquitectura (`[D-048]`), al recibir una entrega de examen, el endpoint responde de inmediato con HTTP `202 Accepted` (`status: ANALYZING`) y delega la llamada pesada a OpenAI Vision (`vision_service` + `llm_client`) a una `BackgroundTask`. Esto garantiza latencias mínimas (<500ms) sin necesidad de infraestructura compleja como Celery/Redis en la fase MVP. Si el cliente/docente cierra la ventana del navegador o apaga el dispositivo, la tarea en segundo plano continúa ejecutándose hasta guardar el resultado final en la base de datos (`status: REVIEW`).
 
 
+
+**Fail Fast (Patrón de Diseño)**  
+Principio de ingeniería de software que dicta que un sistema debe detenerse y reportar un error de forma inmediata y visible en el momento exacto en que ocurre una condición anómala, en lugar de intentar continuar, silenciar el fallo o guardar datos a medias. En este proyecto, `Pydantic` implementa este patrón en la frontera de la API: si el JSON que devuelve el motor LLM alucina un formato o le falta un campo obligatorio, Pydantic lanza una excepción al instante y el estado de la entrega pasa a `ERROR`. Esto detiene el proceso, bloquea la escritura en la base de datos y permite que la PWA del profesor muestre una alerta roja inmediata ("Error de IA al procesar"), garantizando así la fiabilidad absoluta del sistema y evitando corromper la BBDD con correcciones rotas.
 
 **FastAPI**  
 El framework de Python con el que se construye toda la API REST de este proyecto. Su característica más importante es el uso de **decoradores** — instrucciones que se ponen encima de una función para que FastAPI sepa que esa función es un endpoint:
@@ -238,11 +250,17 @@ Un código alfanumérico generado automáticamente que identifica un registro de
 
 ## 4. Inteligencia Artificial
 
+**Baseline (Línea Base de Profundidad)**  
+Límite pedagógico inferior y superior que determina el grado de exigencia con el que la IA debe evaluar una prueba. Evita que un LLM con nivel universitario (como GPT-4o) exija conceptos excesivamente complejos a alumnos de secundaria (castigando respuestas sencillas pero correctas para su edad), sin llegar a penalizar el conocimiento extra válido. En este proyecto, el `RAG Semántico` será el encargado de fijar este baseline inyectando los apuntes exactos de clase.
+
 **Claude**  
 Modelo de lenguaje de la empresa Anthropic. Alternativa a GPT-4o. Se considera especialmente bueno para tareas de razonamiento y escritura estructurada.
 
 **Confidence Score** (Índice de Confianza IA)  
 Medida numérica devuelta por el modelo (`0.0` a `1.0`) que indica la certeza o fiabilidad de la interpretación y lectura de un examen. En api-correccion-formativa-ia-galicia (`[D-024]`), si la confianza es `< 0.75` (caligrafía confusa, borrones), el sistema emite una alerta visual para que la profesora revise con especial atención prioritaria.
+
+**Conocimiento Paramétrico (Parametric Knowledge)**  
+La base de datos interna y estática de información que un modelo de IA absorbió durante su fase de entrenamiento masivo. Es la "memoria general" del LLM. Confiar exclusivamente en él para evaluar exámenes puede causar injusticias pedagógicas (el modelo podría validar respuestas extraídas de internet que el alumno no ha estudiado en clase, o exigir respuestas demasiado avanzadas basándose en conocimiento experto). Se anula o mitiga inyectando el material real de clase mediante RAG.
 
 **Context Overflow (Saturación de contexto) y "Lost in the Middle" (Perdido en el medio)**  
 Fenómeno y limitación arquitectónica de las redes neuronales actuales (Transformers). Ocurre cuando la *Ventana de contexto* se llena con miles de tokens de información. El mecanismo de atención de la IA (*Attention Mechanism*) tiende a priorizar la información que está al principio y al final, "olvidando" temporalmente lo del medio. Para mitigar esto, se utilizan tres estrategias principales:
@@ -253,6 +271,9 @@ Fenómeno y limitación arquitectónica de las redes neuronales actuales (Transf
 
 **Contrato JSON (`[D-024]` / `EvaluacionIA`)**  
 Acuerdo estricto de estructura y tipado definido con Pydantic v2 que transforma a los motores de Inteligencia Artificial (por naturaleza generadores probabilísticos de texto libre) en componentes deterministas de software. Al exigir la validación estricta (`Structured Outputs` / `.parse()`), se prohíbe al LLM emitir saludos, texto libre o formatos alucinados, garantizando que el backend reciba invariablemente campos tipados (calificaciones, marcadores x-y, desglose de rúbricas y `confidence_score`) listos para persistirse en PostgreSQL y mostrarse en la PWA del profesor.
+
+**Embeddings (Incrustaciones Vectoriales)**  
+Representación matemática de un texto. Un modelo de IA toma una palabra, frase o párrafo y lo convierte en una larga lista de números (un vector de cientos de dimensiones). Esta tecnología es el motor del RAG Semántico: permite al sistema comparar matemáticamente dos párrafos (por ejemplo, los apuntes del profesor y la respuesta del alumno) y medir qué tan cerca están en "significado" (similitud del coseno), descubriendo conexiones semánticas aunque utilicen palabras completamente diferentes.
 
 **FinOps (Análisis Práctico de Coste Multimodal)**  
 Evaluación financiera del consumo de tokens. Evaluar una foto de un examen manuscrito comprimida a 2048px en la PWA (`[D-020]`) consume una media de **~1.850 tokens de entrada** (~850 visuales + ~1.000 de rúbrica/prompt) y genera **~600 tokens de salida estructurada JSON Pydantic (`[D-024]`)**. En términos financieros reales:
@@ -265,11 +286,20 @@ Funcionalidad de asistencia de api-correccion-formativa-ia-galicia (`Capa 4` rel
 **GPT-4o**  
 Modelo de lenguaje de OpenAI. A diferencia del antiguo GPT-4 (donde existía una variante separada llamada GPT-4V o GPT-4 Vision para procesar imágenes), **GPT-4o es multimodal de fábrica**: acepta texto, imagen y audio en el mismo modelo sin necesidad de especificar ninguna variante. Esto permite enviarle directamente la foto del examen para que lo lea y evalúe contra la rúbrica.
 
+**Guardarraíles Multinivel (*Multilayered Guardrails*)**  
+Mecanismos de seguridad y validación implementados en la arquitectura para evitar que el motor LLM alucine, vulnere normativas o tome decisiones autónomas. En api-correccion-formativa-ia-galicia se estructuran en tres capas:
+1. **Entrada (Input):** Enmascaramiento de PII en cliente y reglas de exclusión NEAE.
+2. **Salida (Output):** *Structured Outputs* validados por contratos estrictos de Pydantic.
+3. **Gobernanza (Behavioral):** Protocolo *Human-in-the-Loop* (la IA asiste, pero no firma la calificación definitiva).
+
 **Jerarquía Normativa en 5 Capas Relacionales (`JSONB`)**  
 Modelo arquitectónico multinivel de api-correccion-formativa-ia-galicia que desacopla y combina sin ambigüedad la legislación pública (`Capa 1: Decreto Xunta`), la programación anual del departamento (`Capa 2: Saberes y Criterios`), las normas comunes del colegio (`Capa 3: PEC/CCP`), la rúbrica de la prueba asistida (`Capa 4: El Profesor`) y las adaptaciones individuales de equidad (`Capa 5: NEAE/NEE en JSONB`).
 
 **LLM** (Large Language Model — Modelo de Lenguaje Grande)  
 Modelo de inteligencia artificial entrenado con enormes cantidades de texto. Es la IA que corrige los exámenes en este proyecto (GPT-4o o Claude).
+
+**LLMOps** (Large Language Model Operations)  
+Disciplina de la ingeniería de IA que abarca el despliegue, monitorización, mantenimiento y evaluación continua de los modelos de lenguaje en producción (el equivalente a DevOps). El mayor reto de LLMOps en la actualidad es la *Evaluación Semántica Automatizada (LLM-Eval o LLM-as-a-Judge)*: resolver cómo probar automáticamente mediante scripts si un cambio sutil en un Prompt ha mejorado o empeorado la calidad pedagógica de las respuestas en miles de exámenes, sin necesidad de que un humano las lea una por una para hacer control de regresiones.
 
 **Modo Dual de Rúbrica (`COMBINADO` vs `AUDITORIA_CURRICULAR`)**  
 Parámetro arquitectónico de interacción pedagógica (`[D-027]`, `modo_evaluacion`) que resuelve la tensión entre los criterios oficiales de la Xunta y las rúbricas ad-hoc de los docentes sin sobreingeniería en el backend. En modo `COMBINADO`, la IA fusiona los saberes de la ley con la rúbrica de la profesora para calificar entregas diarias con agilidad. En modo `AUDITORIA_CURRICULAR`, la IA corrige la tarea y adicionalmente orienta al docente contrastando su rúbrica contra los Decretos 156/157/2022, advirtiendo en `teacherSummary` de posibles omisiones competenciales.
@@ -287,6 +317,11 @@ El texto de instrucciones que se envía al modelo de IA. Se divide en dos partes
 - **`user prompt` (la tarea concreta):** Contiene los datos variables de cada corrección: la respuesta del alumno, la rúbrica de la profesora, el marco normativo y las adaptaciones NEAE. Cambia en cada petición.
 
 El `prompt_builder.py` construye dinámicamente el `user prompt` combinando estos datos. El `system prompt` permanece constante en todas las correcciones.
+
+**RAG Semántico vs. RAG Determinista**  
+Estrategias de inyección de contexto en la Inteligencia Artificial (*Retrieval-Augmented Generation*):
+- **RAG Determinista (Core):** Recuperación exacta desde bases de datos relacionales tradicionales (PostgreSQL). No hay búsquedas probabilísticas. Se usa para inyectar Leyes Autonómicas, Rúbricas y normativas NEAE, asegurando que el marco legal llegue al LLM íntegro, sin alteraciones semánticas ni omisiones.
+- **RAG Semántico (Roadmap):** Recuperación probabilística de textos libres mediante vectores, para encontrar fragmentos similares. Se usará para cruzar las respuestas del alumno con los apuntes y PDFs de clase de la profesora, estableciendo la *Línea Base de Profundidad* (Baseline) pedagógica que debe cumplir la corrección.
 
 **Prueba evaluable (Instrumento de evaluación)**  
 Cualquier evidencia de aprendizaje del alumno sometida a corrección formativa. En api-correccion-formativa-ia-galicia abarca los 3 formatos del aula moderna: papel manuscrito (foto), creación plástica/visual (foto de mural o cartulina) y entregas digitales (redacciones online o exportaciones PDF/PNG de presentaciones de Canva).
@@ -430,6 +465,9 @@ Estrategia de gobernanza del repositorio por la que se aísla de forma estricta 
 
 **Patrón Showcase (Showcase Pattern)**  
 Estrategia de gobernanza de repositorio (`[D-062]`) diseñada para proteger la propiedad intelectual o el "secreto comercial" de un proyecto (como los prompts de IA y configuraciones exclusivas) mientras se exhibe públicamente toda la infraestructura, arquitectura y base de código. Se implementa utilizando el `.gitignore` para cegar a Git ante los archivos críticos (ej. `prompt_builder.py`, `llm_client.py`), permitiendo que el resto del sistema (modelos relacionales, migraciones de base de datos, frontend PWA) sea visible para auditores y reclutadores, demostrando excelencia técnica ("Build in Public") sin regalar el negocio.
+
+**Open Core (Modelo de Núcleo Abierto)**  
+Estrategia de comercialización y despliegue estrechamente ligada al Patrón Showcase. Consiste en dividir el software en dos partes físicas: un repositorio público (Open Source) que contiene la infraestructura base, y un repositorio privado (`api-correccion-core`) que contiene el verdadero núcleo de valor comercial, secretos, estrategias de ventas y lógica algorítmica.
 
 **.gitignore**  
 
@@ -786,6 +824,9 @@ Modelo en el que el cliente es un usuario individual. En api-correccion-formativ
 **EdTech** (Education Technology — Tecnología educativa)  
 Sector de empresas que desarrollan productos tecnológicos para la educación. Son los potenciales clientes B2B de api-correccion-formativa-ia-galicia.
 
+**Elevator Pitch (Discurso de Ascensor)**  
+Un resumen breve, persuasivo y muy estructurado de un proyecto, producto o perfil profesional, diseñado para contarse en el tiempo que dura un viaje en ascensor (entre 30 y 60 segundos). No busca explicar todos los detalles técnicos, sino despertar el interés rápido detallando "qué problema resuelve" y "por qué es innovador". En este proyecto se centra en la adopción de IA para corregir exámenes de forma alineada a la LOMLOE bajo una arquitectura HitL (*Human-in-the-Loop*).
+
 **Freemium**  
 Modelo de negocio con una versión gratuita (con límites) y una versión de pago (sin límites o con funcionalidades extra).
 
@@ -838,6 +879,12 @@ Motor de OCR de deep learning desarrollado por Baidu, especializado en detecció
 ---
 
 ## 13. Marca Personal y Comunicación Digital
+
+**Soft Launch (Lanzamiento Silencioso)**
+Estrategia de despliegue de un producto o repositorio al público sin realizar un anuncio masivo o campaña de marketing explícita. Permite que el proyecto empiece a indexar orgánicamente y atraiga tráfico cualificado (como un enlace en el perfil de LinkedIn), al tiempo que mitiga el riesgo de saturar a la audiencia.
+
+**Inbound Strategy (Estrategia Inbound)**
+Metodología de posicionamiento profesional basada en "atraer" oportunidades en lugar de "perseguirlas" (Outbound). En lugar de contactar o enviar currículums a puerta fría, se genera contenido de ingeniería de alto valor de forma recurrente (ej. *Build in Public*), logrando que sean los *recruiters* y líderes técnicos quienes inicien proactivamente el contacto.
 
 **Ghostwriting (Redacción Delegada)**
 Técnica de escritura en la que una persona o herramienta ayuda a redactar contenido que otra publica en su propio nombre. En el contexto de LinkedIn y marca personal: usar una IA como asistente para articular ideas propias en publicaciones, manteniendo siempre la voz y la veracidad de la autora. No es deshonesto si el contenido refleja experiencias y pensamientos reales.

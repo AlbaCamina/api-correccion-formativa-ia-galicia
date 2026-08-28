@@ -1132,7 +1132,7 @@ Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `
 **Contexto:**  
 La arquitectura actual implementa un **RAG Determinista** (`[Roadmap-003]`): la normativa autonómica (Decretos 156/157/2022 de la Xunta de Galicia) y la rúbrica del docente se recuperan de PostgreSQL por `marco_id` y `rubrica_id` respectivos y se inyectan como contexto estructurado en el prompt del LLM. Esta estrategia fue validada técnicamente por el mentor de AESIA (Doctor en BBDD) durante la revisión del sistema en julio de 2026.
 
-Sin embargo, esta aproximación tiene una **limitación pedagógica real e identificada por la propia autora del sistema**: el LLM evalúa al alumno usando su conocimiento general (lo que GPT-4o-mini sabe sobre la materia) más el marco normativo y la rúbrica. El sistema **no tiene acceso** a los materiales específicos que el docente ha impartido: el libro de texto adoptado por el departamento, los apuntes propios, los ejemplos del aula, el alcance real del temario tratado hasta la prueba, ni las instrucciones concretas dadas en el examen.
+Sin embargo, esta aproximación tiene una **limitación pedagógica real e identificada por la propia autora del sistema**: al carecer de un RAG Semántico, el LLM evalúa al alumno dependiendo exclusivamente de su **Conocimiento Paramétrico** (lo que GPT-4o-mini memorizó en general sobre la materia durante su entrenamiento) sumado a las reglas del marco normativo y la rúbrica. El sistema **no tiene acceso** a los materiales específicos que el docente ha impartido. Al faltar este contexto, la IA es incapaz de establecer una **Línea Base (Baseline) de Profundidad** pedagógica adecuada, lo que puede provocar que asuma un nivel universitario o de bachillerato para un alumno de la ESO.
 
 Esto puede generar dos tipos de error evaluativo:
 1. **Falso negativo:** Penalizar a un alumno por no aplicar un concepto que el profesor aún no había explicado en clase.
@@ -1340,6 +1340,26 @@ El portfolio técnico mantiene su altísimo valor para reclutadores (demostrando
 
 ---
 
+### D-063
+## Arquitectura de Guardarraíles Multinivel (AI Safety)
+
+**Fecha:** Agosto 2026 (26/08/2026)  
+**Estado:** ✅ Adoptada
+
+**Contexto:**  
+Los modelos de IA generativa son probabilísticos por naturaleza y propensos a alucinaciones o desviaciones normativas. En el ámbito de la evaluación educativa (clasificado como Alto Riesgo según la AI Act), no basta con inyectar un buen prompt; es imperativo garantizar la seguridad, privacidad y validez jurídica de la salida del modelo.
+
+**Decisión:**  
+Formalizar el patrón arquitectónico del sistema como una estructura de **Guardarraíles Multinivel (Multilayered Guardrails)** que envuelve al motor LLM en tres capas estables:
+1. **Guardarraíl de Entrada (Input/Pre-procesamiento):** Enmascaramiento de PII en la aplicación cliente antes del envío (preservando la privacidad) e inyección de reglas duras de equidad (excluir ortografía por adaptaciones NEAE) para bloquear el sesgo algorítmico desde el origen.
+2. **Guardarraíl de Salida (Output/Estructura):** Uso de *Structured Outputs* de OpenAI validados mediante esquemas invariables de `Pydantic` (`EvaluacionIA`). Este guardarraíl bloquea cualquier texto libre o formato JSON inválido, asegurando que el backend reciba estrictamente los campos pactados en el contrato.
+3. **Guardarraíl Comportamental (Gobernanza / HitL):** Implantación del protocolo *Human-in-the-Loop* (D-002) junto a la trazabilidad en BBDD (D-035). La IA queda relegada a asistente ("calcula" la calificación numérica pero jamás firma la evaluación oficial), siendo el humano el actor decisor irremplazable.
+
+**Consecuencias:**  
+Este patrón demuestra madurez en la ingeniería de IA (*AI Safety*), transformando un wrapper probabilístico en un sistema de evaluación determinista, robusto y apto para producción en entornos regulados, cumpliendo simultáneamente la normativa LOMLOE y los principios de la AI Act.
+
+---
+
 *Decisiones técnicas tomadas y documentadas por Alba Camiña García. Redacción asistida por Antigravity (IA Copilot).*  
 *Actualizado el 28/07/2026 — añadida D-050*  
 *Actualizado el 11/08/2026 — añadida D-051 (Pivote arquitectónico a OpenAI para Visión manteniendo Groq para Texto).*  
@@ -1353,6 +1373,7 @@ El portfolio técnico mantiene su altísimo valor para reclutadores (demostrando
 *Actualizado el 25/08/2026 — añadida D-060 (Modelo de Licencia Propietaria para protección SaaS).*  
 *Actualizado el 25/08/2026 — añadida D-061 (Política Zero-GPL de dependencias y CLA).*  
 *Actualizado el 25/08/2026 — añadida D-062 (Patrón Showcase y Protección de Propiedad Intelectual).*  
-*Total de decisiones registradas: 62*
+*Actualizado el 26/08/2026 — añadida D-063 (Arquitectura de Guardarraíles Multinivel).*  
+*Total de decisiones registradas: 63*
 
 
