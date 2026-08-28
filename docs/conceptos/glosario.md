@@ -466,6 +466,9 @@ Estrategia de gobernanza del repositorio por la que se aísla de forma estricta 
 **Patrón Showcase (Showcase Pattern)**  
 Estrategia de gobernanza de repositorio (`[D-062]`) diseñada para proteger la propiedad intelectual o el "secreto comercial" de un proyecto (como los prompts de IA y configuraciones exclusivas) mientras se exhibe públicamente toda la infraestructura, arquitectura y base de código. Se implementa utilizando el `.gitignore` para cegar a Git ante los archivos críticos (ej. `prompt_builder.py`, `llm_client.py`), permitiendo que el resto del sistema (modelos relacionales, migraciones de base de datos, frontend PWA) sea visible para auditores y reclutadores, demostrando excelencia técnica ("Build in Public") sin regalar el negocio.
 
+**Open Core (Modelo de Núcleo Abierto)**  
+Estrategia de comercialización y despliegue estrechamente ligada al Patrón Showcase. Consiste en dividir el software en dos partes físicas: un repositorio público (Open Source) que contiene la infraestructura base, y un repositorio privado (`api-correccion-core`) que contiene el verdadero núcleo de valor comercial, secretos, estrategias de ventas y lógica algorítmica.
+
 **.gitignore**  
 
 Archivo que le dice a Git qué archivos ignorar y no incluir en el repositorio. Los archivos con claves de API (`.env`), dependencias (`venv/`) y cachés (`__pycache__/`) nunca deben subirse.
