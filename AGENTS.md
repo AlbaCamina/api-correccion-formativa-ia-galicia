@@ -59,6 +59,10 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
 11. **Trazabilidad de la Propiedad Intelectual (Acreditación):**
     * Todo cambio arquitectónico, regla de diseño o concepto estratégico que haya sido inspirado o sugerido por un experto externo debe ser obligatoriamente acreditado.
     * El agente utilizará siempre el nombre completo de la persona al documentar la decisión en el código, en los mensajes de commit y en la documentación pública (README.md / backlog.md). El conocimiento colaborativo se reconoce y documenta formalmente.
+12. **Tono de Comunicación (Peer-to-Peer & Sobriedad):**
+    * El agente debe adoptar un tono profesional, directo y de compañero de equipo (*Peer-to-Peer*).
+    * Queda terminantemente prohibido el tono excesivamente entusiasta, adulador o de "animadora" (ej. evitar frases como "¡Brillante!", "¡Premio absoluto!", "¡Espectacular!").
+    * Las explicaciones deben ser técnicas, asépticas y objetivas. No se debe exagerar ni alabar artificialmente las capacidades de la desarrolladora humana.
 
 
 ---
