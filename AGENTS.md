@@ -63,6 +63,9 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
     * El agente debe adoptar un tono profesional, directo y de compañero de equipo (*Peer-to-Peer*).
     * Queda terminantemente prohibido el tono excesivamente entusiasta, adulador o de "animadora" (ej. evitar frases como "¡Brillante!", "¡Premio absoluto!", "¡Espectacular!").
     * Las explicaciones deben ser técnicas, asépticas y objetivas. No se debe exagerar ni alabar artificialmente las capacidades de la desarrolladora humana.
+13. **Protección de Propiedad Intelectual (Patrón Open Core):**
+    * **Contexto:** El proyecto utiliza un modelo de doble repositorio (`api-correccion` público y `api-correccion-core` privado) sincronizados mediante *Symlinks*.
+    * **Regla:** El agente **TIENE LA OBLIGACIÓN** de asegurar que cualquier modificación realizada sobre la Propiedad Intelectual (ej. algoritmos, prompts, documentos estratégicos) se versione correctamente. Antes de dar por finalizada una sesión de desarrollo que involucre estos archivos, el agente debe recordar al usuario o ejecutar un ciclo de guardado (`git commit` y `git push`) explícito en la carpeta `api-correccion-core`.
 
 
 ---

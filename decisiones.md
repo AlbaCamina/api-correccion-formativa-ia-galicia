@@ -69,7 +69,9 @@
 | [D-059](#d-059) | Estrategia de diseño UI: Glassmorphism oscuro + tokens CSS como sistema de diseño del frontend | Ago 2026 | ✅ Adoptada |
 | [D-060](#d-060) | Modelo de Licencia Propietaria ("Todos los Derechos Reservados") como protección de negocio SaaS | Ago 2026 | ✅ Adoptada |
 | [D-061](#d-061) | Política de Cuarentena de Dependencias (Zero-GPL) para blindaje comercial | Ago 2026 | ✅ Adoptada |
-
+| [D-062](#d-062) | Patrón Showcase y Protección de Propiedad Intelectual | Ago 2026 | ✅ Adoptada |
+| [D-063](#d-063) | Arquitectura de Guardarraíles Multinivel (AI Safety) | Ago 2026 | ✅ Adoptada |
+| [D-064](#d-064) | Evolución a Patrón Open Core (Monorepo Físico + Symlinks) para Gobernanza de IP | Ago 2026 | ✅ Adoptada |
 ---
 
 ## Decisiones de Producto y Negocio
@@ -1360,6 +1362,31 @@ Este patrón demuestra madurez en la ingeniería de IA (*AI Safety*), transforma
 
 ---
 
+### D-064
+## Evolución a Patrón Open Core (Monorepo Físico + Symlinks) para Gobernanza de IP
+
+**Fecha:** Agosto 2026 (28/08/2026)  
+**Estado:** ✅ Adoptada
+
+**Contexto:**  
+Tras adoptar el patrón Showcase (`[D-062]`) para proteger la Propiedad Intelectual excluyéndola del repositorio público, surgió un problema de Gobernanza de Datos: los archivos excluidos (`prompt_builder.py`, documentos de negocio) residían localmente en la carpeta pública sin control de versiones, generando un punto único de fallo (riesgo de pérdida por borrado accidental o fallo de disco duro) y dificultando el seguimiento de los cambios estratégicos.
+
+**Opciones consideradas:**
+- **Mantener los archivos locales sin git:** Riesgo inaceptable de pérdida de propiedad intelectual.
+- **Doble repositorio independiente:** Implica mantener dos copias físicas del código, lo que genera una "doble fuente de verdad" y desincronización constante al desarrollar.
+- **Monorepo Virtual mediante Symlinks (Patrón Open Core):** Los archivos confidenciales residen físicamente en un repositorio privado (`api-correccion-core`) con su propio historial Git y copias de seguridad en la nube. Se crean enlaces simbólicos (`Symlinks` / `Junctions`) desde el repositorio público hacia el privado.
+
+**Decisión:**  
+Se adopta el patrón **Open Core con Symlinks**:
+1. Se crea un repositorio privado local (`api-correccion-core`) que actúa como bóveda de seguridad para la IP.
+2. Los módulos de IA (`prompt_builder.py`, `llm_client.py`) y los documentos estratégicos (`docs/negocio`) residen exclusivamente en esta bóveda.
+3. Se vinculan al repositorio público mediante `mklink` (Windows). El IDE y el servidor FastAPI de la carpeta pública los leen y ejecutan con total normalidad como si formaran parte del mismo proyecto.
+
+**Consecuencias:**  
+Se elimina la duplicidad de archivos ("Single Source of Truth"). La ejecución local fluye sin fricciones en el repositorio público, pero cualquier commit a la propiedad intelectual se realiza de forma aislada y segura en el repositorio privado. Se establece la Regla 13 en `AGENTS.md` para obligar al agente a respaldar los cambios del Core de forma independiente.
+
+---
+
 *Decisiones técnicas tomadas y documentadas por Alba Camiña García. Redacción asistida por Antigravity (IA Copilot).*  
 *Actualizado el 28/07/2026 — añadida D-050*  
 *Actualizado el 11/08/2026 — añadida D-051 (Pivote arquitectónico a OpenAI para Visión manteniendo Groq para Texto).*  
@@ -1374,6 +1401,6 @@ Este patrón demuestra madurez en la ingeniería de IA (*AI Safety*), transforma
 *Actualizado el 25/08/2026 — añadida D-061 (Política Zero-GPL de dependencias y CLA).*  
 *Actualizado el 25/08/2026 — añadida D-062 (Patrón Showcase y Protección de Propiedad Intelectual).*  
 *Actualizado el 26/08/2026 — añadida D-063 (Arquitectura de Guardarraíles Multinivel).*  
-*Total de decisiones registradas: 63*
-
+*Actualizado el 28/08/2026 — añadida D-064 (Evolución a Patrón Open Core mediante Symlinks).*  
+*Total de decisiones registradas: 64*
 
