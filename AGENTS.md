@@ -66,6 +66,9 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
 13. **Protección de Propiedad Intelectual (Patrón Open Core):**
     * **Contexto:** El proyecto utiliza un modelo de doble repositorio (`api-correccion` público y `api-correccion-core` privado) sincronizados mediante *Symlinks*.
     * **Regla:** El agente **TIENE LA OBLIGACIÓN** de asegurar que cualquier modificación realizada sobre la Propiedad Intelectual (ej. algoritmos, prompts, documentos estratégicos) se versione correctamente. Antes de dar por finalizada una sesión de desarrollo que involucre estos archivos, el agente debe recordar al usuario o ejecutar un ciclo de guardado (`git commit` y `git push`) explícito en la carpeta `api-correccion-core`.
+14. **Seguridad y Prevención de Malware (Dependencias Alucinadas):**
+    * **Regla:** Queda terminantemente prohibido ejecutar a ciegas comandos de instalación (`pip install` o `npm install`) sugeridos por la IA.
+    * **Obligación Humana:** La orquestadora debe verificar siempre de forma independiente que la librería sugerida existe realmente, es el paquete oficial y cuenta con mantenimiento activo antes de autorizar su instalación. El agente debe recordar esta precaución si propone añadir nuevas dependencias.
 
 
 ---
