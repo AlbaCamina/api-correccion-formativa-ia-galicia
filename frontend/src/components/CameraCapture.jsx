@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { cropHeader } from '../utils/imageCrop';
+import ResultsPanel from './ResultsPanel';
 
 const CameraCapture = () => {
   const videoRef = useRef(null);
@@ -9,6 +10,9 @@ const CameraCapture = () => {
   const [isDrawing, setIsDrawing] = useState(false);
   const [lastPos, setLastPos] = useState({ x: 0, y: 0 });
   const [censorshipMode, setCensorshipMode] = useState(false);
+  const [etapa, setEtapa] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionResult, setSubmissionResult] = useState(null);
   const originalImageRef = useRef(null); // MVP: Guarda la foto intacta para poder deshacer
 
   // Detener la cámara al desmontar el componente
@@ -110,6 +114,8 @@ const CameraCapture = () => {
   const resetCapture = () => {
     setImageCaptured(false);
     setCensorshipMode(false);
+    setSubmissionResult(null);
+    setIsSubmitting(false);
     const canvas = canvasRef.current;
     if (canvas) {
       const ctx = canvas.getContext('2d');
@@ -203,15 +209,85 @@ const CameraCapture = () => {
     img.src = originalImageRef.current;
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
+    if (!etapa) {
+      alert("⚠️ Debes seleccionar una etapa educativa (ESO o BACH) antes de enviar.");
+      return;
+    }
+
     const canvas = canvasRef.current;
     if (!canvas) return;
     
-    // Extraer imagen censurada (Zero Data Retention de la original)
-    const dataUrl = canvas.toDataURL('image/jpeg', 0.8);
-    console.log("🚀 Imagen (censurada) lista para enviar al backend:", dataUrl.substring(0, 50) + "...");
-    alert("Revisa la consola. ¡Imagen censurada lista!");
+    setIsSubmitting(true);
+    
+    try {
+      // Extraer imagen censurada como Blob (Zero Data Retention)
+      const blob = await new Promise(resolve => canvas.toBlob(resolve, 'image/jpeg', 0.8));
+      
+      const formData = new FormData();
+      // Simulamos que file[] es soportado o mandamos un único archivo por ahora
+      formData.append('file', blob, 'examen_capturado.jpg');
+      formData.append('etapa', etapa);
+      formData.append('rubrica_id', 1); // Mock: En producción vendría del contexto/login
+      formData.append('modo_evaluacion', 'COMBINADO');
+      
+      const response = await fetch('http://localhost:8000/api/v1/submissions/upload-and-evaluate', {
+        method: 'POST',
+        body: formData,
+        // Nota: en un entorno real incluiríamos headers de Auth:
+        // headers: { 'Authorization': 'Bearer ' + token }
+      });
+      
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}));
+        throw new Error(errData.detail || 'Error en la subida al servidor');
+      }
+      
+      const data = await response.json();
+      console.log("🚀 Respuesta del backend:", data);
+      
+      setSubmissionResult({
+        success: true,
+        data: data
+      });
+      
+    } catch (err) {
+      console.error("Error subiendo el archivo:", err);
+      setSubmissionResult({
+        success: false,
+        error: err.message
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (submissionResult) {
+    if (submissionResult.success) {
+      return (
+        <ResultsPanel 
+          submissionId={submissionResult.data.submission_id} 
+          onReset={resetCapture} 
+        />
+      );
+    }
+    
+    return (
+      <div className="glass-panel" style={{ textAlign: 'center', animation: 'fadeIn 0.5s ease' }}>
+        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>❌</div>
+        <h2 style={{ color: 'var(--color-danger)' }}>Error en el Envío</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem' }}>
+          {submissionResult.error}
+        </p>
+        <button 
+          onClick={() => setSubmissionResult(null)} 
+          style={{ background: '#555', color: 'white', padding: '1rem 2rem', fontSize: '1.1rem', borderRadius: '8px', cursor: 'pointer', border: 'none' }}
+        >
+          Reintentar Envío
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="camera-container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
@@ -289,11 +365,49 @@ const CameraCapture = () => {
         />
         
         <div className="action-buttons" style={{ display: 'flex', gap: '0.8rem', flexWrap: 'wrap', justifyContent: 'center', width: '100%', padding: '1rem 0' }}>
-          <button onClick={handleRestoreOriginal} style={{ background: '#f59e0b', color: 'black', padding: '1rem', fontSize: '1rem', borderRadius: '8px', flex: '1 1 40%' }}>🔄 Restaurar</button>
-          <button onClick={handleAutoCrop} style={{ background: '#3b82f6', color: 'white', padding: '1rem', fontSize: '1rem', borderRadius: '8px', flex: '1 1 40%' }}>✂️ Recorte Cabecera</button>
-          <button onClick={resetCapture} style={{ background: '#555', color: 'white', padding: '1rem', fontSize: '1rem', borderRadius: '8px', flex: '1 1 40%' }}>❌ Descartar</button>
-          <button onClick={handleSubmit} style={{ background: 'var(--color-success)', color: 'black', fontWeight: 'bold', padding: '1.2rem', fontSize: '1.2rem', borderRadius: '8px', flex: '1 1 100%' }}>
-            ✅ Confirmar y Enviar
+          <div style={{ display: 'flex', flex: '1 1 100%', gap: '1rem', alignItems: 'center', background: 'rgba(255,255,255,0.05)', padding: '1rem', borderRadius: '8px', marginBottom: '1rem', border: '1px solid rgba(255,255,255,0.1)' }}>
+            <label style={{ fontWeight: 'bold', color: 'var(--text-primary)' }}>Etapa Educativa (Obligatorio):</label>
+            <select 
+              value={etapa} 
+              onChange={(e) => setEtapa(e.target.value)}
+              style={{ flex: 1, padding: '0.8rem', borderRadius: '4px', background: '#333', color: 'white', border: '1px solid #555', fontSize: '1rem' }}
+            >
+              <option value="">-- Selecciona --</option>
+              <option value="ESO">Educación Secundaria Obligatoria (ESO)</option>
+              <option value="BACH">Bachillerato (BACH)</option>
+            </select>
+          </div>
+          
+          <button onClick={handleRestoreOriginal} disabled={isSubmitting} style={{ background: '#f59e0b', color: 'black', padding: '1rem', fontSize: '1rem', borderRadius: '8px', flex: '1 1 40%', border: 'none', opacity: isSubmitting ? 0.5 : 1 }}>🔄 Restaurar</button>
+          <button onClick={handleAutoCrop} disabled={isSubmitting} style={{ background: '#3b82f6', color: 'white', padding: '1rem', fontSize: '1rem', borderRadius: '8px', flex: '1 1 40%', border: 'none', opacity: isSubmitting ? 0.5 : 1 }}>✂️ Recorte Cabecera</button>
+          <button onClick={resetCapture} disabled={isSubmitting} style={{ background: '#555', color: 'white', padding: '1rem', fontSize: '1rem', borderRadius: '8px', flex: '1 1 40%', border: 'none', opacity: isSubmitting ? 0.5 : 1 }}>❌ Descartar</button>
+          <button 
+            onClick={handleSubmit} 
+            disabled={isSubmitting}
+            style={{ 
+              background: 'var(--color-success)', 
+              color: 'black', 
+              fontWeight: 'bold', 
+              padding: '1.2rem', 
+              fontSize: '1.2rem', 
+              borderRadius: '8px', 
+              flex: '1 1 100%',
+              border: 'none',
+              display: 'flex',
+              justifyContent: 'center',
+              alignItems: 'center',
+              gap: '0.5rem',
+              cursor: isSubmitting ? 'not-allowed' : 'pointer',
+              opacity: isSubmitting ? 0.8 : 1
+            }}
+          >
+            {isSubmitting ? (
+              <>
+                <span className="spinner"></span> Procesando e Subiendo...
+              </>
+            ) : (
+              '✅ Confirmar y Enviar'
+            )}
           </button>
         </div>
       </div>
