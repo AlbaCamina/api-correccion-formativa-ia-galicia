@@ -148,6 +148,14 @@ La interfaz estará disponible en `https://localhost:5173`. Para testear los com
 npx vitest run
 ```
 
+#### Estado actual del panel de resultados
+
+`ResultsPanel` consulta la evaluación estructurada asociada a una entrega. Mientras el backend mantiene la evaluación en proceso o todavía responde `404`, la interfaz muestra un estado de análisis y continúa la consulta periódica.
+
+Cuando la evaluación está disponible, el panel renderiza los bloques presentes de `EvaluacionIA`, incluidos la transcripción, el desglose por rúbrica, las fortalezas y las mejoras formativas. Los errores HTTP distintos de `404` se presentan como un error gestionado para la persona usuaria.
+
+> **Alcance parcial de `[v0.5-003]`:** el visor paginado de `archivos_urls`, el zoom, los marcadores visuales y la Declaración de Residuo Pedagógico (`[D-057]`) siguen pendientes de implementación.
+
 ---
 
 ## 📡 API Endpoints
@@ -408,7 +416,7 @@ El desarrollo técnico ha sido acelerado utilizando herramientas de *Agentic Cod
 *   **Soberanía Arquitectónica:** El diseño del sistema, las reglas de negocio (LOMLOE) y la seguridad de los datos (Zero Data Retention) son 100% de autoría humana.
 *   **Freno Conductual (*Stop & Consult*):** La IA tiene terminantemente prohibido parchear el sistema estructuralmente sin autorización explícita. Ante un cruce de caminos arquitectónico, debe detenerse y presentar opciones.
 *   **PonyTail Coding (YAGNI):** La IA está bloqueada de realizar abstracciones prematuras o incluir dependencias redundantes.
-*   **Declaración de Residuo y Desacuerdo Controlado:** Apoyándose en la investigación metodológica de Nicolás Rocchia (Ingeniería Adversarial y Residuos Declarados) y el marco sociotécnico de Raquel Garrido Arranz (prevención del *Sedentarismo Operativo* y *Espejismo de la Eficiencia*), la arquitectura bloquea activamente los consensos automatizados engañosos. Tanto en el flujo evaluativo PWA (*Residuo Pedagógico*) como en el orquestador (*Freno Inteligente*), el sistema transfiere de forma obligatoria la incertidumbre (el "residuo") a la profesora o desarrolladora, siendo la autoridad humana la única capaz de cerrar el evento.
+*   **Declaración de Residuo y Desacuerdo Controlado:** Apoyándose en la investigación metodológica de Nicolás Rocchia (Ingeniería Adversarial y Residuos Declarados) y el marco sociotécnico de Raquel Garrido Arranz (prevención del *Sedentarismo Operativo* y *Espejismo de la Eficiencia*), la arquitectura evita consensos automatizados engañosos. El orquestador incorpora el *Freno Inteligente*; el flujo evaluativo PWA prevé incorporar el *Residuo Pedagógico* (`[D-057]`, pendiente en `[v0.5-003]`) para exponer incertidumbres a la profesora antes de la aprobación humana.
 *   **Brújula de Coherencia Arquitectónica:** Adoptando la recomendación de Fernando Parra Conde ("Prueba de los 6 meses"), toda la documentación (ADRs, Issues y Commits) se diseña para garantizar que el historial mantenga una fidelidad del 100% a la filosofía original del proyecto con el paso del tiempo.
 *   **Capa normativa determinista:** El sistema representa la normativa educativa aplicable mediante una estructura JSONB y aplica sobre ella validaciones programadas y trazables. Esta capa evita depender de la inclusión masiva de normativa en el prompt y permite que las reglas implementadas se ejecuten de forma determinista.
 *   **RAG semántico en evaluación:** El roadmap contempla evaluar un mecanismo de recuperación semántica para aportar al modelo de corrección de OpenCode un contexto acotado basado en los apuntes de la docente. Entre las alternativas exploradas se encuentra LightRAG, recomendado por Andrés Corbal Debén. Su adopción no está decidida: se condicionará a una evaluación de utilidad pedagógica, coste económico, consumo y complejidad operativa.
