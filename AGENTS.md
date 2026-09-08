@@ -70,6 +70,30 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
     * **Regla:** Queda terminantemente prohibido ejecutar a ciegas comandos de instalación (`pip install` o `npm install`) sugeridos por la IA.
     * **Obligación Humana:** La orquestadora debe verificar siempre de forma independiente que la librería sugerida existe realmente, es el paquete oficial y cuenta con mantenimiento activo antes de autorizar su instalación. El agente debe recordar esta precaución si propone añadir nuevas dependencias.
 
+## Regla 15 — Cierre de sesión, trabajo parcial y respaldo Git
+
+Se considera cierre de sesión cualquier pausa relevante: apagar, reiniciar o cerrar el equipo; terminar la jornada; cambiar de dispositivo; o dejar el proyecto hasta otro día.
+
+Al cerrar una sesión, comprobar la sincronización de ambos repositorios:
+
+```powershell
+# Desde api-correccion
+git status -sb
+
+# Repositorio privado Core
+Push-Location ..\api-correccion-core
+git status -sb
+Pop-Location
+```
+
+Interpretación y actuación:
+
+- Si ambos repositorios muestran únicamente `## rama...origin/rama`, sin `ahead`, `behind`, cambios (`M`, `A`, `D`) ni archivos sin seguimiento (`??`), los cambios versionados están sincronizados.
+- Si aparece `ahead N`, ejecutar `git push` en el repositorio afectado.
+- No ejecutar `git push` por rutina si no existen commits pendientes; comprobar siempre `git status -sb` antes.
+- Si una tarea está incompleta pero contiene un incremento coherente y validado, realizar un commit parcial trazable con Conventional Commit e identificador de backlog o ADR. No marcar la historia como completada.
+- Si el trabajo está experimental, roto o no es revisable, no forzar un commit `feat`. Conservar solo el trabajo útil; si se usa `git stash`, incluir `-u` para archivos sin seguimiento y recordar que el stash no protege frente a pérdida del equipo.
+- Los archivos ignorados, secretos, `.env`, bases de datos locales y otros activos no versionados requieren un respaldo externo cifrado. Nunca subir secretos al repositorio.
 
 ---
 
