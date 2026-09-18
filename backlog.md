@@ -876,6 +876,7 @@ Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificad
   3. ✅ **Seguridad de Secretos:** Sin API Keys reales en el historial de Git. `.env` bloqueado por `.gitignore`.
   4. ✅ **Licenciamiento:** Archivo `LICENSE` (Propietario — Todos los Derechos Reservados) presente en la raíz. Política Zero-GPL operativa (`[D-061]`).
   5. ✅ **README Onboarding:** Sección de instalación local completa (Docker, Alembic, Uvicorn, PWA frontend).
+  - **Script auxiliar de certificado SSL local (fuera de alcance de Issue 19):** Durante la validación manual end-to-end de la Issue 19 (subida autenticada, evaluación asíncrona y renderizado en `ResultsPanel`), se generó `scratch/generar_cert.py` para crear un certificado autofirmado (`key.pem`, `cert.pem`) y probar el acceso HTTPS desde un dispositivo móvil en la red local vía `192.168.1.243`. La prueba quedó bloqueada por un problema de firewall/red de Windows (`ERR_CONNECTION_ABORTED`) no relacionado con el código de la aplicación, y se pausó por no ser bloqueante para el cierre de la Issue 19. El script se conserva en `scratch/` (excluido de git) para una futura sesión de validación de acceso móvil vía HTTPS en red local.
 
 ---
 
