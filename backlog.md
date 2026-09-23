@@ -769,6 +769,34 @@
 
 **Etiquetas:** `v0.5` `frontend` `red`
 
+### [v0.5.1-001] Transmisión asíncrona PWA ↔ Backend — Completada (Issue #19)
+
+**Como** profesora,
+**quiero** que la PWA envíe la imagen ya anonimizada al backend de forma asíncrona
+**para** iniciar la corrección sin bloquear la interfaz y recibir su resultado estructurado.
+
+**Criterios de aceptación completados:**
+
+- [x] `CameraCapture.jsx` envía el Blob anonimizado mediante `FormData` a `POST /api/v1/submissions/upload-and-evaluate`.
+- [x] Estados de UI `Loading`, `Success` y `Error` gestionados sin bloquear ni romper la PWA.
+- [x] `ResultsPanel.jsx` realiza polling de `GET /api/v1/evaluaciones/{submission_id}` hasta recibir el resultado.
+- [x] Vite expone la PWA por HTTPS en LAN y proxifica `/api` hacia FastAPI local, evitando que el móvil resuelva `localhost` contra sí mismo.
+- [x] Flujo completo validado manualmente en portátil: captura → ofuscación Canvas → transmisión asíncrona → polling → renderizado.
+- [ ] La devolución autenticada en móvil se revalidará cuando exista sesión JWT en la PWA; queda fuera del alcance de #19.
+
+### [v0.5.1-002] Renderizado Glassmorphism de `EvaluacionIA` — Completada (Issue #19)
+
+**Como** docente,
+**quiero** visualizar la corrección formativa estructurada en una interfaz clara y moderna
+**para** interpretar rápidamente el análisis, la rúbrica, los marcadores y el siguiente paso accionable.
+
+**Criterios de aceptación completados:**
+
+- [x] `ResultsPanel.jsx` renderiza `qualitativeAnalysis`, `rubricBreakdown`, `visualMarkers` y `siguiente_paso_accionable`.
+- [x] UI Glassmorphism implementada con CSS nativo: paneles translúcidos, `backdrop-filter`, sombras y transiciones.
+- [x] Validación manual realizada en escritorio durante el flujo completo de evaluación.
+- [x] No se adoptó un gestor global de estado; se mantiene estado local de React conforme a YAGNI.
+- [ ] El visor paginado, la Declaración de Residuo Pedagógico y los marcadores interactivos siguen planificados en `v0.5-003` y `v0.5-004`.
 
 ---
 
@@ -876,6 +904,7 @@ Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificad
   3. ✅ **Seguridad de Secretos:** Sin API Keys reales en el historial de Git. `.env` bloqueado por `.gitignore`.
   4. ✅ **Licenciamiento:** Archivo `LICENSE` (Propietario — Todos los Derechos Reservados) presente en la raíz. Política Zero-GPL operativa (`[D-061]`).
   5. ✅ **README Onboarding:** Sección de instalación local completa (Docker, Alembic, Uvicorn, PWA frontend).
+  - **Script auxiliar de certificado SSL local (fuera de alcance de Issue 19):** Durante la validación manual end-to-end de la Issue 19 (subida autenticada, evaluación asíncrona y renderizado en `ResultsPanel`), se generó `scratch/generar_cert.py` para crear un certificado autofirmado (`key.pem`, `cert.pem`) y probar el acceso HTTPS desde un dispositivo móvil en la red local vía `192.168.1.243`. La prueba quedó bloqueada por un problema de firewall/red de Windows (`ERR_CONNECTION_ABORTED`) no relacionado con el código de la aplicación, y se pausó por no ser bloqueante para el cierre de la Issue 19. El script se conserva en `scratch/` (excluido de git) para una futura sesión de validación de acceso móvil vía HTTPS en red local.
 
 ---
 

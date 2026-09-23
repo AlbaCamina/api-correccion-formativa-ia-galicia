@@ -145,7 +145,15 @@ npm install
 npm run dev -- --host
 ```
 
-La interfaz estará disponible en `https://localhost:5173`. Para testear los componentes visuales:
+#### Desarrollo móvil en LAN y proxy API
+
+Vite se expone en la red local mediante `host: '0.0.0.0'` y mantiene HTTPS de
+desarrollo para habilitar la cámara en dispositivos móviles. El frontend usa rutas relativas bajo `/api`; Vite las reenvía a FastAPI local mediante el proxy de desarrollo hacia `http://127.0.0.1:8000`.
+
+Esto evita que el móvil interprete `localhost` como el propio dispositivo. En el portátil, la interfaz está disponible en `https://localhost:5173`. Para probarla desde la misma red Wi-Fi, abre `https://<IP-LAN-del-equipo>:5173` y acepta la advertencia del certificado de desarrollo si aparece.
+
+Para ejecutar los tests de los componentes visuales:
+
 ```bash
 npx vitest run
 ```
