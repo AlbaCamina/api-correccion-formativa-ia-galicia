@@ -230,14 +230,12 @@ const CameraCapture = () => {
       // Simulamos que file[] es soportado o mandamos un único archivo por ahora
       formData.append('file', blob, 'examen_capturado.jpg');
       formData.append('etapa', etapa);
-      formData.append('rubrica_id', 1); // Mock: En producción vendría del contexto/login
+      formData.append('rubrica_id', 4); // Mock: En producción vendría del contexto/login
       formData.append('modo_evaluacion', 'COMBINADO');
 
-      const response = await fetch('http://localhost:8000/api/v1/submissions/upload-and-evaluate', {
+      const response = await fetch('/api/v1/submissions/upload-and-evaluate', {
         method: 'POST',
         body: formData,
-        // Nota: en un entorno real incluiríamos headers de Auth:
-        // headers: { 'Authorization': 'Bearer ' + token }
       });
 
       if (!response.ok) {

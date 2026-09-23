@@ -79,3 +79,8 @@ smoke_test_llm.py
 smoke_test_qwen.py
 smoke_test_vision.py
 seed_db.py
+
+# Utilidad local para certificado HTTPS de desarrollo
+/generarcert.py
+/key.pem
+/cert.pem

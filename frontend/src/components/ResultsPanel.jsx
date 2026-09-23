@@ -20,7 +20,7 @@ const ResultsPanel = ({ submissionId, onReset }) => {
 
     const pollResult = async () => {
       try {
-        const res = await fetch(`http://localhost:8000/api/v1/evaluaciones/${submissionId}`);
+        const res = await fetch(`/api/v1/evaluaciones/${submissionId}`);
         if (res.ok) {
           const data = await res.json();
 

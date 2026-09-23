@@ -117,7 +117,6 @@ class EvaluacionIA(BaseModel):
         """
         try:
             pesos_validos = [item for item in self.rubricBreakdown if item.peso is not None and item.maxScore > 0]
-            
             if pesos_validos:
                 total_peso = sum(item.peso for item in pesos_validos)
                 if total_peso > 0:
@@ -130,7 +129,6 @@ class EvaluacionIA(BaseModel):
             # Silencioso en Pydantic para no romper la respuesta del LLM (fallback a lo devuelto por la IA)
             # Logueable externamente si fuera necesario
             pass
-            
         return self
 
     @model_validator(mode="after")
