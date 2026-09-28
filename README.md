@@ -39,7 +39,7 @@ graph TD
     subgraph Backend [2. Backend: FastAPI]
         Auth[Validador JWT]
         Router[API REST]
-        PBuilder[Prompt Builder<br>RAG Determinista]
+        PBuilder[Prompt Builder<br>IDC — Inyección<br>Determinista de Contexto]
         Pydantic[Pydantic v2]
     end
 
@@ -428,7 +428,7 @@ El desarrollo técnico ha sido acelerado utilizando herramientas de *Agentic Cod
 *   **PonyTail Coding (YAGNI):** La IA está bloqueada de realizar abstracciones prematuras o incluir dependencias redundantes.
 *   **Declaración de Residuo y Desacuerdo Controlado:** Apoyándose en la investigación metodológica de Nicolás Rocchia (Ingeniería Adversarial y Residuos Declarados) y el marco sociotécnico de Raquel Garrido Arranz (prevención del *Sedentarismo Operativo* y *Espejismo de la Eficiencia*), la arquitectura evita consensos automatizados engañosos. El orquestador incorpora el *Freno Inteligente*; el flujo evaluativo PWA prevé incorporar el *Residuo Pedagógico* (`[D-057]`, pendiente en `[v0.5-003]`) para exponer incertidumbres a la profesora antes de la aprobación humana.
 *   **Brújula de Coherencia Arquitectónica:** Adoptando la recomendación de Fernando Parra Conde ("Prueba de los 6 meses"), toda la documentación (ADRs, Issues y Commits) se diseña para garantizar que el historial mantenga una fidelidad del 100% a la filosofía original del proyecto con el paso del tiempo.
-*   **Capa normativa determinista:** El sistema representa la normativa educativa aplicable mediante una estructura JSONB y aplica sobre ella validaciones programadas y trazables. Esta capa evita depender de la inclusión masiva de normativa en el prompt y permite que las reglas implementadas se ejecuten de forma determinista.
+*   **Inyección Determinista de Contexto (IDC, [D-050]):** El sistema recupera la normativa educativa aplicable (Decretos 156/157/2022 de la Xunta de Galicia) y la rúbrica del docente mediante transacciones SQL por clave primaria exacta (`marco_id`, `rubrica_id`) e inyecta ese contexto estructurado directamente en el prompt del LLM. Este patrón —denominado *Structured Context Injection* o *Deterministic Context Augmentation* en la literatura— garantiza que el decreto que entra al modelo es exactamente el correspondiente, sin posibilidad de error de recuperación por similitud semántica. Es distinto del RAG vectorial: no hay indexación de embeddings ni búsqueda por relevancia para el contexto normativo.
 *   **RAG semántico en evaluación:** El roadmap contempla evaluar un mecanismo de recuperación semántica para aportar al modelo de corrección un contexto acotado basado en los materiales de la docente. Entre las alternativas exploradas se encuentra LightRAG. Su adopción no está decidida: dependerá de una evaluación de utilidad pedagógica, coste económico, consumo y complejidad operativa.
   
 ### 2. Implementación Histórica y Validación (*Fase Ninja*)
