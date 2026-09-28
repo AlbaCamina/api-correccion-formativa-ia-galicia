@@ -64,7 +64,7 @@
 | [D-051](#d-051) | Adopción de OpenAI (`gpt-4o-mini`) para Visión y retención de Groq para Texto (Workload Routing) | Ago 2026 | ✅ Adoptada |
 | [D-052](#d-052) | Asignación determinista de la cualitativa ESO en el backend (umbral de suelo); la regla de redondeo al entero de boletín es configuración de centro | Ago 2026 | ✅ Adoptada |
 | [D-053](#d-053) | Unificación del motor LLM en OpenAI (`gpt-4o-mini`) para texto e imagen tras deprecación de `llama-3.3-70b-versatile` en Groq y fallo de Qwen con JSON complejo | Ago 2026 | ✅ Adoptada |
-| [D-054](#d-054) | Limitación conocida del RAG Determinista v1: ausencia de materiales didácticos del docente como contexto evaluativo | Ago 2026 | ✅ Adoptada |
+| [D-054](#d-054) | Limitación conocida de la Inyección Determinista de Contexto (IDC) v1: ausencia de materiales didácticos del docente como contexto evaluativo | Ago 2026 | ✅ Adoptada |
 | [D-058](#d-058) | Stack Frontend: React + Vite + PWA como elección canónica para la interfaz del profesor | Ago 2026 | ✅ Adoptada |
 | [D-059](#d-059) | Estrategia de diseño UI: Glassmorphism oscuro + tokens CSS como sistema de diseño del frontend | Ago 2026 | ✅ Adoptada |
 | [D-060](#d-060) | Modelo de Licencia Propietaria ("Todos los Derechos Reservados") como protección de negocio SaaS | Ago 2026 | ✅ Adoptada |
@@ -1045,19 +1045,23 @@ Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `
 
 **Consecuencias:** Corrige el ejemplo JSON de `/api/v1/evaluate` en README.md y api_correccion_plan.md, que mostraban `"NA"` como valor inventado sin respaldo normativo. Requiere validador Pydantic que fuerce `None` si `etapa == "BACH"` independientemente de lo que devuelva el LLM.
 
-### D-050 — Estrategia de RAG Relacional (Determinista) vs RAG Vectorial
+### D-050 — Inyección Determinista de Contexto (IDC) vs. RAG Vectorial Semántico
 
 **Estado:** ✅ Adoptada  
-**Fecha:** 28/07/2026
+**Fecha:** 28/07/2026  
+**Corrección terminológica:** 28/09/2026 (el término "RAG Determinista" usado originalmente era técnicamente incorrecto; ver nota)
 
 **Contexto:** Para evaluar formativamente un texto, la IA necesita conocer la rúbrica del profesor y el marco legal asociado (criterios y saberes de la LOMLOE). La tendencia general de la industria para recuperar información externa es usar RAG (*Retrieval-Augmented Generation*) semántico mediante bases de datos vectoriales (ej. ChromaDB, Pinecone). Sin embargo, en el ámbito jurídico-educativo, recuperar un artículo de ley "semánticamente parecido" es inaceptable; se requiere el articulado exacto para garantizar la legalidad de la evaluación.
 
-**Decisión:** Se rechaza la adopción de bases de datos vectoriales para el núcleo del sistema. Se adopta una estrategia de **RAG Relacional (Determinista)**. La API recupera el contexto (Rúbrica del docente y marco normativo LOMLOE) mediante transacciones SQL precisas a través de sus `id` exactos en PostgreSQL (`rubrica_id`, `marco_id`). Estos datos estructurados se inyectan en caliente dentro del prompt que se envía a Groq.
+**Decisión:** Se rechaza la adopción de bases de datos vectoriales para el núcleo del sistema. Se adopta **Inyección Determinista de Contexto (IDC)**: la API recupera el contexto (rúbrica del docente y marco normativo LOMLOE) mediante transacciones SQL precisas a través de sus `id` exactos en PostgreSQL (`rubrica_id`, `marco_id`). Estos datos estructurados se inyectan directamente en el prompt que se envía al LLM.
+
+> [!NOTE]
+> **Corrección terminológica (28/09/2026):** El nombre original "RAG Relacional (Determinista)" usado en versiones anteriores de este ADR era un oxímoron técnico. La definición académica de RAG (*Retrieval-Augmented Generation*) exige tres fases obligatorias: indexación vectorial → recuperación por similitud → augmentación del prompt. En este sistema, la fase de "recuperación por similitud" no existe: el documento correcto se obtiene por clave primaria SQL (`rubrica_id`, `marco_id`), no por ranking de relevancia. El patrón correcto se denomina **Structured Context Injection** o **Deterministic Context Augmentation** en la literatura. El término IDC (Inyección Determinista de Contexto) se adopta como denominación interna del proyecto. El `[Roadmap-005]` y `[Roadmap-010]` sí implementarán RAG semántico real (con embeddings y vector store) para materiales didácticos del docente.
 
 **Consecuencias:**
-1. **YAGNI & Simplicidad:** No necesitamos añadir ni mantener microservicios extra para ChromaDB ni ejecutar modelos intermedios de *embeddings*.
-2. **Seguridad Legal:** La IA siempre evalúa con el 100% de la ley y los criterios vigentes inyectados de forma transaccional, eliminando la alucinación en la fase de recuperación de contexto (*Retrieval*).
-3. **Robustez Arquitectónica:** Proporciona un argumento sólido y demostrable ante auditorías técnicas para justificar que la API no sufre de "ruido semántico".
+1. **YAGNI & Simplicidad:** No necesitamos añadir ni mantener microservicios extra para ChromaDB ni ejecutar modelos intermedios de *embeddings* para el contexto normativo.
+2. **Seguridad Legal:** La IA siempre evalúa con el 100% de la ley y los criterios vigentes inyectados de forma transaccional, eliminando la posibilidad de error en la fase de recuperación de contexto.
+3. **Robustez Arquitectónica:** Proporciona un argumento sólido y demostrable ante auditorías técnicas para justificar que la API no sufre de "ruido semántico" en la recuperación del marco legal.
 
 ### D-051 — Adopción de OpenAI (`gpt-4o-mini`) para Visión y retención de Groq para Texto (Workload Routing)
 
@@ -1125,27 +1129,27 @@ Durante la Fase 5 de la Issue #12 se evaluaron dos opciones para hacer el tipo `
 
 ---
 
-### D-054
-## Limitación conocida del RAG Determinista v1: ausencia de materiales didácticos del docente como contexto evaluativo
+### D-054 — Limitación conocida de la Inyección Determinista de Contexto (IDC) v1: ausencia de materiales didácticos del docente como contexto evaluativo
 
 **Estado:** ✅ Adoptada (Limitación documentada)  
-**Fecha:** 18/08/2026
+**Fecha:** 18/08/2026  
+**Corrección terminológica:** 28/09/2026
 
 **Contexto:**  
-La arquitectura actual implementa un **RAG Determinista** (`[Roadmap-003]`): la normativa autonómica (Decretos 156/157/2022 de la Xunta de Galicia) y la rúbrica del docente se recuperan de PostgreSQL por `marco_id` y `rubrica_id` respectivos y se inyectan como contexto estructurado en el prompt del LLM. Esta estrategia fue validada técnicamente por el mentor de AESIA (Doctor en BBDD) durante la revisión del sistema en julio de 2026.
+La arquitectura actual implementa **Inyección Determinista de Contexto (IDC)** (`[D-050]`): la normativa autonómica (Decretos 156/157/2022 de la Xunta de Galicia) y la rúbrica del docente se recuperan de PostgreSQL por `marco_id` y `rubrica_id` respectivos y se inyectan como contexto estructurado en el prompt del LLM. Esta estrategia fue validada técnicamente por el mentor de AESIA (Doctor en BBDD) durante la revisión del sistema en julio de 2026.
 
-Sin embargo, esta aproximación tiene una **limitación pedagógica real e identificada por la propia autora del sistema**: al carecer de un RAG Semántico, el LLM evalúa al alumno dependiendo exclusivamente de su **Conocimiento Paramétrico** (lo que GPT-4o-mini memorizó en general sobre la materia durante su entrenamiento) sumado a las reglas del marco normativo y la rúbrica. El sistema **no tiene acceso** a los materiales específicos que el docente ha impartido. Al faltar este contexto, la IA es incapaz de establecer una **Línea Base (Baseline) de Profundidad** pedagógica adecuada, lo que puede provocar que asuma un nivel universitario o de bachillerato para un alumno de la ESO.
+Sin embargo, esta aproximación tiene una **limitación pedagógica real e identificada por la propia autora del sistema**: al inyectar solo el marco normativo y la rúbrica (sin los materiales que el docente ha impartido en el aula), el LLM evalúa al alumno dependiendo exclusivamente de su **Conocimiento Paramétrico** (lo que GPT-4o-mini memorizó en general sobre la materia durante su entrenamiento) sumado a las reglas del marco normativo y la rúbrica. El sistema **no tiene acceso** a los materiales específicos que el docente ha impartido. Al faltar este contexto, la IA es incapaz de establecer una **Línea Base (Baseline) de Profundidad** pedagógica adecuada, lo que puede provocar que asuma un nivel universitario o de bachillerato para un alumno de la ESO.
 
 Esto puede generar dos tipos de error evaluativo:
 1. **Falso negativo:** Penalizar a un alumno por no aplicar un concepto que el profesor aún no había explicado en clase.
 2. **Falso positivo:** Valorar positivamente una respuesta que el alumno ha copiado de una fuente externa que el profesor no reconoce como válida según su criterio de aula.
 
 **Opciones consideradas:**
-- **Ignorar la limitación y asumir que el conocimiento general del LLM es suficiente:** Aceptable en v1 donde el flujo HitL garantiza que el docente revisa y aprueba siempre la corrección antes de firmarla (`[D-002]`). El professor detectará manualmente cualquier desvío del contenido impartido.
-- **RAG Semántico con materiales del docente (`[Roadmap-005]`):** Permitir al docente subir apuntes, fragmentos del libro de texto y criterios de examen. El sistema los chunkea, los embebe (embeddings) y los indexa en un vector store. Antes de evaluar, recupera los fragmentos más relevantes a la pregunta del alumno y los inyecta como contexto adicional. Esta es la evolución natural pero introduce complejidad técnica significativa (pipeline de embeddings, vector store, chunking strategy) que supera el alcance del MVP v1.
+- **Ignorar la limitación y asumir que el conocimiento general del LLM es suficiente:** Aceptable en v1 donde el flujo HitL garantiza que el docente revisa y aprueba siempre la corrección antes de firmarla (`[D-002]`). El profesor detectará manualmente cualquier desvío del contenido impartido.
+- **RAG Semántico con materiales del docente (`[Roadmap-005]`):** Permitir al docente subir apuntes, fragmentos del libro de texto y criterios de examen. El sistema los chunkea, los embebe (embeddings) y los indexa en un vector store. Antes de evaluar, recupera los fragmentos más relevantes a la pregunta del alumno y los inyecta como contexto adicional. Esta sí es RAG en el sentido técnico completo (indexación → recuperación por similitud → augmentación), y es la evolución natural, pero introduce complejidad técnica significativa que supera el alcance del MVP v1.
 
 **Decisión:**  
-Se documenta formalmente como **limitación conocida y aceptada** de la v1 actual, mitigada por el flujo HitL obligatorio (`[D-002]`). La evolución hacia un **RAG Semántico con materiales didácticos del docente** se planifica como `[Roadmap-005]` en el `backlog.md`.
+Se documenta formalmente como **limitación conocida y aceptada** de la v1 actual, mitigada por el flujo HitL obligatorio (`[D-002]`). La evolución hacia **RAG Semántico real con materiales didácticos del docente** se planifica como `[Roadmap-005]` en el `backlog.md`.
 
 **Consecuencias:**  
 1. El `README.md` de v1.0 (`[v1.0-003]`) documentará esta limitación en la sección de arquitectura con honestidad técnica.
@@ -1400,6 +1404,7 @@ Se elimina la duplicidad de archivos ("Single Source of Truth"). La ejecución l
 *Actualizado el 25/08/2026 — añadida D-060 (Modelo de Licencia Propietaria para protección SaaS).*  
 *Actualizado el 25/08/2026 — añadida D-061 (Política Zero-GPL de dependencias y CLA).*  
 *Actualizado el 25/08/2026 — añadida D-062 (Patrón Showcase y Protección de Propiedad Intelectual).*  
+*Actualizado el 28/09/2026 — corrección terminológica en D-050 y D-054: el término "RAG Determinista/Relacional" era técnicamente incorrecto (RAG requiere indexación vectorial y recuperación por similitud, que no existen en este sistema). Se adopta IDC (Inyección Determinista de Contexto) como denominación precisa del patrón implementado (lookup SQL por clave primaria + augmentación del prompt). D-050 y D-054 actualizados con nota técnica de corrección y fecha.*
 *Actualizado el 26/08/2026 — añadida D-063 (Arquitectura de Guardarraíles Multinivel).*  
 *Actualizado el 28/08/2026 — añadida D-064 (Evolución a Patrón Open Core mediante Symlinks).*  
 *Total de decisiones registradas: 64*
