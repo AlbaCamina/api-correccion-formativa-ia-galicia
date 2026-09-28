@@ -890,6 +890,16 @@
 | Roadmap-009 | Compuerta Adversarial para Módulos Sensibles (D-035): Desacuerdo Controlado (Multi-LLM) restringido a cambios de alto riesgo para optimizar costes. (Candidato: Disensor CLI v1.0+ / Metodología: Nicolás Rocchia). | 🔮 Roadmap |
 | Roadmap-010 | Motor Híbrido *Light RAG* para inyección legal y normativa sin sobrecarga de tokens (Inspiración: Andrés de Quantia). | 🔮 Roadmap |
 
+> [!NOTE]
+> **Nota de diseño para `[Roadmap-001]` — Más allá de comprobar si la URL sigue viva:**
+> La experiencia documentada en proyectos de RAG normativo educativo en producción (septiembre 2026) revela que el DOG/BOE Tracker no puede limitarse a verificar la accesibilidad del enlace oficial. Los boletines oficiales presentan cuatro tipos de "minas normativas" que un rastreador ingenuo no detecta:
+> 1. **Artículos anulados judicialmente** cuyo texto sigue impreso en el PDF oficial publicado en el boletín (la anulación se registra en un número posterior; el PDF original permanece en línea sin modificar).
+> 2. **Páginas de un decreto que pertenecen a otra norma** (erratas de maquetación que una corrección de errores posterior elimina, pero el PDF original sigue sin actualizar).
+> 3. **Reales decretos derogados por agotamiento de vigencia** (con fecha de caducidad explícita en su texto, pero cuya URL sigue activa).
+> 4. **Normas formalmente derogadas pero aún aplicables** a módulos o ciclos con currículo de versión anterior (régimen de transitoriedad durante períodos de sustitución curricular).
+>
+> El índice de vigencia de `[Roadmap-001]` debe incluir un campo de metadatos por norma con al menos: `estado_validez` (`vigente | derogado | parcialmente_anulado | regimen_transitorio`), `anotaciones_judiciales` (referencias a sentencias que anulan artículos específicos), `correcciones_error_aplicadas` (números de boletín de fe de erratas que afectan al PDF original) y `descripcion_transitoriedad` (excepción de aplicabilidad residual). Una norma con cualquier matiz pendiente de verificación **no entra en la base de conocimiento** hasta que su estado esté confirmado. **Principio rector:** prefiero un hueco declarado a un dato inventado.
+
 
 ---
 
