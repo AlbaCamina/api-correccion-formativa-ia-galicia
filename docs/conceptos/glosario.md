@@ -323,8 +323,18 @@ Las dos estrategias de llevar información externa al LLM que usa o planifica es
 - **IDC — Inyección Determinista de Contexto ([D-050], Core actual):** El backend recupera la rúbrica del docente y el marco normativo LOMLOE mediante clave primaria exacta en PostgreSQL (`rubrica_id`, `marco_id`) y los inyecta directamente en el prompt. No hay búsqueda por similitud semántica, no hay vectores: el contexto correcto llega íntegro sin posibilidad de error de recuperación. **Esta estrategia NO es RAG** en el sentido técnico: no hay indexación de embeddings ni recuperación por relevancia.
 - **RAG Semántico ([Roadmap-005] y [Roadmap-010]):** Recuperación probabilística de fragmentos mediante embeddings y vector store, para encontrar los materiales de clase más relevantes a la pregunta del alumno. Esto sí es RAG en el sentido técnico completo (indexación → recuperación por similitud → augmentación). Planificado para inyectar apuntes y PDFs del docente como contexto pedagógico, estableciendo la *Línea Base de Profundidad* (Baseline) que fija el nivel de exigencia correcto para la edad del alumno.
 
+**Minas Normativas**  
+Término adoptado en este proyecto (inspirado en Edu Torregrosa, IES Dr. Lluís Simarro, septiembre 2026) para los cuatro tipos de trampas que hacen que un boletín oficial parezca válido pero no lo sea:
+1. **Artículo anulado judicialmente** cuyo PDF original sigue en línea sin modificar (la anulación se registra en un número posterior del boletín).
+2. **Errata de maquetación** corregida en un número posterior, pero el PDF original sigue sin actualizar.
+3. **Decreto con fecha de caducidad explícita** cuya URL sigue activa aunque haya expirado.
+4. **Norma formalmente derogada** que sigue siendo aplicable a determinados cursos o ciclos en régimen de transitoriedad durante períodos de sustitución curricular.
+
+El `[Roadmap-001]` (DOG/BOE Tracker) debe registrar el estado de cada norma con el campo `estado_validez` antes de permitir que entre en la base de conocimiento. Ver nota de diseño con los metadatos requeridos en `backlog.md`.
+
 **Prueba evaluable (Instrumento de evaluación)**  
 Cualquier evidencia de aprendizaje del alumno sometida a corrección formativa. En api-correccion-formativa-ia-galicia abarca los 3 formatos del aula moderna: papel manuscrito (foto), creación plástica/visual (foto de mural o cartulina) y entregas digitales (redacciones online o exportaciones PDF/PNG de presentaciones de Canva).
+
 
 **Simetría Lingüística (Bilingüismo co-oficial / Espejo lingüístico)**  
 Directriz imperativa de diseño pedagógico (`[D-036]`, `Regla 7` en `SYSTEM_PROMPT`) en sistemas educativos de comunidades con lengua co-oficial (como Galicia). Ordena al motor LLM detectar de forma automática el idioma vehicular (gallego normativo o castellano) en el que esté redactada la respuesta o prueba evaluable del alumno, y formular el 100% de los campos cualitativos de retorno (`reasoning`, `teacherSummary` y `siguiente_paso_accionable`) exactamente en ese mismo idioma. Evita que la IA responda por defecto en castellano ante entregas en gallego, sin exigir que la profesora seleccione interruptores manuales en la interfaz.
