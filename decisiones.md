@@ -66,7 +66,8 @@
 | [D-053](#d-053) | Unificación del motor LLM en OpenAI (`gpt-4o-mini`) para texto e imagen tras deprecación de `llama-3.3-70b-versatile` en Groq y fallo de Qwen con JSON complejo | Ago 2026 | ✅ Adoptada |
 | [D-054](#d-054) | Limitación conocida de la Inyección Determinista de Contexto (IDC) v1: ausencia de materiales didácticos del docente como contexto evaluativo | Ago 2026 | ✅ Adoptada |
 | [D-058](#d-058) | Stack Frontend: React + Vite + PWA como elección canónica para la interfaz del profesor | Ago 2026 | ✅ Adoptada |
-| [D-059](#d-059) | Estrategia de diseño UI: Glassmorphism oscuro + tokens CSS como sistema de diseño del frontend | Ago 2026 | ✅ Adoptada |
+| [D-058-A](#d-058-a) | Correccin de certificado SSL de desarrollo: extensin KeyUsage faltante (corrige alcance D-058) | Sep 2026 | ? Adoptada |
+  | [D-059](#d-059) | Estrategia de diseño UI: Glassmorphism oscuro + tokens CSS como sistema de diseño del frontend | Ago 2026 | ✅ Adoptada |
 | [D-060](#d-060) | Modelo de Licencia Propietaria ("Todos los Derechos Reservados") como protección de negocio SaaS | Ago 2026 | ✅ Adoptada |
 | [D-061](#d-061) | Política de Cuarentena de Dependencias (Zero-GPL) para blindaje comercial | Ago 2026 | ✅ Adoptada |
 | [D-062](#d-062) | Patrón Showcase y Protección de Propiedad Intelectual | Ago 2026 | ✅ Adoptada |
@@ -1255,6 +1256,22 @@ Se adopta **React + Vite** como framework y bundler del frontend, configurado co
 **Referencia cruzada:** D-007 (PWA estrategia móvil), D-008 (Stack general), `[v0.5-001]`.
 
 ---
+
+### D-058-A
+## Correccin de certificado SSL de desarrollo: extensin KeyUsage faltante
+
+**Fecha:** Septiembre 2026  
+**Estado:** ? Adoptada
+
+**Contexto:**  
+Durante la validacin end-to-end mvil de la PWA (Issue 19), la conexin HTTPS en red local hacia Chrome Android fall con el error ERR_CONNECTION_ABORTED. Inicialmente se atribuy a un bloqueo de firewall/red de Windows.
+
+**Decisin:**  
+Tras investigacin en el entorno local, se identific que Chrome Android exige criptografa estricta para conexiones HTTPS, rechazando certificados autofirmados que carecen de la extensin KeyUsage para soporte de firmas digitales, especialmente al utilizar cipher suites modernas (ECDHE_RSA). Se parche el script generarcert.py aadiendo explcitamente .add_extension(x509.KeyUsage(digital_signature=True, key_encipherment=True, ...), critical=True).
+
+**Consecuencias:**  
+- **Positivas:** La conexin HTTPS y la captura mvil nativa en Android fueron exitosas tras la regeneracin del certificado, validando que la arquitectura del frontend es funcional en dispositivos reales.
+- **Negativas:** La devolucin del resultado (polling) arroj HTTP 401 en mvil debido a la falta de persistencia del JWT en localStorage al suspenderse la pestaa, derivando en una nueva deuda tcnica documentada.
 
 ### D-059
 ## Estrategia de diseño UI: Sistema de tokens CSS + Glassmorphism oscuro
