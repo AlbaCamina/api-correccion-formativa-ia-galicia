@@ -4,7 +4,8 @@ pydantic[email]>=2.6.0
 pydantic-settings>=2.2.0
 
 openai>=1.14.0
-sqlalchemy>=2.0.28
+# <2.1: SQLAlchemy 2.1 usa psycopg v3 por defecto en postgresql:// (ver backlog.md, deuda de dependencias)
+sqlalchemy>=2.0.28,<2.1
 alembic>=1.13.1
 psycopg2-binary>=2.9.9
 pytest>=8.0.0
