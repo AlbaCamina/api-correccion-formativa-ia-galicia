@@ -1,7 +1,7 @@
 # api-correccion-formativa-ia-galicia 🎓⚡
 
 [![FastAPI](https://img.shields.io/badge/FastAPI-005571?style=flat&logo=fastapi)](https://fastapi.tiangolo.com/)
-[![Python 3.14+](https://img.shields.io/badge/Python-3.14%2B-blue?style=flat&logo=python)](https://www.python.org/)
+[![Python 3.14](https://img.shields.io/badge/Python-3.14-blue?style=flat&logo=python)](https://www.python.org/)
 [![PostgreSQL 16](https://img.shields.io/badge/PostgreSQL-16--Alpine-316192?style=flat&logo=postgresql)](https://www.postgresql.org/)
 [![OpenAI](https://img.shields.io/badge/LLM-OpenAI%20gpt--4o--mini-orange?style=flat)](https://openai.com/)
 [![Decretos 156/2022 e 157/2022](https://img.shields.io/badge/Normativa-Decretos%20156%2F2022%20e%20157%2F2022%20Galicia-lightblue?style=flat)](#)
@@ -79,7 +79,7 @@ graph TD
 
 ### Prerrequisitos
 
-*   Python 3.12 o superior (probado en Python 3.14 en entorno WSL)
+*   Python 3.14 (versión en la que se desarrolla y se ejecuta la suite de pruebas; otras versiones no están verificadas)
 *   Docker y Docker Compose (para el contenedor transaccional de PostgreSQL 16 Alpine)
 *   Entorno Linux / WSL (Windows Subsystem for Linux)
 
