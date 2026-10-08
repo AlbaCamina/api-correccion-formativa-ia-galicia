@@ -265,7 +265,7 @@
 - [x] SQLAlchemy configurado con connection pool (`backend/models/database.py`)
 - [x] Alembic configurado para migraciones (`alembic.ini` + `alembic/env.py`)
 - [x] Primera migración vacía ejecutada correctamente (`initial empty revision`)
-- [ ] *Nota de Deuda/Sincronización:* Generar y aplicar las revisiones de migración de Alembic para sincronizar el historial formal de migraciones con las columnas del esquema actual en BBDD (`estado_feed_forward` y `audit_metadata`) → ver `[v0.2-008]`.
+- [x] *Nota de Deuda/Sincronización:* Generar y aplicar las revisiones de migración de Alembic para sincronizar el historial formal de migraciones con las columnas del esquema actual en BBDD (`estado_feed_forward` y `audit_metadata`) → ver `[v0.2-008]`. Resuelto con la migración `326ff2789e2e` (22/07/2026).
 
 
 **Etiquetas:** `v0.2` `database` `infra`
@@ -494,8 +494,8 @@
 **para** operar de forma autónoma en modo local/stealth y escalar a Cloudinary cuando se requiera persistencia en nube.
 
 **Criterios de aceptación:**
-- [ ] Creación de servicio abstracto `StorageService` capaz de alternar de proveedor según la configuración en `.env`.
-- [ ] Si `STORAGE_PROVIDER=local`, las imágenes anonimizadas se sirven desde el sistema de archivos local (`/uploads`) y se registran en `submissions.archivos_urls` como rutas locales/relativas.
+- [x] Creación de servicio abstracto `StorageService` capaz de alternar de proveedor según la configuración en `.env`. *(`backend/services/storage_service.py`; Cloudinary es un stub deliberado, YAGNI.)*
+- [ ] Si `STORAGE_PROVIDER=local`, las imágenes anonimizadas se sirven desde el sistema de archivos local (`/uploads`) y se registran en `submissions.archivos_urls` como rutas locales/relativas. *Parcial: los archivos se guardan y se sirven desde `/uploads`; `submissions` no tiene campo `archivos_urls`.*
 - [ ] Si `STORAGE_PROVIDER=cloudinary`, las imágenes ya anonimizadas (`[v0.3-002]`) se suben a la nube vía SDK de Cloudinary y se almacena la lista de URLs públicas seguras en `submissions.archivos_urls`.
 - [ ] Eliminación de archivos temporales de trabajo tras completarse con éxito la subida o persistencia final (`Cold Storage` [D-021]).
 
@@ -503,18 +503,18 @@
 
 ---
 
-### [v0.3-004] Integración con Modelo Multimodal de Visión (`Groq LPU Vision` / Fallback)
+### [v0.3-004] Integración con Modelo Multimodal de Visión (`gpt-4o-mini` Vision, `[D-051]` `[D-053]`)
 
 **Como** profesora,  
 **quiero** que el sistema lea el examen manuscrito automáticamente desde la imagen anonimizada  
 **para** transcribir su contenido y evaluarlo contra la rúbrica sin intervención manual de picado de datos.
 
 **Criterios de aceptación:**
-- [ ] El cliente LLM (`llm_client.py`) incorpora soporte para modelos multimodales usando `gpt-4o-mini` en OpenAI (modelo Vision activo, ver [D-051]). El modelo soporta imagen vía URL o Base64 y Structured Outputs nativos para el JSON.
-- [ ] El servicio recupera `submissions.archivos_urls` (o rutas locales) y adjunta la imagen (en Base64 si es local o URL si es nube) al payload del prompt formativo.
-- [ ] El modelo multimodal retorna el contrato JSON estructurado (`EvaluacionIA`), incluyendo la transcripción fiel (`transcription`) del examen manuscrito.
-- [ ] Si la caligrafía presenta tramos ilegibles, el modelo los marca pedagógicamente con `[ILEGIBLE]` y sus coordenadas aproximadas sin romper la validación Pydantic del contrato.
-- [ ] El resultado y los marcadores visuales (`visualMarkers`) calculados se guardan en `evaluaciones.resultado_ia`.
+- [x] El cliente LLM (`llm_client.py`) incorpora soporte para modelos multimodales usando `gpt-4o-mini` en OpenAI (modelo Vision activo, ver [D-051]). El modelo soporta imagen vía URL o Base64 y Structured Outputs nativos para el JSON.
+- [ ] El servicio recupera `submissions.archivos_urls` (o rutas locales) y adjunta la imagen (en Base64 si es local o URL si es nube) al payload del prompt formativo. *Pendiente: el pipeline actual transcribe con `vision_service` a partir de los bytes subidos y evalúa el texto; no reenvía la imagen desde `archivos_urls` al prompt de evaluación.*
+- [x] El modelo multimodal retorna el contrato JSON estructurado (`EvaluacionIA`), incluyendo la transcripción fiel (`transcription`) del examen manuscrito.
+- [ ] Si la caligrafía presenta tramos ilegibles, el modelo los marca pedagógicamente con `[ILEGIBLE]` y sus coordenadas aproximadas sin romper la validación Pydantic del contrato. *Parcial: `[ILEGIBLE]` implementado en `vision_service`; coordenadas aproximadas no implementadas.*
+- [x] El resultado y los marcadores visuales (`visualMarkers`) calculados se guardan en `evaluaciones.resultado_ia`.
 
 **Etiquetas:** `v0.3` `backend` `ia` `vision`
 
@@ -763,9 +763,9 @@
 **Criterios de aceptación:**
 - [ ] Soporte para procesar múltiples folios por entrega (gestión de arrays de imágenes).
 - [ ] Vista previa y reordenación de folios antes de confirmar (opcional para v0.5).
-- [ ] **Selector obligatorio de `etapa` (ESO/BACH):** La interfaz bloquea el envío y exige seleccionar la etapa educativa, alineándose con el *Breaking Change* de backend (`[D-041]`) para prevenir errores HTTP 422.
-- [ ] Botón de envío que transmite el array de imágenes anonimizadas y datos a `POST /api/v1/submissions` mediante `fetch`.
-- [ ] Indicador de carga bloqueante (Spinner) mientras el servidor sube la imagen y encola la corrección asíncrona.
+- [x] **Selector obligatorio de `etapa` (ESO/BACH):** La interfaz bloquea el envío y exige seleccionar la etapa educativa, alineándose con el *Breaking Change* de backend (`[D-041]`) para prevenir errores HTTP 422.
+- [x] Botón de envío que transmite la imagen anonimizada y los datos a `POST /api/v1/submissions/upload-and-evaluate` mediante `fetch` (Issue #19). *El envío de arrays de imágenes depende del criterio de multi-folio, aún abierto.*
+- [x] Indicador de carga bloqueante (Spinner) mientras el servidor sube la imagen y encola la corrección asíncrona.
 
 **Etiquetas:** `v0.5` `frontend` `red`
 
@@ -782,7 +782,7 @@
 - [x] `ResultsPanel.jsx` realiza polling de `GET /api/v1/evaluaciones/{submission_id}` hasta recibir el resultado.
 - [x] Vite expone la PWA por HTTPS en LAN y proxifica `/api` hacia FastAPI local, evitando que el móvil resuelva `localhost` contra sí mismo.
 - [x] Flujo completo validado manualmente en portátil: captura → ofuscación Canvas → transmisión asíncrona → polling → renderizado.
-- [ ] La devolución autenticada en móvil se revalidará cuando exista sesión JWT en la PWA; queda fuera del alcance de #19.
+- [-] La devolución autenticada en móvil se revalidará cuando exista sesión JWT en la PWA; queda fuera del alcance de #19.
 
 ### [v0.5.1-002] Renderizado Glassmorphism de `EvaluacionIA` — Completada (Issue #19)
 
@@ -796,7 +796,7 @@
 - [x] UI Glassmorphism implementada con CSS nativo: paneles translúcidos, `backdrop-filter`, sombras y transiciones.
 - [x] Validación manual realizada en escritorio durante el flujo completo de evaluación.
 - [x] No se adoptó un gestor global de estado; se mantiene estado local de React conforme a YAGNI.
-- [ ] El visor paginado, la Declaración de Residuo Pedagógico y los marcadores interactivos siguen planificados en `v0.5-003` y `v0.5-004`.
+- [-] El visor paginado, la Declaración de Residuo Pedagógico y los marcadores interactivos siguen planificados en `v0.5-003` y `v0.5-004`.
 
 ---
 
