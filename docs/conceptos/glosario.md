@@ -221,6 +221,8 @@ Tabla de auditoría que registra todas las acciones importantes del sistema con 
 **Connection pool**  
 Conjunto de conexiones abiertas a la base de datos que se mantienen activas y se reutilizan entre peticiones en lugar de abrir y cerrar una conexión física con cada endpoint. En api-correccion-formativa-ia-galicia se implementa nativamente en `backend/models/database.py` (`pool_size=10, max_overflow=20`), evitando saturar PostgreSQL y garantizando latencias mínimas en concurrencia (`[D-030]`).
 
+**DetachedInstanceError y Ciclo de Vida ORM (`expire_on_commit`)**  
+Excepción característica de SQLAlchemy ORM. Ocurre cuando el código intenta acceder a los atributos de un objeto cuyos datos han sido expirados tras un `session.commit()` o cuyo contexto transaccional se ha cerrado con `session.close()`. Al quedar el objeto "desvinculado" (*detached*) de una sesión viva, SQLAlchemy no puede consultar la base de datos para recargar el atributo bajo demanda. Se mitiga desacoplando los atributos en esquemas Pydantic antes de cerrar la sesión, reasociando la instancia con `session.merge()`, o configurando `expire_on_commit=False` en factories de sesión (`sessionmaker`) durante tests unitarios.
 
 **CRUD** (Create, Read, Update, Delete — Crear, Leer, Actualizar, Eliminar)  
 Las cuatro operaciones básicas sobre cualquier dato. Decir "CRUD completo" significa que se pueden hacer las cuatro.
@@ -754,6 +756,9 @@ Estrategia de arquitectura de pruebas (`[D-056]`) que combina dos capas compleme
 - **Capa 1 (Unitarios TDD)**: Ejecución ultra-rápida (<4s) utilizando SQLite en memoria RAM (`sqlite:///:memory:`) para el desarrollo diario, permitiendo refactorizar e iterar sin necesidad de depender de contenedores ni contaminar los datos locales del desarrollador.
 - **Capa 2 (Integración CI/CD)**: Ejecución automatizada en la v0.5 (`[v0.5-007]`) utilizando un esquema/contenedor vaciado de PostgreSQL 16 Alpine en Docker. Esta capa ejecuta las migraciones reales de Alembic (`alembic upgrade head`) para validar la sintaxis DDL y el comportamiento estricto de tipos de datos avanzados (`JSONB`).
 
+**Entorno Limpio (Clean Environment Isolation)**  
+Protocolo empírico de validación (Pilar 3 de `[D-035]`) que exige verificar la reproducibilidad de una aplicación levantando un entorno virtual efímero e instalando estrictamente las dependencias declaradas en `requirements.txt` desde cero. Desmiente el sesgo clásico de *"funciona en mi máquina"*: un conjunto de tests en verde en un `.venv` local preexistente no constituye evidencia válida si no se demuestra que una instalación aislada resuelve versiones compatibles sin dependencias fantasma o preinstaladas.
+
 **GitHub Actions**  
 Plataforma de automatización y CI/CD integrada directamente en GitHub. Mediante archivos de configuración YAML (ubicados en `.github/workflows/`), permite definir flujos de trabajo (*workflows*) que se disparan ante eventos del repositorio (como un `git push` o un `Pull Request`), ejecutando tests automatizados en contenedores Docker y desplegando la API sin intervención manual.
 
@@ -783,6 +788,9 @@ Segunda capa de verificación y redacción en PWA (`[D-034]`). Además del recor
 
 **Hacheo Unidireccional (`bcrypt` / Password Hashing)**  
 Algoritmo criptográfico irreversible (de un solo sentido) utilizado en `backend/services/auth_service.py` para almacenar las contraseñas (`hashed_password`) en la tabla `profesores` (`[v0.2-002]`). A diferencia del cifrado simétrico, no requiere ni depende de ninguna clave maestra secreta en `.env` para funcionar; aplica un cálculo matemático complejo sobre la contraseña (`salt + hash`). Para validar un login, el motor aplica la misma fórmula al texto ingresado y compara los hashes resultantes, garantizando seguridad absoluta ante filtraciones y cero riesgo de pérdida por reinicios o migraciones de servidor.
+
+**Extensión KeyUsage en Certificados X.509 (TLS/SSL Móvil)**  
+Campo normativo del estándar X.509 (`[D-058-A]`) que restringe los propósitos criptográficos para los que se autoriza una clave pública (ej. `digital_signature`, `key_encipherment`). Mientras que Chrome Desktop es tolerante con certificados autofirmados rudimentarios en red local emitiendo advertencias eludibles, Chrome para Android aplica rigor criptográfico estricto y bloquea la conexión (`ERR_CONNECTION_ABORTED`) con suites ECDHE si el certificado no declara explícitamente `KeyUsage(digital_signature=True)`.
 
 **Trust, but verify (Confía, pero verifica)**  
 Regla de oro fundamental en ciberseguridad, auditoría e ingeniería con Inteligencia Artificial. Consiste en el principio de no asumir nunca que un proceso automatizado (como un despliegue CI/CD, una integración de git, o la respuesta de un Agente IA autónomo) es correcto por defecto sin someterlo a comprobación empírica. Implica validar siempre mediante revisión de código, inspección del árbol de archivos o pruebas de caja blanca para garantizar la integridad y soberanía de los datos antes de pasar a producción.

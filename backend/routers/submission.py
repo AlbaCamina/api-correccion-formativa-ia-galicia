@@ -259,6 +259,28 @@ def listar_submissions(
     return query.all()
 
 
+@router.get("/{submission_id}", response_model=SubmissionResponse)
+def obtener_submission(
+    submission_id: str,
+    db: Session = Depends(get_db),
+    current_profesor: Profesor = Depends(get_current_profesor),
+):
+    """
+    Obtiene el detalle de una entrega específica perteneciente al docente.
+    Incluye estado, metadatos y lista de archivos_urls anonimizados (v0.3-003, D-022).
+    """
+    sub = db.query(Submission).filter(
+        Submission.id == submission_id,
+        Submission.profesor_id == current_profesor.id,
+    ).first()
+    if not sub:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Entrega no encontrada."
+        )
+    return sub
+
+
 def validar_recorte_cabecera(file_bytes: bytes, filename: str):
     _, ext = os.path.splitext(filename.lower())
     if ext in {".pdf"}:
@@ -530,6 +552,7 @@ async def upload_and_evaluate(
         rubrica_id=rubrica.id,
         alumno_id=alumno_id,
         adaptaciones_alumno=adaptaciones,
+        archivos_urls=[url],
         estado="ANALYZING"
     )
     db.add(submission)

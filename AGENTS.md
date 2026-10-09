@@ -30,6 +30,7 @@ Este archivo proporciona contexto persistente para cualquier Agente de Inteligen
      1. **Diseño:** Decisión o directriz arquitectónica clara registrada en `decisiones.md` (ADR).
      2. **Implementación:** Código actualizado, coherente con la decisión, en modelos/routers/servicios.
      3. **Evidencia:** Pruebas automatizadas (`pytest`) en verde en entorno limpio.
+        * **Definición estricta de "Entorno Limpio":** No equivale a ejecutar sobre el `.venv` local existente con dependencias preinstaladas. Exige verificar empíricamente que una instalación desde cero a partir de `requirements.txt` en un entorno aislado instala dependencias compatibles y ejecuta la suite completa de pruebas en verde (0 fallos). El Agente tiene terminantemente prohibido afirmar que las pruebas pasan en "entorno limpio" si solo las ha verificado en el entorno local de desarrollo.
      4. **Documentación:** `README.md` y `backlog.md` sincronizados y cualquier deuda técnica residual explícita.
    * **Trazabilidad humana:** El agente nunca atribuye a la IA acciones persistidas de cambio de estado en BBDD cuando el flujo normativo exige autorización docente (`HitL`). La IA puede proponer y aportar contexto en `audit_metadata`; el `actor` que firma cambios formativos es siempre humano (profesor o alumno, según el caso).
 7. **Auto-Revisión Obligatoria Pre-Entrega (*Self-Review Gate*):**

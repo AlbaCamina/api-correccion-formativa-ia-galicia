@@ -7,7 +7,7 @@ Hito [v0.2-005] y ADR [D-002], [D-023], [D-024], [D-026].
 """
 import uuid
 from datetime import datetime, timezone
-from typing import Any, Dict, Optional
+from typing import Any, Dict, List, Optional
 
 from sqlalchemy import Column, Integer, String, JSON, ForeignKey, DateTime, Float, Boolean
 from sqlalchemy.orm import relationship
@@ -43,6 +43,9 @@ class Submission(Base):
     
     # Campo flexible JSONB para guardar adaptaciones del alumno (DEA/ACNS/ACS) según Decreto 229/2011
     adaptaciones_alumno = Column(JSON, nullable=True)
+
+    # Rutas o URLs relativas/públicas de las imágenes anonimizadas del examen (D-021, D-022)
+    archivos_urls = Column(JSON, nullable=True)
     
     # Estados del ciclo de vida de la corrección
     estado = Column(String(50), default="PENDING", nullable=False)
@@ -119,6 +122,7 @@ class SubmissionCreate(BaseModel):
     rubrica_id: int = Field(..., description="ID de la rúbrica del docente requerida para evaluar.")
     alumno_id: Optional[str] = Field(None, max_length=100, description="Identificador seudonimizado del alumno (RGPD).")
     adaptaciones_alumno: Optional[Dict[str, Any]] = Field(None, description="Adaptaciones NEAE configuradas.")
+    archivos_urls: Optional[List[str]] = Field(None, description="Lista de rutas de folios ya subidos/anonimizados.")
 
 
 class SubmissionResponse(BaseModel):
@@ -131,6 +135,7 @@ class SubmissionResponse(BaseModel):
     rubrica_id: int = Field(..., description="ID de la rúbrica utilizada.")
     alumno_id: Optional[str] = Field(..., description="Identificador anónimo del alumno.")
     adaptaciones_alumno: Optional[Dict[str, Any]] = Field(..., description="Adaptaciones asociadas.")
+    archivos_urls: Optional[List[str]] = Field(None, description="Lista de rutas o URLs de los folios del examen.")
     estado: str = Field(..., description="Estado del ciclo de vida (PENDING/ANALYZING/REVIEW/GRADED).")
     estado_feed_forward: str = Field(
         ...,

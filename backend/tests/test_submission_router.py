@@ -23,7 +23,7 @@ engine = create_engine(
     connect_args={"check_same_thread": False},
     poolclass=StaticPool,
 )
-TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, expire_on_commit=False, bind=engine)
 
 
 class TestSubmissionRouter(unittest.TestCase):
@@ -316,6 +316,47 @@ class TestSubmissionRouter(unittest.TestCase):
         ).first()
         self.assertIsNotNone(log_err)
         self.assertIn("Fallo simulado en LLM", log_err.audit_metadata["error_detail"])
+
+    def test_upload_and_evaluate_persists_archivos_urls(self):
+        """Valida que la subida persista la lista de rutas en submissions.archivos_urls (v0.3-003, D-022)."""
+        img = Image.new("RGB", (100, 100), color="white")
+        img_byte_arr = io.BytesIO()
+        img.save(img_byte_arr, format="PNG")
+        img_bytes = img_byte_arr.getvalue()
+
+        response = self.client.post(
+            "/api/v1/submissions/upload-and-evaluate",
+            files={"file": ("cropped_archivos.png", img_bytes, "image/png")},
+            data={
+                "rubrica_id": 1,
+                "etapa": "BACH",
+                "modo_evaluacion": "COMBINADO",
+                "alumno_id": "ALU-ARCHIVOS-01"
+            }
+        )
+
+        self.assertEqual(response.status_code, 202)
+        sub_id = response.json()["submission_id"]
+
+        sub_db = self.db.query(Submission).filter(Submission.id == sub_id).first()
+        self.assertIsNotNone(sub_db)
+        self.assertIsNotNone(sub_db.archivos_urls)
+        self.assertIsInstance(sub_db.archivos_urls, list)
+        self.assertEqual(len(sub_db.archivos_urls), 1)
+        self.assertTrue(sub_db.archivos_urls[0].startswith("/uploads/"))
+
+        # Verificar que GET /api/v1/submissions/{id} expone archivos_urls en el schema
+        get_res = self.client.get(f"/api/v1/submissions/{sub_id}")
+        self.assertEqual(get_res.status_code, 200)
+        get_data = get_res.json()
+        self.assertEqual(get_data["id"], sub_id)
+        self.assertEqual(get_data["archivos_urls"], sub_db.archivos_urls)
+
+    def test_get_submission_by_id_not_found(self):
+        """Valida que consultar una submission inexistente retorne HTTP 404."""
+        response = self.client.get("/api/v1/submissions/non-existent-uuid")
+        self.assertEqual(response.status_code, 404)
+        self.assertIn("Entrega no encontrada", response.json()["detail"])
 
 
 if __name__ == "__main__":
