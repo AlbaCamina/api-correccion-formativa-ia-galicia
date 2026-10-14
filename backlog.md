@@ -889,6 +889,8 @@
 | Roadmap-008 | PWA UX: Refactorización de `imageCrop` hacia una librería avanzada (ej. `cropperjs`) con bounding box móvil e historial de estados (Undo/Redo). | 🔮 Roadmap |
 | Roadmap-009 | Compuerta Adversarial para Módulos Sensibles (D-035): Desacuerdo Controlado (Multi-LLM) restringido a cambios de alto riesgo para optimizar costes. (Candidato: Disensor CLI v1.0+ / Metodología: Nicolás Rocchia). | 🔮 Roadmap |
 | Roadmap-010 | Motor Híbrido *Light RAG* para inyección legal y normativa sin sobrecarga de tokens (Inspiración: Andrés de Quantia). | 🔮 Roadmap |
+| Roadmap-011 | Sesiones de corrección por grupo-clase (`[v0.6-001]`) | 🔮 Roadmap |
+| Roadmap-012 | Hardening de seguridad LLM (OWASP Top 10 for LLMs — LLM01): Detección y mitigación de Prompt Injection indirecto en respuestas del alumnado (ADR previo pendiente) | 🔮 Roadmap |
 
 > [!NOTE]
 > **Nota de diseño para `[Roadmap-001]` — Más allá de comprobar si la URL sigue viva:**
@@ -927,5 +929,6 @@ Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificad
 *Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] e incorporadas historias de cierre v0.2 y demo HitL pre-auditoría (`[v0.2-008]`, `[v0.2-009]`, `[v0.2-010]`).*  
 *Total de historias: 34 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 3*  
 *Actualizado el 20/07/2026 — Auditoría normativa LOMLOE (D-040–D-045): etapa obligatoria ESO/BACH, escala BE/NA, media ponderada en backend (issue #10, PR #11).*  
-*Actualizado el 10/08/2026 — [Roadmap-002] añadido TrOCR como candidato alternativo a Tesseract para Capa 1 PII (caligrafía manuscrita). [D-051] registrado en decisiones.md.*
+*Actualizado el 10/08/2026 — [Roadmap-002] añadido TrOCR como candidato alternativo a Tesseract para Capa 1 PII (caligrafía manuscrita). [D-051] registrado en decisiones.md.*  
+*Actualizado el 14/10/2026 — [Roadmap-012] incorporado hardening de seguridad LLM (OWASP Top 10 for LLMs — LLM01: Prompt Injection indirecto en exámenes).*
 
