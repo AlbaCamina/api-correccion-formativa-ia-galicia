@@ -800,6 +800,23 @@
 
 ---
 
+### [v0.5-009] Autenticación JWT en PWA, Selector Dinámico de Rúbrica y Robustez de Polling Asíncrono (Deuda Issue #19)
+
+**Como** profesora,  
+**quiero** iniciar sesión en la PWA, elegir dinámicamente mi rúbrica y recibir un aviso claro si el procesamiento en segundo plano falla  
+**para** poder evaluar desde el móvil o el portátil sin depender de fixtures locales ni quedar bloqueada en un estado de carga infinito.
+
+**Criterios de aceptación:**
+- [ ] Inicio de sesión real en la PWA (`/api/v1/auth/login-json`) con persistencia del token JWT en `localStorage` para evitar pérdida de sesión al suspenderse la pestaña en móvil (`[D-058-A]`).
+- [ ] Cabecera `Authorization: Bearer <token>` inyectada tanto en la subida (`POST /api/v1/submissions/upload-and-evaluate` en `CameraCapture.jsx`) como en el polling (`GET /api/v1/evaluaciones/{submission_id}` en `ResultsPanel.jsx`).
+- [ ] Carga de las rúbricas del docente autenticado (`GET /api/v1/rubricas`), selector de rúbrica en la UI y eliminación del fixture temporal `formData.append('rubrica_id', 4)` en `CameraCapture.jsx`.
+- [ ] **Corte de polling ante fallo asíncrono (`submission.estado == "ERROR"`):** `GET /api/v1/evaluaciones/{submission_id}` comprueba si `submission.estado in {"ERROR", "FAILED"}` y devuelve un error HTTP explícito (distinto de `404`), permitiendo que `ResultsPanel.jsx` detenga el `setInterval` y muestre el error en lugar de quedar en bucle infinito de *"Analizando con IA..."* (enfoque YAGNI sin doble petición en cliente). Incluye test en `test_evaluation_router.py`.
+- [ ] Revisión y control del límite de salida del modelo (`LengthFinishReasonError` / `max_completion_tokens`) en el pipeline asíncrono ante imágenes capturadas desde móvil, más revalidación end-to-end autenticada en LAN HTTPS.
+
+**Etiquetas:** `v0.5` `frontend` `backend` `auth` `tech-debt`
+
+---
+
 ## 🏆 Versión 1.0 — MVP Completo y Desplegado
 
 **Objetivo:** El producto está desplegado en una URL pública, documentado y listo para ser mostrado en portfolio y al auditor externo.
@@ -922,13 +939,16 @@ Ver AUDITORIA.md, sección 4, fila "Alembic (migraciones reales)" — clasificad
   4. ✅ **Licenciamiento:** Archivo `LICENSE` (Propietario — Todos los Derechos Reservados) presente en la raíz. Política Zero-GPL operativa (`[D-061]`).
   5. ✅ **README Onboarding:** Sección de instalación local completa (Docker, Alembic, Uvicorn, PWA frontend).
   - **Script auxiliar de certificado SSL local (fuera de alcance de Issue 19):** Durante la validación manual end-to-end de la Issue 19 (subida autenticada, evaluación asíncrona y renderizado en `ResultsPanel`), se generó `scratch/generar_cert.py` para crear un certificado autofirmado (`key.pem`, `cert.pem`) y probar el acceso HTTPS desde un dispositivo móvil en la red local vía `192.168.1.243`. Se validó exitosamente la conexión y captura HTTPS móvil tras añadir la extensión KeyUsage al certificado ([D-058-A]). El script se conserva en `scratch/` (excluido de git) para una futura sesión de validación de acceso móvil vía HTTPS en red local.
+- **Fixture temporal `rubrica_id: 4` y falta de sesión JWT en la PWA (Deuda Issue #19 → `[v0.5-009]`):** `CameraCapture.jsx` mantiene temporalmente `formData.append('rubrica_id', 4); // Mock: En producción vendría del contexto/login` y tanto la subida como el polling en `ResultsPanel.jsx` se envían sin cabecera `Authorization: Bearer`. El ID `4` solo existe en el PostgreSQL local de desarrollo (`profesor_id: 3`). Requiere implementar autenticación PWA con persistencia en `localStorage` (`[D-058-A]`) y selector dinámico de rúbrica antes de cualquier despliegue o demo compartida.
+- **Polling infinito en `ResultsPanel.jsx` cuando la tarea asíncrona pasa a `ERROR` y límite de salida del LLM (verificado el 16/10/2026 → `[v0.5-009]`):** Cuando `procesar_evaluacion_en_segundo_plano` (`backend/routers/submission.py`) falla (por ejemplo, al alcanzar el límite de salida del modelo en OpenAI durante una prueba móvil), captura la excepción, actualiza `submission.estado = "ERROR"` y registra `IA_EVALUATION_ERROR` en `ChangeLog`, pero no crea registro en la tabla `evaluaciones`. Como `GET /api/v1/evaluaciones/{submission_id}` (`backend/routers/evaluation.py`) no inspecciona `submission.estado`, responde `HTTP 404` indefinidamente (el mismo código que devuelve mientras `estado == "ANALYZING"`), provocando que `ResultsPanel.jsx` (`else if (res.status !== 404)`) nunca detenga el polling. Solución YAGNI acordada en `[v0.5-009]`: comprobar `submission.estado in {"ERROR", "FAILED"}` en `obtener_evaluacion` para retornar un error HTTP distinto de `404` que detenga automáticamente el polling en el cliente, y revisar el límite de tokens de salida del modelo.
 
 ---
 
 *Arquitectura y Criterios de Aceptación diseñados por Alba Camiña García. Formateo y revisión asistidos por Antigravity (IA Copilot).*  
 *Actualizado el 16/07/2026 — Sincronizadas transiciones formativas [D-026] e incorporadas historias de cierre v0.2 y demo HitL pre-auditoría (`[v0.2-008]`, `[v0.2-009]`, `[v0.2-010]`).*  
-*Total de historias: 34 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 3*  
+*Total de historias: 35 | Versiones: 6 (0.1 → 1.0) | Ítems en Roadmap: 3*  
 *Actualizado el 20/07/2026 — Auditoría normativa LOMLOE (D-040–D-045): etapa obligatoria ESO/BACH, escala BE/NA, media ponderada en backend (issue #10, PR #11).*  
 *Actualizado el 10/08/2026 — [Roadmap-002] añadido TrOCR como candidato alternativo a Tesseract para Capa 1 PII (caligrafía manuscrita). [D-051] registrado en decisiones.md.*  
-*Actualizado el 14/10/2026 — [Roadmap-012] incorporado hardening de seguridad LLM (OWASP Top 10 for LLMs — LLM01: Prompt Injection indirecto en exámenes).*
+*Actualizado el 14/10/2026 — [Roadmap-012] incorporado hardening de seguridad LLM (OWASP Top 10 for LLMs — LLM01: Prompt Injection indirecto en exámenes).*  
+*Actualizado el 16/10/2026 — `[v0.5-009]` registrado: autenticación JWT en PWA, selector dinámico de rúbrica (retirada de fixture `rubrica_id: 4`), corte de polling ante estado `ERROR` en `GET /api/v1/evaluaciones/{submission_id}` y control de límite de salida del modelo.*
 
